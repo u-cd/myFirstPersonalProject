@@ -3,6 +3,10 @@ services:
   app:
     build: .
     ports:
-      - "80:3000"
+      - "3000:3000"
     environment:
       - NODE_ENV=production
+    env_file:
+      - .env
+    volumes:
+      - ./public:/usr/src/app/public
