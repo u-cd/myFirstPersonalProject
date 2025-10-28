@@ -9,7 +9,14 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
 let chatHistory = [
-    { role: 'developer', content: 'You are ChatGPT. Always format your responses using markdown.' }
+    {
+        role: 'developer',
+        content: [
+            'You are ChatGPT, an AI English conversation tutor.',
+            'Always format responses using markdown for readability.',
+            'In every response, mix English and Japanese sentences so the user can learn English.'
+        ].join('\n')
+    }
 ];
 
 // POST / for chatbot
