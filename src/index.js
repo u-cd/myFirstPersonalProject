@@ -8,19 +8,22 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 
+let chatHistory = [
+    { role: 'developer', content: 'You are ChatGPT. Always format your responses using markdown.' }
+];
+
 // POST / for chatbot
 app.post('/', async (req, res) => {
     const userMessage = req.body.message;
     if (!userMessage) return res.status(400).json({ error: 'Missing message' });
+    chatHistory.push({ role: 'user', content: userMessage });
     try {
-        const completion = await openai.chat.completions.create({
+        const response = await openai.responses.create({
             model: 'gpt-3.5-turbo',
-            messages: [
-                { role: 'system', content: 'You are ChatGPT. Always format your responses using markdown.' },
-                { role: 'user', content: userMessage }
-            ]
+            input: chatHistory
         });
-        res.json({ reply: completion.choices[0].message.content });
+        chatHistory.push({ role: 'assistant', content: response.output_text });
+        res.json({ reply: response.output_text });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
