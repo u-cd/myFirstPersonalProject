@@ -14,8 +14,11 @@ app.post('/', async (req, res) => {
     if (!userMessage) return res.status(400).json({ error: 'Missing message' });
     try {
         const completion = await openai.chat.completions.create({
-            model: 'gpt-5',
-            messages: [{ role: 'user', content: userMessage }]
+            model: 'gpt-5-chat-latest',
+            messages: [
+                { role: 'system', content: 'You are ChatGPT. Always format your responses using markdown.' },
+                { role: 'user', content: userMessage }
+            ]
         });
         res.json({ reply: completion.choices[0].message.content });
     } catch (err) {

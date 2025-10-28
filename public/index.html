@@ -16,29 +16,9 @@
             overflow-y: auto;
         }
 
-        #container {
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            width: 100vw;
-            margin: 0;
-            overflow-y: auto;
-        }
-
-        #centered {
-            width: 50vw;
-            min-width: 320px;
-            max-width: 900px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-        }
-
         #chat {
             flex: 1;
-            width: 100%;
+            width: 50vw;
             min-width: 320px;
             max-width: 900px;
             overflow-y: auto;
@@ -49,7 +29,7 @@
         }
 
         .bubble {
-            max-width: 80%;
+            max-width: 100%;
             padding: 12px 18px;
             border-radius: 18px;
             font-size: 1rem;
@@ -89,7 +69,7 @@
             display: flex;
             gap: 8px;
             padding: 16px;
-            width: 100%;
+            width: 50vw;
         }
 
         #input {
@@ -134,29 +114,26 @@
             color: #888;
             font-size: 0.95em;
             margin: 12px 0 8px 0;
-            width: 100%;
+            width: 50vw;
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body>
-    <div id="container">
-        <div id="centered">
-            <div id="chat"></div>
-            <form id="form" autocomplete="off">
-                <input id="input" type="text" placeholder="Type your English..." required autofocus />
-                <button id="send" type="submit" aria-label="Send">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                        stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </form>
-            <div id="disclaimer">
-                Treat the AI's answers as a helpful starting point, not the final word.
-            </div>
-        </div>
+    <div id="chat"></div>
+    <form id="form" autocomplete="off">
+        <input id="input" type="text" placeholder="Type your English..." required autofocus />
+        <button id="send" type="submit" aria-label="Send">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+        </button>
+    </form>
+    <div id="disclaimer">
+        Treat the AI's answers as a helpful starting point, not the final word.
     </div>
     <script>
         const chat = document.getElementById('chat');
@@ -168,7 +145,7 @@
             const userMsg = input.value.trim();
             if (!userMsg) return;
             // Add user bubble
-            chat.innerHTML += `<div class='bubble user'>${userMsg}</div>`;
+            chat.innerHTML += `<div class='bubble user'>${userMsg.replace(/\n/g, '<br>')}</div>`;
             input.value = '';
             chat.scrollTop = chat.scrollHeight;
             // Fetch LLM reply
@@ -178,7 +155,8 @@
                 body: JSON.stringify({ message: userMsg })
             });
             const data = await res.json();
-            chat.innerHTML += `<div class='bubble llm'>${data.reply || data.error}</div>`;
+            // Render LLM reply as markdown
+            chat.innerHTML += `<div class='bubble llm'>${marked.parse(data.reply || data.error)}</div>`;
             chat.scrollTop = chat.scrollHeight;
         };
     </script>
