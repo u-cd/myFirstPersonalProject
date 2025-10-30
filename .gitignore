@@ -1,3 +1,4 @@
 node_modules/
 .env
 my-ec2-key*.pem
+projectManagementSpreadsheet
