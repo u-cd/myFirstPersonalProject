@@ -6,6 +6,7 @@ const ChatMessage = require('../models/ChatMessage');
 const app = express();
 const port = process.env.PORT || 3000;
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const { v4: uuidv4 } = require('uuid');
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
@@ -25,21 +26,27 @@ const systemPrompt = {
     ].join('\n')
 };
 
+// Endpoint to start a new chat and generate a chatId
+app.post('/newchat', (req, res) => {
+    const chatId = uuidv4();
+    res.json({ chatId });
+});
+
 // POST / for chatbot
 app.post('/', async (req, res) => {
     const userMessage = req.body.message;
-    if (!userMessage) return res.status(400).json({ error: 'Missing message' });
+    const chatId = req.body.chatId;
+    if (!userMessage || !chatId) return res.status(400).json({ error: 'Missing message or chatId' });
     try {
         // Save user message to DB
-        await ChatMessage.create({ role: 'user', content: userMessage });
+        await ChatMessage.create({ chatId, role: 'user', content: userMessage });
 
-        // Get last 20 messages from DB (for context)
-        const history = await ChatMessage.find().sort({ timestamp: -1 }).limit(20).lean();
+        // Get last 20 messages for this chatId from DB (for context)
+        const history = await ChatMessage.find({ chatId }).sort({ timestamp: -1 }).limit(20).lean();
         const cleanedHistory = history.map(msg => ({ role: msg.role, content: msg.content }));
         const inputHistory = [systemPrompt, ...cleanedHistory.reverse()];
 
         // Debug: log history and inputHistory
-        console.log('Raw history from MongoDB:', history);
         console.log('Input history for LLM:', inputHistory);
 
         const response = await openai.responses.create({
@@ -48,7 +55,7 @@ app.post('/', async (req, res) => {
         });
 
         // Save assistant response to DB
-        await ChatMessage.create({ role: 'assistant', content: response.output_text });
+        await ChatMessage.create({ chatId, role: 'assistant', content: response.output_text });
         res.json({ reply: response.output_text });
     } catch (err) {
         res.status(500).json({ error: err.message });

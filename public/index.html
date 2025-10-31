@@ -123,8 +123,8 @@
     <form id="form" autocomplete="off">
         <input id="input" type="text" placeholder="Type your English..." required autofocus />
         <button id="send" type="submit" aria-label="Send">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222"
+                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"></line>
                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
             </svg>
@@ -138,10 +138,19 @@
         const form = document.getElementById('form');
         const input = document.getElementById('input');
 
+        // Get a new chatId on page load
+        let chatId = null;
+        async function startNewChat() {
+            const res = await fetch('/newchat', { method: 'POST' });
+            const data = await res.json();
+            chatId = data.chatId;
+        }
+        startNewChat();
+
         form.onsubmit = async (e) => {
             e.preventDefault();
             const userMsg = input.value.trim();
-            if (!userMsg) return;
+            if (!userMsg || !chatId) return;
             // Add user bubble
             chat.innerHTML += `<div class='bubble user'>${userMsg.replace(/\n/g, '<br>')}</div>`;
             input.value = '';
@@ -150,7 +159,7 @@
             const res = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMsg })
+                body: JSON.stringify({ message: userMsg, chatId })
             });
             const data = await res.json();
             // Render LLM reply as markdown
