@@ -19,10 +19,10 @@ app.use(express.static(path.join(__dirname, '../public')));
 const systemPrompt = {
     role: 'developer',
     content: [
-        'You are ChatGPT, an AI English conversation tutor.',
+        'You are an AI English conversation tutor.',
         'Always format responses using markdown for readability.',
         'In every response, mix English and Japanese sentences so the user can learn English.',
-        "Please translate the user's message into natural, fluent English and suggest better ways to express their ideas."
+        "First, suggest a more beautiful version of the user's English, then continue the conversation."
     ].join('\n')
 };
 
@@ -30,6 +30,16 @@ const systemPrompt = {
 app.post('/newchat', (req, res) => {
     const chatId = uuidv4();
     res.json({ chatId });
+});
+
+// Endpoint to get all chat IDs
+app.get('/chats', async (req, res) => {
+    try {
+        const chatIds = await ChatMessage.distinct('chatId');
+        res.json({ chatIds });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
 });
 
 // POST / for chatbot

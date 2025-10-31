@@ -19,7 +19,9 @@
         #chat {
             flex: 1;
             overflow-y: auto;
-            padding: 24px 25vw 16px 25vw;
+            width: 50vw;
+            margin: 0 auto;
+            padding: 24px 16px 16px 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
@@ -119,31 +121,68 @@
 </head>
 
 <body>
-    <div id="chat"></div>
-    <form id="form" autocomplete="off">
-        <input id="input" type="text" placeholder="Type your English..." required autofocus />
-        <button id="send" type="submit" aria-label="Send">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-        </button>
-    </form>
-    <div id="disclaimer">
-        Treat the AI's answers as a helpful starting point, not the final word.
+    <div style="display:flex; height:100vh;">
+        <div id="sidebar"></div>
+        <div style="flex:1; display:flex; flex-direction:column;">
+            <div id="chat"></div>
+            <form id="form" autocomplete="off">
+                <input id="input" type="text" placeholder="Type your English..." required autofocus />
+                <button id="send" type="submit" aria-label="Send">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+            <div id="disclaimer">
+                Treat the AI's answers as a helpful starting point, not the final word.
+            </div>
+        </div>
     </div>
     <script>
+        // Load sidebar.html into #sidebar, then load sidebar.js so its code runs
+        fetch('/sidebar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                // Run sidebar logic directly
+                async function loadChats() {
+                    console.log("sidebar's loadChats function started");
+                    const sidebarContent = document.getElementById('sidebar-content');
+                    if (!sidebarContent) return;
+                    // Add New Chat link
+                    sidebarContent.innerHTML = '<a href="/" style="display:block; color:#1565c0; text-decoration:none; font-weight:bold; font-size:1.1em; padding:8px 24px; border-radius:8px; background:#e6f3ff; margin-bottom:8px;">New Chat</a>';
+                    // Fetch chat IDs
+                    const res = await fetch('/chats');
+                    const data = await res.json();
+                    if (data.chatIds && data.chatIds.length) {
+                        sidebarContent.innerHTML += '<div style="margin:16px 0 0 0; font-weight:bold; color:#444; padding-left:24px;">Old Chats</div>';
+                        data.chatIds.forEach(id => {
+                            sidebarContent.innerHTML += `<a href="/?chatId=${id}" style="display:block; color:#222; text-decoration:none; font-size:1em; padding:6px 24px; border-radius:6px; margin-top:4px;">${id}</a>`;
+                        });
+                    }
+                }
+                loadChats();
+            });
         const chat = document.getElementById('chat');
         const form = document.getElementById('form');
         const input = document.getElementById('input');
 
-        // Get a new chatId on page load
-        let chatId = null;
+
+        // Get chatId from URL if present
+        function getChatIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('chatId');
+        }
+
+        let chatId = getChatIdFromUrl();
         async function startNewChat() {
-            const res = await fetch('/newchat', { method: 'POST' });
-            const data = await res.json();
-            chatId = data.chatId;
+            if (!chatId) {
+                const res = await fetch('/newchat', { method: 'POST' });
+                const data = await res.json();
+                chatId = data.chatId;
+            }
         }
         startNewChat();
 
