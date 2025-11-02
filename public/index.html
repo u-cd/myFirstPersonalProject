@@ -4,10 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UI is harder than I thought</title>
+    <title>Frontend is harder than I thought</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@0.0.4/open-dyslexic.min.css">
     <style>
+        /* html,
+        body,
+        * {
+            font-family: 'OpenDyslexic' !important;
+        } */
+
         body {
-            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            font-family: 'OpenDyslexic', 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
             background: #fff;
             margin: 0;
             height: 100vh;
@@ -19,12 +26,14 @@
         #chat {
             flex: 1;
             overflow-y: auto;
-            padding: 24px 25vw 16px 25vw;
+            width: 50vw;
+            margin: 0 auto;
+            padding: 24px 16px 16px 16px;
             display: flex;
             flex-direction: column;
             gap: 12px;
             scrollbar-width: thin;
-            scrollbar-color: #888 #ffffff;
+            scrollbar-color: #bbb #ffffff;
         }
 
         .bubble {
@@ -51,8 +60,8 @@
         }
 
         .user {
-            background: #e6f3ff;
-            color: #1565c0;
+            background: #bdd;
+            color: #0a2a4a;
             align-self: flex-end;
             border-bottom-right-radius: 4px;
         }
@@ -119,29 +128,96 @@
 </head>
 
 <body>
-    <div id="chat"></div>
-    <form id="form" autocomplete="off">
-        <input id="input" type="text" placeholder="Type your English..." required autofocus />
-        <button id="send" type="submit" aria-label="Send">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <line x1="22" y1="2" x2="11" y2="13"></line>
-                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-            </svg>
-        </button>
-    </form>
-    <div id="disclaimer">
-        Treat the AI's answers as a helpful starting point, not the final word.
+    <div style="display:flex; height:100vh;">
+        <div id="sidebar"></div>
+        <div style="flex:1; display:flex; flex-direction:column;">
+            <div id="chat"></div>
+            <form id="form" autocomplete="off">
+                <input id="input" type="text" placeholder="Type your English..." required autofocus />
+                <button id="send" type="submit" aria-label="Send">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"></line>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                </button>
+            </form>
+            <div id="disclaimer">
+                Treat the AI's answers as a helpful starting point, not the final word.
+            </div>
+        </div>
     </div>
     <script>
+        // Load sidebar.html into #sidebar
+        fetch('/sidebar.html')
+            .then(res => res.text())
+            .then(html => {
+                document.getElementById('sidebar').innerHTML = html;
+                // Run sidebar logic directly
+                async function loadChats() {
+                    console.log("sidebar's loadChats function started");
+                    const sidebarContent = document.getElementById('sidebar-content');
+                    if (!sidebarContent) return;
+                    // Fetch chat IDs with last message date, sorted
+                    const res = await fetch('/chats-with-last-date-and-title');
+                    const data = await res.json();
+                    if (data.chats && data.chats.length) {
+                        sidebarContent.innerHTML += '<div class="sidebar-old-chats-header">Old chats</div>';
+                        data.chats.forEach(chat => {
+                            let linkText = chat.title && chat.title.trim() ? chat.title.trim() : 'Untitled chat';
+                            const chatLink = document.createElement('a');
+                            chatLink.href = `/?chatId=${chat.chatId}`;
+                            chatLink.textContent = linkText;
+                            chatLink.className = 'sidebar-old-chat-link';
+                            chatLink.addEventListener('click', async (e) => {
+                                e.preventDefault();
+                                // Load old conversation for this chatId
+                                const chatArea = document.getElementById('chat');
+                                chatArea.innerHTML = '';
+                                const res = await fetch(`/chat-history?chatId=${chat.chatId}`);
+                                const data = await res.json();
+                                if (data.messages && data.messages.length) {
+                                    data.messages.forEach(msg => {
+                                        if (msg.role === 'user') {
+                                            chatArea.innerHTML += `<div class='bubble user'>${msg.content.replace(/\n/g, '<br>')}</div>`;
+                                        } else {
+                                            chatArea.innerHTML += `<div class='bubble llm'>${marked.parse(msg.content)}</div>`;
+                                        }
+                                    });
+                                    chatArea.scrollTop = chatArea.scrollHeight;
+                                }
+                                // Update chatId for new messages
+                                chatId = chat.chatId;
+                            });
+                            sidebarContent.appendChild(chatLink);
+                        });
+                    }
+                }
+                loadChats();
+            });
+
         const chat = document.getElementById('chat');
         const form = document.getElementById('form');
         const input = document.getElementById('input');
 
+        // Get chatId from URL if present
+        function getChatIdFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            return params.get('chatId');
+        }
+
+        let chatId = getChatIdFromUrl();
+        async function startNewChat() {
+            if (!chatId) {
+                chatId = crypto.randomUUID();
+            }
+        }
+        startNewChat();
+
         form.onsubmit = async (e) => {
             e.preventDefault();
             const userMsg = input.value.trim();
-            if (!userMsg) return;
+            if (!userMsg || !chatId) return;
             // Add user bubble
             chat.innerHTML += `<div class='bubble user'>${userMsg.replace(/\n/g, '<br>')}</div>`;
             input.value = '';
@@ -150,7 +226,7 @@
             const res = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMsg })
+                body: JSON.stringify({ message: userMsg, chatId })
             });
             const data = await res.json();
             // Render LLM reply as markdown
