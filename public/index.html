@@ -5,9 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UI is harder than I thought</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@0.0.4/open-dyslexic.min.css">
     <style>
+        html,
+        body,
+        * {
+            font-family: 'OpenDyslexic' !important;
+        }
+
         body {
-            font-family: 'Segoe UI', 'Roboto', Arial, sans-serif;
+            /* font-family: 'OpenDyslexic', 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif; */
             background: #fff;
             margin: 0;
             height: 100vh;
@@ -141,7 +148,7 @@
         </div>
     </div>
     <script>
-        // Load sidebar.html into #sidebar, then load sidebar.js so its code runs
+        // Load sidebar.html into #sidebar
         fetch('/sidebar.html')
             .then(res => res.text())
             .then(html => {
@@ -151,24 +158,27 @@
                     console.log("sidebar's loadChats function started");
                     const sidebarContent = document.getElementById('sidebar-content');
                     if (!sidebarContent) return;
-                    // Add New Chat link
-                    sidebarContent.innerHTML = '<a href="/" style="display:block; color:#1565c0; text-decoration:none; font-weight:bold; font-size:1.1em; padding:8px 24px; border-radius:8px; background:#e6f3ff; margin-bottom:8px;">New Chat</a>';
-                    // Fetch chat IDs
-                    const res = await fetch('/chats');
+                    // Fetch chat IDs with last message date, sorted
+                    const res = await fetch('/chats-with-last-date');
                     const data = await res.json();
-                    if (data.chatIds && data.chatIds.length) {
-                        sidebarContent.innerHTML += '<div style="margin:16px 0 0 0; font-weight:bold; color:#444; padding-left:24px;">Old Chats</div>';
-                        data.chatIds.forEach(id => {
-                            sidebarContent.innerHTML += `<a href="/?chatId=${id}" style="display:block; color:#222; text-decoration:none; font-size:1em; padding:6px 24px; border-radius:6px; margin-top:4px;">${id}</a>`;
+                    if (data.chats && data.chats.length) {
+                        sidebarContent.innerHTML += '<div style="margin:16px 0 0 0; color:#444; padding-left:24px;">Old chats</div>';
+                        data.chats.forEach(chat => {
+                            let dateStr = 'Unknown date';
+                            if (chat.lastDate) {
+                                const d = new Date(chat.lastDate);
+                                dateStr = d.toLocaleString();
+                            }
+                            sidebarContent.innerHTML += `<a href="/?chatId=${chat.chatId}" style="display:block; color:#222; text-decoration:none; font-size:1em; padding:6px 24px; border-radius:6px; margin-top:4px;">${dateStr}</a>`;
                         });
                     }
                 }
                 loadChats();
             });
+
         const chat = document.getElementById('chat');
         const form = document.getElementById('form');
         const input = document.getElementById('input');
-
 
         // Get chatId from URL if present
         function getChatIdFromUrl() {
@@ -179,9 +189,7 @@
         let chatId = getChatIdFromUrl();
         async function startNewChat() {
             if (!chatId) {
-                const res = await fetch('/newchat', { method: 'POST' });
-                const data = await res.json();
-                chatId = data.chatId;
+                chatId = crypto.randomUUID();
             }
         }
         startNewChat();

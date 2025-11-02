@@ -26,17 +26,27 @@ const systemPrompt = {
     ].join('\n')
 };
 
-// Endpoint to start a new chat and generate a chatId
-app.post('/newchat', (req, res) => {
-    const chatId = uuidv4();
-    res.json({ chatId });
-});
-
 // Endpoint to get all chat IDs
-app.get('/chats', async (req, res) => {
+// Endpoint to get all chat IDs with their last message date, sorted by date descending
+app.get('/chats-with-last-date', async (req, res) => {
     try {
+        // Get all unique chatIds
         const chatIds = await ChatMessage.distinct('chatId');
-        res.json({ chatIds });
+        // For each chatId, get its last message timestamp
+        const chatInfos = await Promise.all(chatIds.map(async chatId => {
+            const lastMsg = await ChatMessage.findOne({ chatId }).sort({ timestamp: -1 }).lean();
+            return {
+                chatId,
+                lastDate: lastMsg && lastMsg.timestamp ? lastMsg.timestamp : null
+            };
+        }));
+        // Sort by lastDate descending (newest first)
+        chatInfos.sort((a, b) => {
+            if (!a.lastDate) return 1;
+            if (!b.lastDate) return -1;
+            return new Date(b.lastDate) - new Date(a.lastDate);
+        });
+        res.json({ chats: chatInfos });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
