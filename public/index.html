@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UI is harder than I thought</title>
+    <title>Frontend is harder than I thought</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@0.0.4/open-dyslexic.min.css">
     <style>
         html,
@@ -33,7 +33,7 @@
             flex-direction: column;
             gap: 12px;
             scrollbar-width: thin;
-            scrollbar-color: #888 #ffffff;
+            scrollbar-color: #dddddd #ffffff;
         }
 
         .bubble {
@@ -169,7 +169,37 @@
                                 const d = new Date(chat.lastDate);
                                 dateStr = d.toLocaleString();
                             }
-                            sidebarContent.innerHTML += `<a href="/?chatId=${chat.chatId}" style="display:block; color:#222; text-decoration:none; font-size:1em; padding:6px 24px; border-radius:6px; margin-top:4px;">${dateStr}</a>`;
+                            const chatLink = document.createElement('a');
+                            chatLink.href = `/?chatId=${chat.chatId}`;
+                            chatLink.textContent = dateStr;
+                            chatLink.style.display = 'block';
+                            chatLink.style.color = '#222';
+                            chatLink.style.textDecoration = 'none';
+                            chatLink.style.fontSize = '1em';
+                            chatLink.style.padding = '6px 24px';
+                            chatLink.style.borderRadius = '6px';
+                            chatLink.style.marginTop = '4px';
+                            chatLink.addEventListener('click', async (e) => {
+                                e.preventDefault();
+                                // Load old conversation for this chatId
+                                const chatArea = document.getElementById('chat');
+                                chatArea.innerHTML = '';
+                                const res = await fetch(`/chat-history?chatId=${chat.chatId}`);
+                                const data = await res.json();
+                                if (data.messages && data.messages.length) {
+                                    data.messages.forEach(msg => {
+                                        if (msg.role === 'user') {
+                                            chatArea.innerHTML += `<div class='bubble user'>${msg.content.replace(/\n/g, '<br>')}</div>`;
+                                        } else {
+                                            chatArea.innerHTML += `<div class='bubble llm'>${marked.parse(msg.content)}</div>`;
+                                        }
+                                    });
+                                    chatArea.scrollTop = chatArea.scrollHeight;
+                                }
+                                // Update chatId for new messages
+                                chatId = chat.chatId;
+                            });
+                            sidebarContent.appendChild(chatLink);
                         });
                     }
                 }

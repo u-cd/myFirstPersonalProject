@@ -26,7 +26,18 @@ const systemPrompt = {
     ].join('\n')
 };
 
-// Endpoint to get all chat IDs
+// Endpoint to get all messages for a chatId
+app.get('/chat-history', async (req, res) => {
+    const chatId = req.query.chatId;
+    if (!chatId) return res.status(400).json({ error: 'Missing chatId' });
+    try {
+        const messages = await ChatMessage.find({ chatId }).sort({ timestamp: 1 }).lean();
+        res.json({ messages });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Endpoint to get all chat IDs with their last message date, sorted by date descending
 app.get('/chats-with-last-date', async (req, res) => {
     try {
