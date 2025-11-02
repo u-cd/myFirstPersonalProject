@@ -159,19 +159,15 @@
                     const sidebarContent = document.getElementById('sidebar-content');
                     if (!sidebarContent) return;
                     // Fetch chat IDs with last message date, sorted
-                    const res = await fetch('/chats-with-last-date');
+                    const res = await fetch('/chats-with-last-date-and-title');
                     const data = await res.json();
                     if (data.chats && data.chats.length) {
                         sidebarContent.innerHTML += '<div class="sidebar-old-chats-header">Old chats</div>';
                         data.chats.forEach(chat => {
-                            let dateStr = 'Unknown date';
-                            if (chat.lastDate) {
-                                const d = new Date(chat.lastDate);
-                                dateStr = d.toLocaleString();
-                            }
+                            let linkText = chat.title && chat.title.trim() ? chat.title.trim() : 'Untitled chat';
                             const chatLink = document.createElement('a');
                             chatLink.href = `/?chatId=${chat.chatId}`;
-                            chatLink.textContent = dateStr;
+                            chatLink.textContent = linkText;
                             chatLink.className = 'sidebar-old-chat-link';
                             chatLink.addEventListener('click', async (e) => {
                                 e.preventDefault();

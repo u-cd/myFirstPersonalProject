@@ -38,16 +38,19 @@ app.get('/chat-history', async (req, res) => {
 });
 
 // Endpoint to get all chat IDs with their last message date, sorted by date descending
-app.get('/chats-with-last-date', async (req, res) => {
+app.get('/chats-with-last-date-and-title', async (req, res) => {
     try {
         // Get all unique chatIds
         const chatIds = await ChatMessage.distinct('chatId');
-        // For each chatId, get its last message timestamp
+        // For each chatId, get its last message timestamp and title (from first assistant message)
         const chatInfos = await Promise.all(chatIds.map(async chatId => {
             const lastMsg = await ChatMessage.findOne({ chatId }).sort({ timestamp: -1 }).lean();
+            // Find the first assistant message with a title for this chat
+            const titleMsg = await ChatMessage.findOne({ chatId, role: 'assistant', title: { $exists: true, $ne: null } }).sort({ timestamp: 1 }).lean();
             return {
                 chatId,
-                lastDate: lastMsg && lastMsg.timestamp ? lastMsg.timestamp : null
+                lastDate: lastMsg && lastMsg.timestamp ? lastMsg.timestamp : null,
+                title: titleMsg && titleMsg.title ? titleMsg.title : null
             };
         }));
         // Sort by lastDate descending (newest first)
@@ -71,21 +74,47 @@ app.post('/', async (req, res) => {
         // Save user message to DB
         await ChatMessage.create({ chatId, role: 'user', content: userMessage });
 
-        // Get last 20 messages for this chatId from DB (for context)
-        const history = await ChatMessage.find({ chatId }).sort({ timestamp: -1 }).limit(20).lean();
-        const cleanedHistory = history.map(msg => ({ role: msg.role, content: msg.content }));
-        const inputHistory = [systemPrompt, ...cleanedHistory.reverse()];
+        // Get all messages for this chatId
+        const allMessages = await ChatMessage.find({ chatId }).sort({ timestamp: 1 }).lean();
+
+        // Prepare context for LLM
+        const cleanedHistory = allMessages.map(msg => ({ role: msg.role, content: msg.content }));
+        const inputHistory = [systemPrompt, ...cleanedHistory.slice(-20)];
 
         // Debug: log history and inputHistory
         console.log('Input history for LLM:', inputHistory);
 
+        // Get assistant response
         const response = await openai.responses.create({
             model: 'gpt-5-chat-latest',
             input: inputHistory
         });
 
         // Save assistant response to DB
-        await ChatMessage.create({ chatId, role: 'assistant', content: response.output_text });
+        const assistantMsg = await ChatMessage.create({ chatId, role: 'assistant', content: response.output_text });
+
+        // If this is the first exchange (user + assistant), generate a chat title
+        if (allMessages.length === 1) {
+            // Use both user and assistant first message for title
+            const titlePrompt = [
+                {
+                    role: 'developer',
+                    content: 'Generate a short, descriptive chat title (max 8 words) based on the following user and assistant messages. Respond ONLY with the title.'
+                },
+                { role: 'user', content: userMessage },
+                { role: 'assistant', content: response.output_text }
+            ];
+            const titleResponse = await openai.responses.create({
+                model: 'gpt-5-chat-latest',
+                input: titlePrompt
+            });
+            // Save title to the first assistant message for this chat
+            await ChatMessage.updateOne(
+                { _id: assistantMsg._id },
+                { $set: { title: titleResponse.output_text } }
+            );
+        }
+
         res.json({ reply: response.output_text });
     } catch (err) {
         res.status(500).json({ error: err.message });
