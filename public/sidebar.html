@@ -1,7 +1,7 @@
 </div>
 <style>
     #sidebar-content {
-        width: 333px;
+        width: 300px;
         background: #f5f5f5;
         height: 100vh;
         padding: 24px 0;
@@ -12,7 +12,7 @@
         gap: 16px;
         overflow-y: auto;
         scrollbar-width: thin;
-        scrollbar-color: #dddddd #f5f5f5;
+        scrollbar-color: #bbb #f5f5f5;
     }
 
     .sidebar-new-chat {
@@ -23,7 +23,6 @@
         font-size: 1.1em;
         padding: 8px 24px;
         border-radius: 8px;
-        /* background: #ededed; */
         margin-bottom: 8px;
         transition: background 0.2s;
         gap: 8px;
@@ -37,6 +36,29 @@
 
     .sidebar-new-chat:hover {
         background: #d6d6d6;
+    }
+
+    .sidebar-old-chats-header {
+        margin: 16px 0 0 0;
+        color: #444;
+        padding-left: 24px;
+        font-size: 1.05em;
+        /* font-weight: bold; */
+    }
+
+    .sidebar-old-chat-link {
+        display: block;
+        color: #222;
+        text-decoration: none;
+        font-size: 1em;
+        padding: 6px 24px;
+        border-radius: 6px;
+        margin-top: 4px;
+    }
+
+    .sidebar-old-chat-link:hover {
+        background: #eee;
+        color: #1565c0;
     }
 </style>
 <div id="sidebar-content">

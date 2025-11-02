@@ -6,7 +6,6 @@ const ChatMessage = require('../models/ChatMessage');
 const app = express();
 const port = process.env.PORT || 3000;
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-const { v4: uuidv4 } = require('uuid');
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
