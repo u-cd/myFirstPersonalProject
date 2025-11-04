@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>ai語</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+    <style>
+        body {
+            font-family: 'OpenDyslexic', Arial, sans-serif;
+            background: #ffffff;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 80px auto;
+            padding: 32px;
+            background: #fff;
+            border-radius: 12px;
+        }
+
+        input {
+            font-size: 1.1em;
+            margin: 8px 0;
+            padding: 10px;
+            width: 100%;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+
+        button {
+            font-size: 1.1em;
+            margin: 8px 0;
+            padding: 10px;
+            width: 100%;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+
+        #google-login {
+            background: #f7f7f7;
+            color: #222;
+            border: 1px solid #bbb;
+            margin-bottom: 8px;
+            display: block;
+            transition: background 0.2s, border 0.2s;
+        }
+
+        #google-login:hover {
+            background: #d1d1d1;
+            border: 1px solid #888;
+        }
+
+        #login-form button {
+            background: #1565c0;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+        #login-form button:hover {
+            background: #0d47a1;
+        }
+
+        .message {
+            color: #1565c0;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <h2>Log in or sign up</h2>
+        <button id="google-login" style="background:#fff;color:#1565c0;border:1px solid #1565c0;margin-bottom:8px;">
+            <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
+                style="width:20px;vertical-align:middle;margin-right:8px;"> Continue with Google
+        </button>
+        <div style="text-align:center;color:#888;margin:8px 0;font-size:1em;">or</div>
+        <form id="login-form">
+            <input type="email" id="email" placeholder="Enter your email" required />
+            <button type="submit">Continue with email</button>
+        </form>
+        <div class="message" id="message"></div>
+    </div>
+    <script type="module">
+        import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.js';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const loginForm = document.getElementById('login-form');
+        const messageDiv = document.getElementById('message');
+        const googleLoginBtn = document.getElementById('google-login');
+
+        googleLoginBtn.onclick = async () => {
+            try {
+                await supabase.auth.signInWithOAuth({ provider: 'google' });
+            } catch (err) {
+                messageDiv.innerHTML = 'Google login failed.<br>Googleログインに失敗しました。';
+                console.log('Google login error:', err);
+            }
+        };
+
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            try {
+                const { error } = await supabase.auth.signInWithOtp({ email });
+                if (error) {
+                    messageDiv.innerHTML = 'Failed to send sign-in link.<br>サインインリンクの送信に失敗しました。';
+                    console.log('Supabase sign-in error:', error);
+                } else {
+                    messageDiv.innerHTML = 'Sign-in link sent! Check your email. If you do not see it, it may be in your spam folder.<br>サインインリンクを送信しました。メールが届かない場合は、迷惑フォルダもご確認ください。';
+                }
+            } catch (err) {
+                messageDiv.innerHTML = 'Unexpected error.<br>予期しないエラーが発生しました。';
+                console.log('Unexpected error:', err);
+            }
+        };
+    </script>
+</body>
+
+</html>
