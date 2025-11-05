@@ -28,25 +28,28 @@ const systemPrompt = {
 // Endpoint to get all messages for a chatId
 app.get('/chat-history', async (req, res) => {
     const chatId = req.query.chatId;
-    if (!chatId) return res.status(400).json({ error: 'Missing chatId' });
+    const userId = req.query.userId;
+    if (!chatId || !userId) return res.status(400).json({ error: 'Missing chatId or userId' });
     try {
-        const messages = await ChatMessage.find({ chatId }).sort({ timestamp: 1 }).lean();
+        const messages = await ChatMessage.find({ chatId, userId }).sort({ timestamp: 1 }).lean();
         res.json({ messages });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Endpoint to get all chat IDs with their last message date, sorted by date descending
+// Endpoint to get all chat IDs with their last message date and title (only userId's), sorted by date descending
 app.get('/chats-with-last-date-and-title', async (req, res) => {
+    const userId = req.query.userId;
+    if (!userId) return res.status(400).json({ error: 'Missing userId' });
     try {
-        // Get all unique chatIds
-        const chatIds = await ChatMessage.distinct('chatId');
+        // Get all unique chatIds for this user
+        const chatIds = await ChatMessage.distinct('chatId', { userId });
         // For each chatId, get its last message timestamp and title (from first assistant message)
         const chatInfos = await Promise.all(chatIds.map(async chatId => {
-            const lastMsg = await ChatMessage.findOne({ chatId }).sort({ timestamp: -1 }).lean();
+            const lastMsg = await ChatMessage.findOne({ chatId, userId }).sort({ timestamp: -1 }).lean();
             // Find the first assistant message with a title for this chat
-            const titleMsg = await ChatMessage.findOne({ chatId, role: 'assistant', title: { $exists: true, $ne: null } }).sort({ timestamp: 1 }).lean();
+            const titleMsg = await ChatMessage.findOne({ chatId, userId, role: 'assistant', title: { $exists: true, $ne: null } }).sort({ timestamp: 1 }).lean();
             return {
                 chatId,
                 lastDate: lastMsg && lastMsg.timestamp ? lastMsg.timestamp : null,
@@ -69,20 +72,20 @@ app.get('/chats-with-last-date-and-title', async (req, res) => {
 app.post('/', async (req, res) => {
     const userMessage = req.body.message;
     const chatId = req.body.chatId;
-    if (!userMessage || !chatId) return res.status(400).json({ error: 'Missing message or chatId' });
+    const userId = req.body.userId;
+    if (!userMessage || !chatId || !userId) return res.status(400).json({ error: 'Missing message, chatId, or userId' });
     try {
         // Save user message to DB
-        await ChatMessage.create({ chatId, role: 'user', content: userMessage });
+        await ChatMessage.create({ chatId, userId, role: 'user', content: userMessage });
 
-        // Get all messages for this chatId
-        const allMessages = await ChatMessage.find({ chatId }).sort({ timestamp: 1 }).lean();
+        // Get all messages for this chatId and userId
+        const allMessages = await ChatMessage.find({ chatId, userId }).sort({ timestamp: 1 }).lean();
+        // Debug: log allMessages
+        console.log('allmessages for LLM context:', allMessages);
 
         // Prepare context for LLM
         const cleanedHistory = allMessages.map(msg => ({ role: msg.role, content: msg.content }));
         const inputHistory = [systemPrompt, ...cleanedHistory.slice(-20)];
-
-        // Debug: log history and inputHistory
-        console.log('Input history for LLM:', inputHistory);
 
         // Get assistant response
         const response = await openai.responses.create({
@@ -91,7 +94,7 @@ app.post('/', async (req, res) => {
         });
 
         // Save assistant response to DB
-        const assistantMsg = await ChatMessage.create({ chatId, role: 'assistant', content: response.output_text });
+        const assistantMsg = await ChatMessage.create({ chatId, userId, role: 'assistant', content: response.output_text });
 
         // If this is the first exchange (user + assistant), generate a chat title
         if (allMessages.length === 1) {

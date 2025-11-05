@@ -84,7 +84,7 @@
 
         .login-message {
             min-height: 32px;
-            text-align: center;
+            /* text-align: center; */
             color: rgb(0, 0, 0);
             font-size: 1em;
         }
@@ -318,11 +318,14 @@
                     chat.scrollTop = chat.scrollHeight;
                 };
             } else {
-                // Show chat UI
                 app.innerHTML = `
                 <div style="display:flex; height:100vh;">
                     <div id="sidebar"></div>
                     <div style="flex:1; display:flex; flex-direction:column;">
+                        <div id="user-info" style="background:#f7f7f8;padding:10px 18px 6px 18px;border-bottom:1px solid #eee;font-size:1em;color:#444;">
+                            <span style="font-weight:bold;">User:</span> ${user.email || 'No email'}<br>
+                            <span style="font-size:0.95em;color:#888;">ID: ${user.id}</span>
+                        </div>
                         <div id="chat"></div>
                         <form id="form" autocomplete="off">
                             <input id="input" type="text" placeholder="Type your English..." required autofocus />
@@ -340,6 +343,7 @@
                     </div>
                 </div>
                 `;
+                // --- Only for authenticated users: send userId with chat requests ---
                 // Load sidebar
                 fetch('/sidebar.html')
                     .then(res => res.text())
@@ -357,7 +361,7 @@
                         async function loadChats() {
                             const sidebarContent = document.getElementById('sidebar-content');
                             if (!sidebarContent) return;
-                            const res = await fetch('/chats-with-last-date-and-title');
+                            const res = await fetch(`/chats-with-last-date-and-title?userId=${encodeURIComponent(user.id)}`);
                             const data = await res.json();
                             if (data.chats && data.chats.length) {
                                 data.chats.forEach(chat => {
@@ -365,12 +369,12 @@
                                     const chatLink = document.createElement('a');
                                     chatLink.href = `/?chatId=${chat.chatId}`;
                                     chatLink.textContent = linkText;
-                                    chatLink.className = 'sidebar-old-chat-link';
+                                    chatLink.className = 'sidebar-chat-link';
                                     chatLink.addEventListener('click', async (e) => {
                                         e.preventDefault();
                                         const chatArea = document.getElementById('chat');
                                         chatArea.innerHTML = '';
-                                        const res = await fetch(`/chat-history?chatId=${chat.chatId}`);
+                                        const res = await fetch(`/chat-history?chatId=${chat.chatId}&userId=${encodeURIComponent(user.id)}`);
                                         const data = await res.json();
                                         if (data.messages && data.messages.length) {
                                             data.messages.forEach(msg => {
@@ -415,7 +419,7 @@
                     const res = await fetch('/', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: userMsg, chatId })
+                        body: JSON.stringify({ message: userMsg, chatId, userId: user.id })
                     });
                     const data = await res.json();
                     chat.innerHTML += `<div class='bubble llm'>${marked.parse(data.reply || data.error)}</div>`;

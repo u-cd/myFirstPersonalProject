@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const chatMessageSchema = new mongoose.Schema({
     chatId: String,
+    userId: String, // Supabase user.id
     role: String,
     content: String,
     timestamp: { type: Date, default: Date.now },
