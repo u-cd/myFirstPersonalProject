@@ -128,128 +128,177 @@
 </head>
 
 <body>
-    <div style="display:flex; height:100vh;">
-        <div id="sidebar"></div>
-        <div style="flex:1; display:flex; flex-direction:column;">
-            <div id="chat"></div>
-            <form id="form" autocomplete="off">
-                <input id="input" type="text" placeholder="Type your English..." required autofocus />
-                <button id="send" type="submit" aria-label="Send">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                        stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </form>
-            <div id="disclaimer">
-                Treat the AI's answers as a helpful starting point, not the final word.
-            </div>
-        </div>
+    <div id="app-container">
+        <!-- Content will be rendered by JS: login or chat UI -->
     </div>
-    <script>
-        // Detect Supabase link login
-        window.addEventListener('DOMContentLoaded', () => {
-            const hash = window.location.hash.substring(1);
-            const params = new URLSearchParams(hash);
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        import { SUPABASE_URL, SUPABASE_ANON_KEY } from './supabase-config.js';
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-            if (params.has('access_token')) {
-                // User arrived via a valid link
-                const accessToken = params.get('access_token');
-                console.log('Logged in with access token:', accessToken);
-                // Optionally, redirect or update UI
-            } else if (params.has('error')) {
-                // There was an error (e.g., expired link)
-                const error = params.get('error_description') || params.get('error');
-                alert('Login error: ' + error);
-                // Optionally, redirect or update UI
-            }
-        });
-        // Load sidebar.html into #sidebar
-        fetch('/sidebar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('sidebar').innerHTML = html;
-                // Run sidebar logic directly
-                async function loadChats() {
-                    console.log("sidebar's loadChats function started");
-                    const sidebarContent = document.getElementById('sidebar-content');
-                    if (!sidebarContent) return;
-                    // Fetch chat IDs with last message date, sorted
-                    const res = await fetch('/chats-with-last-date-and-title');
-                    const data = await res.json();
-                    if (data.chats && data.chats.length) {
-                        sidebarContent.innerHTML += '<div class="sidebar-old-chats-header">Old chats</div>';
-                        data.chats.forEach(chat => {
-                            let linkText = chat.title && chat.title.trim() ? chat.title.trim() : 'Untitled chat';
-                            const chatLink = document.createElement('a');
-                            chatLink.href = `/?chatId=${chat.chatId}`;
-                            chatLink.textContent = linkText;
-                            chatLink.className = 'sidebar-old-chat-link';
-                            chatLink.addEventListener('click', async (e) => {
-                                e.preventDefault();
-                                // Load old conversation for this chatId
-                                const chatArea = document.getElementById('chat');
-                                chatArea.innerHTML = '';
-                                const res = await fetch(`/chat-history?chatId=${chat.chatId}`);
-                                const data = await res.json();
-                                if (data.messages && data.messages.length) {
-                                    data.messages.forEach(msg => {
-                                        if (msg.role === 'user') {
-                                            chatArea.innerHTML += `<div class='bubble user'>${msg.content.replace(/\n/g, '<br>')}</div>`;
-                                        } else {
-                                            chatArea.innerHTML += `<div class='bubble llm'>${marked.parse(msg.content)}</div>`;
+        // SPA-style: show login or chat UI based on auth state
+        async function renderApp() {
+            const { data: { user } } = await supabase.auth.getUser();
+            console.log('Supabase user:', user);
+            const app = document.getElementById('app-container');
+            if (!user) {
+                // Show login form
+                app.innerHTML = `
+                <div class="login-container">
+                    <h2>Log in or sign up</h2>
+                    <button id="google-login" style="background:#f7f7f7;color:#222;border:1px solid #bbb;margin-bottom:8px;display:block;transition:background 0.2s, border 0.2s;">
+                        <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google" style="width:20px;vertical-align:middle;margin-right:8px;"> Continue with Google
+                    </button>
+                    <div style="text-align:center;color:#888;margin:8px 0;font-size:1em;">or</div>
+                    <form id="login-form">
+                        <input type="email" id="email" placeholder="Enter your email" required />
+                        <button type="submit">Continue with email</button>
+                    </form>
+                    <div class="message" id="message"></div>
+                </div>
+                `;
+                // Add login logic
+                const loginForm = document.getElementById('login-form');
+                const messageDiv = document.getElementById('message');
+                const googleLoginBtn = document.getElementById('google-login');
+                googleLoginBtn.onclick = async () => {
+                    try {
+                        await supabase.auth.signInWithOAuth({ provider: 'google' });
+                    } catch (err) {
+                        messageDiv.innerHTML = 'Google login failed.<br>Googleログインに失敗しました。';
+                        console.log('Google login error:', err);
+                    }
+                };
+                loginForm.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const email = document.getElementById('email').value;
+                    try {
+                        const { error } = await supabase.auth.signInWithOtp({ email });
+                        if (error) {
+                            messageDiv.innerHTML = 'Failed to send sign-in link.<br>サインインリンクの送信に失敗しました。';
+                            console.log('Supabase sign-in error:', error);
+                        } else {
+                            messageDiv.innerHTML = 'Sign-in link sent! Check your email. If you do not see it, it may be in your spam folder.<br>サインインリンクを送信しました。メールが届かない場合は、迷惑フォルダもご確認ください。';
+                        }
+                    } catch (err) {
+                        messageDiv.innerHTML = 'Unexpected error.<br>予期しないエラーが発生しました。';
+                        console.log('Unexpected error:', err);
+                    }
+                };
+            } else {
+                // Show chat UI
+                app.innerHTML = `
+                <div style="display:flex; height:100vh;">
+                    <div id="sidebar"></div>
+                    <div style="flex:1; display:flex; flex-direction:column;">
+                        <div id="chat"></div>
+                        <form id="form" autocomplete="off">
+                            <input id="input" type="text" placeholder="Type your English..." required autofocus />
+                            <button id="send" type="submit" aria-label="Send">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
+                                    stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                            </button>
+                        </form>
+                        <div id="disclaimer">
+                            Treat the AI's answers as a helpful starting point, not the final word.
+                        </div>
+                    </div>
+                </div>
+                `;
+                // Load sidebar
+                fetch('/sidebar.html')
+                    .then(res => res.text())
+                    .then(html => {
+                        document.getElementById('sidebar').innerHTML = html;
+                        // Attach logout handler after sidebar is loaded
+                        const logoutBtn = document.getElementById('logout-btn');
+                        if (logoutBtn) {
+                            logoutBtn.onclick = async () => {
+                                await supabase.auth.signOut();
+                                renderApp();
+                            };
+                        }
+                        // Run sidebar logic directly
+                        async function loadChats() {
+                            const sidebarContent = document.getElementById('sidebar-content');
+                            if (!sidebarContent) return;
+                            const res = await fetch('/chats-with-last-date-and-title');
+                            const data = await res.json();
+                            if (data.chats && data.chats.length) {
+                                data.chats.forEach(chat => {
+                                    let linkText = chat.title && chat.title.trim() ? chat.title.trim() : 'Untitled chat';
+                                    const chatLink = document.createElement('a');
+                                    chatLink.href = `/?chatId=${chat.chatId}`;
+                                    chatLink.textContent = linkText;
+                                    chatLink.className = 'sidebar-old-chat-link';
+                                    chatLink.addEventListener('click', async (e) => {
+                                        e.preventDefault();
+                                        const chatArea = document.getElementById('chat');
+                                        chatArea.innerHTML = '';
+                                        const res = await fetch(`/chat-history?chatId=${chat.chatId}`);
+                                        const data = await res.json();
+                                        if (data.messages && data.messages.length) {
+                                            data.messages.forEach(msg => {
+                                                if (msg.role === 'user') {
+                                                    chatArea.innerHTML += `<div class='bubble user'>${msg.content.replace(/\n/g, '<br>')}</div>`;
+                                                } else {
+                                                    chatArea.innerHTML += `<div class='bubble llm'>${marked.parse(msg.content)}</div>`;
+                                                }
+                                            });
+                                            chatArea.scrollTop = chatArea.scrollHeight;
                                         }
+                                        chatId = chat.chatId;
                                     });
-                                    chatArea.scrollTop = chatArea.scrollHeight;
-                                }
-                                // Update chatId for new messages
-                                chatId = chat.chatId;
-                            });
-                            sidebarContent.appendChild(chatLink);
-                        });
+                                    sidebarContent.appendChild(chatLink);
+                                });
+                            }
+                        }
+                        loadChats();
+                    });
+                // Chat logic
+                const chat = document.getElementById('chat');
+                const form = document.getElementById('form');
+                const input = document.getElementById('input');
+                function getChatIdFromUrl() {
+                    const params = new URLSearchParams(window.location.search);
+                    return params.get('chatId');
+                }
+                let chatId = getChatIdFromUrl();
+                async function startNewChat() {
+                    if (!chatId) {
+                        chatId = crypto.randomUUID();
                     }
                 }
-                loadChats();
-            });
-
-        const chat = document.getElementById('chat');
-        const form = document.getElementById('form');
-        const input = document.getElementById('input');
-
-        // Get chatId from URL if present
-        function getChatIdFromUrl() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('chatId');
-        }
-
-        let chatId = getChatIdFromUrl();
-        async function startNewChat() {
-            if (!chatId) {
-                chatId = crypto.randomUUID();
+                startNewChat();
+                form.onsubmit = async (e) => {
+                    e.preventDefault();
+                    const userMsg = input.value.trim();
+                    if (!userMsg || !chatId) return;
+                    chat.innerHTML += `<div class='bubble user'>${userMsg.replace(/\n/g, '<br>')}</div>`;
+                    input.value = '';
+                    chat.scrollTop = chat.scrollHeight;
+                    const res = await fetch('/', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: userMsg, chatId })
+                    });
+                    const data = await res.json();
+                    chat.innerHTML += `<div class='bubble llm'>${marked.parse(data.reply || data.error)}</div>`;
+                    chat.scrollTop = chat.scrollHeight;
+                };
             }
         }
-        startNewChat();
 
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const userMsg = input.value.trim();
-            if (!userMsg || !chatId) return;
-            // Add user bubble
-            chat.innerHTML += `<div class='bubble user'>${userMsg.replace(/\n/g, '<br>')}</div>`;
-            input.value = '';
-            chat.scrollTop = chat.scrollHeight;
-            // Fetch LLM reply
-            const res = await fetch('/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMsg, chatId })
-            });
-            const data = await res.json();
-            // Render LLM reply as markdown
-            chat.innerHTML += `<div class='bubble llm'>${marked.parse(data.reply || data.error)}</div>`;
-            chat.scrollTop = chat.scrollHeight;
-        };
+        // Listen for auth state changes (e.g., after magic link or Google login)
+        supabase.auth.onAuthStateChange((_event, _session) => {
+            renderApp();
+        });
+
+        // Initial render
+        renderApp();
     </script>
 </body>
 
