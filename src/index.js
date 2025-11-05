@@ -25,11 +25,6 @@ const systemPrompt = {
     ].join('\n')
 };
 
-// Temporary route to serve login.html for testing
-app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/login.html'));
-});
-
 // Endpoint to get all messages for a chatId
 app.get('/chat-history', async (req, res) => {
     const chatId = req.query.chatId;

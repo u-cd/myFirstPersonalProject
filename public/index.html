@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frontend is harder than I thought</title>
+    <title>ai語</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@0.0.4/open-dyslexic.min.css">
     <style>
         /* html,
@@ -148,6 +148,23 @@
         </div>
     </div>
     <script>
+        // Detect Supabase link login
+        window.addEventListener('DOMContentLoaded', () => {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+
+            if (params.has('access_token')) {
+                // User arrived via a valid link
+                const accessToken = params.get('access_token');
+                console.log('Logged in with access token:', accessToken);
+                // Optionally, redirect or update UI
+            } else if (params.has('error')) {
+                // There was an error (e.g., expired link)
+                const error = params.get('error_description') || params.get('error');
+                alert('Login error: ' + error);
+                // Optionally, redirect or update UI
+            }
+        });
         // Load sidebar.html into #sidebar
         fetch('/sidebar.html')
             .then(res => res.text())
