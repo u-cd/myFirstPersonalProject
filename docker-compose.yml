@@ -11,4 +11,3 @@ services:
     volumes:
       - ./src:/usr/src/app/src
       - ./public:/usr/src/app/public
-    command: npx nodemon src/index.js
