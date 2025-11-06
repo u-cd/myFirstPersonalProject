@@ -72,14 +72,15 @@ app.get('/chats-with-last-date-and-title', async (req, res) => {
 app.post('/', async (req, res) => {
     const userMessage = req.body.message;
     const chatId = req.body.chatId;
-    const userId = req.body.userId;
-    if (!userMessage || !chatId || !userId) return res.status(400).json({ error: 'Missing message, chatId, or userId' });
+    const userId = req.body.userId; // Optional - can be null for logged-out users
+    if (!userMessage || !chatId) return res.status(400).json({ error: 'Missing message or chatId' });
     try {
-        // Save user message to DB
-        await ChatMessage.create({ chatId, userId, role: 'user', content: userMessage });
+        // Save user message to DB (userId can be null for anonymous users)
+        await ChatMessage.create({ chatId, userId: userId || null, role: 'user', content: userMessage });
 
-        // Get all messages for this chatId and userId
-        const allMessages = await ChatMessage.find({ chatId, userId }).sort({ timestamp: 1 }).lean();
+        // Get all messages for this chatId (and userId if provided)
+        const query = userId ? { chatId, userId } : { chatId };
+        const allMessages = await ChatMessage.find(query).sort({ timestamp: 1 }).lean();
         // Debug: log allMessages
         console.log('allmessages for LLM context:', allMessages);
 
@@ -93,8 +94,8 @@ app.post('/', async (req, res) => {
             input: inputHistory
         });
 
-        // Save assistant response to DB
-        const assistantMsg = await ChatMessage.create({ chatId, userId, role: 'assistant', content: response.output_text });
+        // Save assistant response to DB (userId can be null for anonymous users)
+        const assistantMsg = await ChatMessage.create({ chatId, userId: userId || null, role: 'assistant', content: response.output_text });
 
         // If this is the first exchange (user + assistant), generate a chat title
         if (allMessages.length === 1) {
