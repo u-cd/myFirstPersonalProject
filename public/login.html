@@ -1,27 +1,26 @@
 <div class="sidebar-overlay" id="sidebar-overlay"></div>
 <div class="app-layout">
     <div id="sidebar">
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M3 12H21M3 6H21M3 18H21" stroke="#222" stroke-width="2" stroke-linecap="round"
-                    stroke-linejoin="round" />
-            </svg>
-        </button>
-        <div class="login-container" id="login-container">
-            <h2>Log in or sign up</h2>
-            <button id="google-login">
-                <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
-                    style="width:20px;vertical-align:middle;margin-right:8px;"> Continue with Google
-            </button>
-            <div class="login-or">or</div>
-            <form id="login-form">
-                <input type="email" id="email" placeholder="Enter your email" required />
-                <button type="submit">Continue with email</button>
-            </form>
-            <div class="login-message" id="message"></div>
+        <div id="sidebar-content-wrapper">
+            <div class="login-container" id="login-container">
+                <h2>Log in or sign up</h2>
+                <button id="google-login">
+                    <img src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google"
+                        style="width:20px;vertical-align:middle;margin-right:8px;"> Continue with Google
+                </button>
+                <div class="login-or">or</div>
+                <form id="login-form">
+                    <input type="email" id="email" placeholder="Enter your email" required />
+                    <button type="submit">Continue with email</button>
+                </form>
+                <div class="login-message" id="message"></div>
+            </div>
         </div>
     </div>
     <div class="main-content" id="main-content">
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu">
+            <div id="login-btn">Log in</div>
+        </button>
         <div id="chat"></div>
         <form id="form" autocomplete="off">
             <input id="input" type="text" placeholder="Type your English..." required autofocus />

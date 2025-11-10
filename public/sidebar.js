@@ -124,6 +124,7 @@ function setupUserAccount(user) {
 }
 
 function setupMobileMenu() {
+    console.log('I am set up mobile menu');
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     const sidebarWrapper = document.getElementById('sidebar-content-wrapper');
@@ -132,7 +133,7 @@ function setupMobileMenu() {
 
     // Mobile menu button click
     mobileMenuBtn.addEventListener('click', () => {
-        toggleMobileSidebar();
+        openMobileSidebar();
     });
 
     // Overlay click to close sidebar
@@ -148,17 +149,19 @@ function setupMobileMenu() {
     });
 }
 
-function toggleMobileSidebar() {
+function openMobileSidebar() {
+    console.log('I am open mobile sidebar');
     const sidebarWrapper = document.getElementById('sidebar-content-wrapper');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
 
     if (sidebarWrapper && sidebarOverlay) {
-        sidebarWrapper.classList.toggle('sidebar-open');
-        sidebarOverlay.classList.toggle('active');
+        sidebarWrapper.classList.add('sidebar-open');
+        sidebarOverlay.classList.add('active');
     }
 }
 
 function closeMobileSidebar() {
+    console.log('I am close mobile sidebar');
     const sidebarWrapper = document.getElementById('sidebar-content-wrapper');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
 
