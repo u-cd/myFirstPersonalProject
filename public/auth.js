@@ -11,8 +11,17 @@ export async function getCurrentUser() {
 
 // Sign in with Google OAuth
 export async function signInWithGoogle() {
+    const isLocalhost = window.location.hostname === 'localhost';
+
+    const redirectUrl = isLocalhost
+        ? 'http://localhost:3000'
+        : 'https://aigooooo.com';
+
     try {
-        await supabase.auth.signInWithOAuth({ provider: 'google' });
+        await supabase.auth.signInWithOAuth({
+            provider: 'google',
+            options: { redirectTo: redirectUrl }
+        });
         return { success: true };
     } catch (error) {
         return { success: false, error: error.message };
@@ -21,8 +30,17 @@ export async function signInWithGoogle() {
 
 // Sign in with email (magic link)
 export async function signInWithEmail(email) {
+    const isLocalhost = window.location.hostname === 'localhost';
+
+    const redirectUrl = isLocalhost
+        ? 'http://localhost:3000'
+        : 'https://aigooooo.com';
+
     try {
-        const { error } = await supabase.auth.signInWithOtp({ email });
+        const { error } = await supabase.auth.signInWithOtp({
+            email,
+            options: { redirectTo: redirectUrl }
+        });
         if (error) {
             return { success: false, error: error.message };
         }
