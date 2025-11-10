@@ -4,235 +4,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Frontend is harder than I thought</title>
+    <title>ai語</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@0.0.4/open-dyslexic.min.css">
-    <style>
-        /* html,
-        body,
-        * {
-            font-family: 'OpenDyslexic' !important;
-        } */
-
-        body {
-            font-family: 'OpenDyslexic', 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
-            background: #fff;
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        #chat {
-            flex: 1;
-            overflow-y: auto;
-            width: 50vw;
-            margin: 0 auto;
-            padding: 24px 16px 16px 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            scrollbar-width: thin;
-            scrollbar-color: #bbb #ffffff;
-        }
-
-        .bubble {
-            padding: 12px 18px;
-            border-radius: 18px;
-            font-size: 1rem;
-            line-height: 1.5;
-            word-break: break-word;
-            margin-bottom: 2px;
-            position: relative;
-            animation: fadein 0.2s;
-        }
-
-        @keyframes fadein {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .user {
-            background: #bdd;
-            color: #0a2a4a;
-            align-self: flex-end;
-            border-bottom-right-radius: 4px;
-        }
-
-        .llm {
-            color: #222;
-            align-self: flex-start;
-            border-bottom-left-radius: 4px;
-        }
-
-        #form {
-            display: flex;
-            gap: 8px;
-            padding: 16px;
-            width: 50vw;
-            margin: 0 auto;
-        }
-
-        #input {
-            flex: 1;
-            font-size: 1rem;
-            padding: 10px 14px;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            outline: none;
-            background: #f7f7f8;
-            transition: border 0.2s;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        #input:focus {
-            border: 1.5px solid #555;
-        }
-
-        #send {
-            background: none;
-            color: #222;
-            border: none;
-            border-radius: 50%;
-            padding: 0;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        #send:hover {
-            background: #eee;
-        }
-
-        #disclaimer {
-            text-align: center;
-            color: #888;
-            font-size: 0.95em;
-            margin: 12px 0 8px 0;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 
 <body>
-    <div style="display:flex; height:100vh;">
-        <div id="sidebar"></div>
-        <div style="flex:1; display:flex; flex-direction:column;">
-            <div id="chat"></div>
-            <form id="form" autocomplete="off">
-                <input id="input" type="text" placeholder="Type your English..." required autofocus />
-                <button id="send" type="submit" aria-label="Send">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                        stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                    </svg>
-                </button>
-            </form>
-            <div id="disclaimer">
-                Treat the AI's answers as a helpful starting point, not the final word.
-            </div>
-        </div>
+    <div id="app-container">
+        <!-- Content will be rendered by JS: login or chat UI -->
     </div>
-    <script>
-        // Load sidebar.html into #sidebar
-        fetch('/sidebar.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('sidebar').innerHTML = html;
-                // Run sidebar logic directly
-                async function loadChats() {
-                    console.log("sidebar's loadChats function started");
-                    const sidebarContent = document.getElementById('sidebar-content');
-                    if (!sidebarContent) return;
-                    // Fetch chat IDs with last message date, sorted
-                    const res = await fetch('/chats-with-last-date-and-title');
-                    const data = await res.json();
-                    if (data.chats && data.chats.length) {
-                        sidebarContent.innerHTML += '<div class="sidebar-old-chats-header">Old chats</div>';
-                        data.chats.forEach(chat => {
-                            let linkText = chat.title && chat.title.trim() ? chat.title.trim() : 'Untitled chat';
-                            const chatLink = document.createElement('a');
-                            chatLink.href = `/?chatId=${chat.chatId}`;
-                            chatLink.textContent = linkText;
-                            chatLink.className = 'sidebar-old-chat-link';
-                            chatLink.addEventListener('click', async (e) => {
-                                e.preventDefault();
-                                // Load old conversation for this chatId
-                                const chatArea = document.getElementById('chat');
-                                chatArea.innerHTML = '';
-                                const res = await fetch(`/chat-history?chatId=${chat.chatId}`);
-                                const data = await res.json();
-                                if (data.messages && data.messages.length) {
-                                    data.messages.forEach(msg => {
-                                        if (msg.role === 'user') {
-                                            chatArea.innerHTML += `<div class='bubble user'>${msg.content.replace(/\n/g, '<br>')}</div>`;
-                                        } else {
-                                            chatArea.innerHTML += `<div class='bubble llm'>${marked.parse(msg.content)}</div>`;
-                                        }
-                                    });
-                                    chatArea.scrollTop = chatArea.scrollHeight;
-                                }
-                                // Update chatId for new messages
-                                chatId = chat.chatId;
-                            });
-                            sidebarContent.appendChild(chatLink);
-                        });
-                    }
-                }
-                loadChats();
-            });
+    <script type="module">
+        import { getCurrentUser, onAuthStateChange } from './auth.js';
+        import { initializeLoginPage } from './login.js';
+        import { initializeAuthenticatedApp } from './app.js';
 
-        const chat = document.getElementById('chat');
-        const form = document.getElementById('form');
-        const input = document.getElementById('input');
+        // SPA-style: show login or chat UI based on auth state
+        async function renderApp() {
+            console.log('I am render app');
+            const user = await getCurrentUser();
+            // console.log('Supabase user:', user);
+            const app = document.getElementById('app-container');
 
-        // Get chatId from URL if present
-        function getChatIdFromUrl() {
-            const params = new URLSearchParams(window.location.search);
-            return params.get('chatId');
-        }
+            if (!user) {
+                // Load login page
+                const response = await fetch('/login.html');
+                const loginHTML = await response.text();
+                app.innerHTML = loginHTML;
 
-        let chatId = getChatIdFromUrl();
-        async function startNewChat() {
-            if (!chatId) {
-                chatId = crypto.randomUUID();
+                // Initialize login functionality
+                initializeLoginPage();
+            } else {
+                // Load authenticated app
+                const response = await fetch('/app.html');
+                const appHTML = await response.text();
+                app.innerHTML = appHTML;
+
+                // Initialize authenticated app functionality
+                await initializeAuthenticatedApp();
             }
         }
-        startNewChat();
 
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            const userMsg = input.value.trim();
-            if (!userMsg || !chatId) return;
-            // Add user bubble
-            chat.innerHTML += `<div class='bubble user'>${userMsg.replace(/\n/g, '<br>')}</div>`;
-            input.value = '';
-            chat.scrollTop = chat.scrollHeight;
-            // Fetch LLM reply
-            const res = await fetch('/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMsg, chatId })
-            });
-            const data = await res.json();
-            // Render LLM reply as markdown
-            chat.innerHTML += `<div class='bubble llm'>${marked.parse(data.reply || data.error)}</div>`;
-            chat.scrollTop = chat.scrollHeight;
-        };
+        // Listen for auth state changes (e.g., after magic link or Google login)
+        onAuthStateChange((_event, _session) => {
+            console.log('I am on auth state change');
+            renderApp();
+        });
+
+        // Initial render
+        renderApp();
     </script>
 </body>
 
