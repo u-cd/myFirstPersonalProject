@@ -354,7 +354,7 @@ body {
         /* Hidden off-screen */
         background: #fff;
         /* width: 280px; */
-        height: 100vh;
+        height: 100%;
         z-index: 1000;
         transition: left 0.3s ease;
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
@@ -372,7 +372,8 @@ body {
         top: 0;
         left: 0;
         width: 100vw;
-        height: 100vh;
+        /* height: 100vh; */
+        height: 100%;
         background: rgba(255, 255, 255, 0.5);
         backdrop-filter: blur(1px);
         -webkit-backdrop-filter: blur(1px);
