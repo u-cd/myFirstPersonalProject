@@ -19,6 +19,7 @@ body {
 .app-layout {
     display: flex;
     height: 100vh;
+    /* for mobile address bar issue */
     height: 100dvh;
 }
 
@@ -372,8 +373,9 @@ body {
         top: 0;
         left: 0;
         width: 100vw;
-        /* height: 100vh; */
-        height: 100%;
+        height: 100vh;
+        /* for mobile address bar issue */
+        height: 100dvh;
         background: rgba(255, 255, 255, 0.5);
         backdrop-filter: blur(1px);
         -webkit-backdrop-filter: blur(1px);
