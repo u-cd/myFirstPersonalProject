@@ -20,7 +20,8 @@ body {
     display: flex;
     height: 100vh;
     /* for mobile address bar issue */
-    height: 100dvh;
+    /* height: 100dvh; */
+    height: 100svh;
 }
 
 .main-content {
@@ -376,7 +377,7 @@ body {
         width: 100vw;
         height: 100vh;
         /* for mobile address bar issue */
-        height: 100dvh;
+        height: 100%;
         background: rgba(255, 255, 255, 0.5);
         backdrop-filter: blur(1px);
         -webkit-backdrop-filter: blur(1px);
@@ -520,7 +521,7 @@ body {
         left: 0;
         width: 100vw;
         height: 100vh;
-        height: 100dvh;
+        height: 100%;
         background: rgba(255, 255, 255, 0.5);
         backdrop-filter: blur(1px);
         -webkit-backdrop-filter: blur(1px);
