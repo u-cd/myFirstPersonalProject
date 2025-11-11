@@ -124,7 +124,6 @@ function setupUserAccount(user) {
 }
 
 function setupMobileMenu() {
-    console.log('I am set up mobile menu');
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     const sidebarOverlay = document.getElementById('sidebar-overlay');
     const sidebarWrapper = document.getElementById('sidebar-content-wrapper');

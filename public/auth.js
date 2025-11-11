@@ -16,6 +16,7 @@ export async function signInWithGoogle() {
     const redirectUrl = isLocalhost
         ? 'http://localhost:3000'
         : 'https://aigooooo.com';
+    console.log('redirectUrl: ', redirectUrl);
 
     try {
         await supabase.auth.signInWithOAuth({
@@ -35,6 +36,7 @@ export async function signInWithEmail(email) {
     const redirectUrl = isLocalhost
         ? 'http://localhost:3000'
         : 'https://aigooooo.com';
+        console.log('redirectUrl: ', redirectUrl);
 
     try {
         const { error } = await supabase.auth.signInWithOtp({

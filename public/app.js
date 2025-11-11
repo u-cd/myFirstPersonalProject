@@ -2,7 +2,6 @@ import { getCurrentUser } from './auth.js';
 import { loadSidebar } from './sidebar.js';
 
 export async function initializeAuthenticatedApp() {
-    console.log('I am initialize authenticated app');
     const user = await getCurrentUser();
     if (!user) return;
 

@@ -21,7 +21,7 @@
 
         // SPA-style: show login or chat UI based on auth state
         async function renderApp() {
-            console.log('I am render app');
+            // console.log('I am render app');
             const user = await getCurrentUser();
             // console.log('Supabase user:', user);
             const app = document.getElementById('app-container');
@@ -47,7 +47,7 @@
 
         // Listen for auth state changes (e.g., after magic link or Google login)
         onAuthStateChange((_event, _session) => {
-            console.log('I am on auth state change');
+            // console.log('I am on auth state change');
             renderApp();
         });
 
