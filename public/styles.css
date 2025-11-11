@@ -14,16 +14,17 @@ body {
     /* for mobile address bar issue */
     height: 100vh;
     height: 100dvh;
-    height: 100svh;
+    /* height: 100svh; */
     overflow: hidden;
 }
 
 /* App Layout Styles */
 .app-layout {
     display: flex;
+    /* for mobile address bar issue */
     height: 100vh;
     height: 100dvh;
-    height: 100svh;
+    /* height: 100svh; */
     /* height: 100%; */
 }
 
