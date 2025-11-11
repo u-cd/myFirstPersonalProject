@@ -81,8 +81,6 @@ app.post('/', async (req, res) => {
         // Get all messages for this chatId (and userId if provided)
         const query = userId ? { chatId, userId } : { chatId };
         const allMessages = await ChatMessage.find(query).sort({ timestamp: 1 }).lean();
-        // Debug: log allMessages
-        console.log('allmessages for LLM context:', allMessages);
 
         // Prepare context for LLM
         const cleanedHistory = allMessages.map(msg => ({ role: msg.role, content: msg.content }));
