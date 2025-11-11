@@ -21,7 +21,10 @@ body {
 /* App Layout Styles */
 .app-layout {
     display: flex;
-    height: 100%;
+    height: 100vh;
+    height: 100dvh;
+    height: 100svh;
+    /* height: 100%; */
 }
 
 .main-content {
