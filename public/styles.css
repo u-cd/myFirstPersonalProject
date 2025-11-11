@@ -9,19 +9,19 @@ body {
     font-family: 'OpenDyslexic', 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
     background: #fff;
     margin: 0;
-    height: 100vh;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    /* for mobile address bar issue */
+    height: 100vh;
+    height: 100dvh;
+    height: 100svh;
+    overflow: hidden;
 }
 
 /* App Layout Styles */
 .app-layout {
     display: flex;
-    height: 100vh;
-    /* for mobile address bar issue */
-    /* height: 100dvh; */
-    height: 100svh;
+    height: 100%;
 }
 
 .main-content {
@@ -30,6 +30,7 @@ body {
     flex-direction: column;
     min-width: 0;
     height: 100%;
+    overflow: hidden;
     /* Prevent flex item from overflowing */
 }
 
@@ -375,7 +376,6 @@ body {
         top: 0;
         left: 0;
         width: 100vw;
-        height: 100vh;
         /* for mobile address bar issue */
         height: 100%;
         background: rgba(255, 255, 255, 0.5);
@@ -520,7 +520,6 @@ body {
         top: 0;
         left: 0;
         width: 100vw;
-        height: 100vh;
         height: 100%;
         background: rgba(255, 255, 255, 0.5);
         backdrop-filter: blur(1px);
