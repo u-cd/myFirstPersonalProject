@@ -1,3 +1,10 @@
 node_modules/
 .env
 my-ec2-key*.pem
+
+# for runteq graduate examination
+README copy.md
+runteq_ERDiagram.md
+runteq_issue.md
+
+spreadsheet
