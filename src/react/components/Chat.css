@@ -1,0 +1,243 @@
+/* Chat Component Styles */
+.chat {
+    flex: 1;
+    overflow-y: auto;
+    width: 50vw;
+    margin: 0 auto;
+    padding: 24px 16px 16px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scrollbar-width: thin;
+    scrollbar-color: #bbb #ffffff;
+}
+
+/* Chat Bubble Styles */
+.bubble {
+    padding: 12px 18px;
+    border-radius: 18px;
+    font-size: 1rem;
+    line-height: 1.5;
+    word-break: break-word;
+    margin-bottom: 2px;
+    position: relative;
+    animation: fadein 0.2s;
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.user {
+    background: #bdd;
+    color: #0a2a4a;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.llm {
+    color: #222;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+/* Form and Input Styles */
+.chat-form {
+    display: flex;
+    gap: 8px;
+    padding: 16px;
+    width: 50vw;
+    margin: 0 auto;
+}
+
+.chat-input {
+    flex: 1;
+    font-size: 1rem;
+    padding: 10px 14px;
+    border-radius: 100px;
+    border: 1px solid #ddd;
+    outline: none;
+    background: #ffffff;
+    transition: border 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.chat-input:focus {
+    border: 1.5px solid #555;
+}
+
+/* Send Button */
+.send-btn {
+    background: none;
+    color: #222;
+    border: none;
+    border-radius: 50%;
+    padding: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.send-btn:hover {
+    background: #eee;
+}
+
+/* Disclaimer */
+.disclaimer {
+    text-align: center;
+    color: #888;
+    font-size: 0.95em;
+    margin: 12px 0 8px 0;
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 768px) {
+    .chat {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        padding: 60px 16px 16px 16px;
+        margin: 0;
+    }
+
+    .chat-form {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        padding: 0px 16px;
+        margin: 0;
+        gap: 0;
+    }
+
+    .disclaimer {
+        font-size: 0.8em;
+        margin: 12px 0;
+    }
+
+    .bubble {
+        padding: 10px 14px;
+        font-size: 0.95rem;
+        line-height: 1.8;
+    }
+
+    .llm.bubble {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .chat-input {
+        font-size: 16px;
+        padding: 12px 14px;
+    }
+
+    .send-btn {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+    }
+}
+
+/* Tablet Responsive */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .chat {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        padding: 60px 32px 16px 32px;
+        margin: 0;
+    }
+
+    .chat-form {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        padding: 0px 32px;
+        margin: 0;
+        gap: 0;
+    }
+
+    .disclaimer {
+        font-size: 1em;
+        margin: 24px 0;
+    }
+
+    .bubble {
+        padding: 10px 14px;
+        font-size: 1.3rem;
+        line-height: 1.8;
+    }
+
+    .llm.bubble {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .chat-input {
+        font-size: 1.2rem;
+        padding: 12px 14px;
+    }
+
+    .send-btn {
+        width: 44px;
+        height: 44px;
+        flex-shrink: 0;
+    }
+}
+
+/* Desktop Responsive */
+@media screen and (min-width: 1025px) {
+    .chat {
+        width: 50vw;
+        max-width: 800px;
+    }
+
+    .chat-form {
+        width: 50vw;
+        max-width: 800px;
+    }
+}
+
+/* Large Desktop */
+@media screen and (min-width: 1440px) {
+    .chat {
+        width: 45vw;
+        max-width: 900px;
+    }
+
+    .chat-form {
+        width: 45vw;
+        max-width: 900px;
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    .bubble {
+        animation: none;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .bubble {
+        border: 2px solid;
+    }
+
+    .chat-input {
+        border: 2px solid;
+    }
+}
