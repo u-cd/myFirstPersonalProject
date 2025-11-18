@@ -79,3 +79,6 @@ AI：OpenAI API
 - 1週間単位で小さな目標を設定し、進捗を確認しながら進めます
 - 1つ1つのタスクに対して目安の所要時間を振っていく形でスケジュールの調整を行います
 - 想定以上に時間がかかる場合は、技術選定の見直しも検討します
+
+## 画面遷移図
+Figma：https://www.figma.com/board/P2QWX1Z0kuKyk7pWxFjvGb/Screen-transition-diagram?node-id=0-1&t=e7SoDy2GQPxRZXmq-1
