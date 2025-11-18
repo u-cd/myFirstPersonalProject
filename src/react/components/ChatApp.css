@@ -1,0 +1,77 @@
+/* ChatApp Component Styles */
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Mobile menu button */
+.mobile-menu-btn {
+    display: none;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+    background: #fff;
+    border: none;
+    padding: 20px;
+    cursor: pointer;
+}
+
+/* Sidebar overlay for mobile */
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    z-index: 999;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+.mobile-menu-content {
+    padding: 10px 14px;
+    border: none;
+    outline: none;
+    background: #fff;
+    font-size: 1.4em;
+}
+
+/* Mobile Responsive */
+@media screen and (max-width: 768px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    .mobile-menu-content {
+        font-size: 1.4em;
+    }
+}
+
+/* Tablet Responsive */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    .mobile-menu-content {
+        font-size: 1.6em;
+    }
+}
+
+/* Desktop Responsive */
+@media screen and (min-width: 1025px) {
+    .mobile-menu-btn {
+        display: none;
+    }
+}
