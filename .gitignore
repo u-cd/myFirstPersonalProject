@@ -1,6 +1,11 @@
 node_modules/
+
+# secret files
 .env
 my-ec2-key*.pem
+
+# React build output
+public/dist/
 
 # for runteq graduate examination
 README copy.md

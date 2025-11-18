@@ -9,7 +9,6 @@ services:
     env_file:
       - .env
     volumes:
-    # for development. delete if not need.
-      # - ./src:/usr/src/app/src
-      # - ./public:/usr/src/app/public
+    # mount public/dist (react generated files) for development
+    # delete if not need.
       - ./public/dist:/usr/src/app/public/dist
