@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -9,6 +9,9 @@ RUN npm install --include=dev
 
 # Bundle app source
 COPY . .
+
+# Build React application
+RUN npm run build
 
 EXPOSE 3000
 

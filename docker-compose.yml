@@ -9,5 +9,7 @@ services:
     env_file:
       - .env
     volumes:
-      - ./src:/usr/src/app/src
-      - ./public:/usr/src/app/public
+    # for development. delete if not need.
+      # - ./src:/usr/src/app/src
+      # - ./public:/usr/src/app/public
+      - ./public/dist:/usr/src/app/public/dist
