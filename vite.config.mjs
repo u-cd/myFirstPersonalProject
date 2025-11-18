@@ -8,14 +8,5 @@ export default defineConfig({
     build: {
         outDir: '../../public/dist',
         emptyOutDir: true
-    },
-    server: {
-        port: 5173,
-        proxy: {
-            '^/(?!src|node_modules|@vite|@fs).*': {
-                target: 'http://localhost:3000',
-                changeOrigin: true
-            }
-        }
     }
 });
