@@ -8,7 +8,7 @@ my-ec2-key*.pem
 public/dist/
 
 # for runteq graduate examination
-README copy.md
+runteq_screen_transition_diagram.md
 runteq_ERDiagram.md
 runteq_issue.md
 

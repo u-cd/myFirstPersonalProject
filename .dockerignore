@@ -1,6 +1,8 @@
 node_modules
 npm-debug.log
 .env
+my-ec2-key.pem
+spreadsheet
 .DS_Store
 Dockerfile
 .dockerignore
