@@ -1,19 +1,76 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
 import { supabase } from '../supabase-config';
 import Chat from './Chat';
 import { v4 as uuidv4 } from 'uuid';
+import './Login.css';
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [agreed, setAgreed] = useState(false);
 
     // Anonymous chat state
     const [chatMessages, setChatMessages] = useState([]);
     const [chatId] = useState(() => uuidv4());
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [mainContent, setMainContent] = useState('chat'); // 'chat' | 'terms' | 'privacy'
+    const [termsMarkdown, setTermsMarkdown] = useState('');
+    const [privacyMarkdown, setPrivacyMarkdown] = useState('');
+
+    // Dynamic max height for markdown panels based on actual layout
+    const docScrollRef = useRef(null);
+    const [docMaxHeight, setDocMaxHeight] = useState(undefined);
+
+    useEffect(() => {
+        const updateMaxHeight = () => {
+            if (!docScrollRef.current) return;
+            const rect = docScrollRef.current.getBoundingClientRect();
+            // Leave a small bottom gap to avoid touching screen edges
+            const bottomGap = 12;
+            const available = Math.max(0, window.innerHeight - rect.top - bottomGap);
+            setDocMaxHeight(available);
+        };
+
+        // Run on mount and when content/view changes
+        const raf = requestAnimationFrame(updateMaxHeight);
+        window.addEventListener('resize', updateMaxHeight);
+        window.addEventListener('orientationchange', updateMaxHeight);
+
+        return () => {
+            cancelAnimationFrame(raf);
+            window.removeEventListener('resize', updateMaxHeight);
+            window.removeEventListener('orientationchange', updateMaxHeight);
+        };
+    }, [mainContent, termsMarkdown, privacyMarkdown]);
+
+    const showTerms = async (e) => {
+        e.preventDefault();
+        if (!termsMarkdown) {
+            const res = await fetch('/terms-of-use.md');
+            setTermsMarkdown(await res.text());
+        }
+        setMainContent('terms');
+    };
+    const showPrivacy = async (e) => {
+        e.preventDefault();
+        if (!privacyMarkdown) {
+            const res = await fetch('/privacy-policy.md');
+            setPrivacyMarkdown(await res.text());
+        }
+        setMainContent('privacy');
+    };
+    const showChat = (e) => {
+        if (e) e.preventDefault();
+        setMainContent('chat');
+    };
 
     const signInWithGoogle = async () => {
+        if (!agreed) {
+            setMessage('You must agree to the Terms of Use and Privacy Policy before logging in.<br>ログインする前に利用規約とプライバシーポリシーに同意してください。');
+            return;
+        }
         setLoading(true);
         try {
             const isLocalhost = window.location.hostname === 'localhost';
@@ -41,6 +98,10 @@ export default function Login() {
     const signInWithEmail = async (e) => {
         e.preventDefault();
         if (!email) return;
+        if (!agreed) {
+            setMessage('You must agree to the Terms of Use and Privacy Policy before logging in.<br>ログインする前に利用規約とプライバシーポリシーに同意してください。');
+            return;
+        }
 
         setLoading(true);
         try {
@@ -118,7 +179,12 @@ export default function Login() {
             <div id="sidebar">
                 <div className={`sidebar-content-wrapper ${sidebarOpen ? 'sidebar-open' : ''}`}>
                     <div className="login-container">
-                        <h2>Log in or sign up</h2>
+                        <div
+                            className="login-message"
+                            dangerouslySetInnerHTML={{ __html: message }}
+                        />
+
+                        <h2>Log in or Sign up</h2>
 
                         <button
                             className="google-login"
@@ -149,15 +215,31 @@ export default function Login() {
                             </button>
                         </form>
 
-                        <div
-                            className="login-message"
-                            dangerouslySetInnerHTML={{ __html: message }}
-                        />
+                        <div style={{ margin: '12px 0 8px 0', fontSize: '0.95em' }}>
+                            <input
+                                type="checkbox"
+                                id="agreePolicies"
+                                checked={agreed}
+                                onChange={e => setAgreed(e.target.checked)}
+                                required
+                                style={{ marginRight: '6px' }}
+                            />
+                            <label htmlFor="agreePolicies">
+                                I agree to the
+                                <a href="#terms" onClick={showTerms} style={{ margin: '0 4px', cursor: 'pointer', textDecoration: 'underline' }}>Terms of Use</a>
+                                and
+                                <a href="#privacy" onClick={showPrivacy} style={{ margin: '0 4px', cursor: 'pointer', textDecoration: 'underline' }}>Privacy Policy</a>
+                                .<br />
+                                <span style={{ fontSize: '0.92em', color: '#555' }}>
+                                    （利用規約およびプライバシーポリシーに同意します）
+                                </span>
+                            </label>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* Main content with anonymous chat */}
+            {/* Main content area: chat or policy docs */}
             <div className="main-content">
                 {/* Mobile menu button */}
                 <button
@@ -168,12 +250,37 @@ export default function Login() {
                     <div>Log in</div>
                 </button>
 
-                {/* Anonymous chat using Chat component */}
-                <Chat
-                    messages={chatMessages}
-                    onSendMessage={sendAnonymousMessage}
-                    currentChatId={chatId}
-                />
+                {mainContent === 'chat' && (
+                    <Chat
+                        messages={chatMessages}
+                        onSendMessage={sendAnonymousMessage}
+                        currentChatId={chatId}
+                    />
+                )}
+                {mainContent === 'terms' && (
+                    <div className="doc-container">
+                        <button onClick={showChat} className="doc-back">Close</button>
+                        <div
+                            style={{ maxHeight: docMaxHeight ? `${docMaxHeight}px` : undefined }}
+                            className="doc-scroll"
+                            ref={docScrollRef}
+                        >
+                            <ReactMarkdown>{termsMarkdown}</ReactMarkdown>
+                        </div>
+                    </div>
+                )}
+                {mainContent === 'privacy' && (
+                    <div className="doc-container">
+                        <button onClick={showChat} className="doc-back">Close</button>
+                        <div
+                            style={{ maxHeight: docMaxHeight ? `${docMaxHeight}px` : undefined }}
+                            className="doc-scroll"
+                            ref={docScrollRef}
+                        >
+                            <ReactMarkdown>{privacyMarkdown}</ReactMarkdown>
+                        </div>
+                    </div>
+                )}
             </div>
         </>
     );

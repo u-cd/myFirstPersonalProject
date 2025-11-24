@@ -13,8 +13,12 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
+    
 app.use(express.json());
+// Serve built frontend assets first (so /assets/* resolves to dist assets)
 app.use(express.static(path.join(__dirname, '../public/dist')));
+// Serve other public files (markdown, images, etc.)
+app.use(express.static(path.join(__dirname, '../public')));
 
 // Initial system prompt
 const systemPrompt = {
