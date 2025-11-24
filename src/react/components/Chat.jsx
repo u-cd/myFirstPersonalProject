@@ -30,8 +30,44 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
 
     return (
         <>
+
             <div ref={chatRef} className="chat">
-                {messages.map((message, index) => (
+                {(() => {
+                    const helloMsg = {
+                        role: 'llm',
+                        content: [
+                            '# Welcome to ai語!',
+                            'This is an **AI English conversation tutor**.',
+                            '',
+                            'Originally, this app was created by the developer for my own English learning.',
+                            'The goal is to help you study real, natural English easily and comfortably.',
+                            '',
+                            'このアプリは **AI英会話シミュレーター** （練習台）です。🤖🇬🇧',
+                            '',
+                            '### I will help you improve your English!',
+                            '### あなたの英語学習をサポートします！📚📝',
+                            '',
+                            '- 下の入力欄にメッセージを入力して、英語学習を始めましょう！👇💬✍️',
+                            '- 英語で書いてみましょう！📝（日本語まじりでもOKです😊）例: "Hello! 今日の天気はどうですか？"🌤️',
+                            '- 分からないことがあれば、いつでも質問してください！❓🙋‍♂️🙋‍♀️',
+                            '',
+                            '---',
+                            '',
+                            "**Let's get started!** 🌟 楽しく学びましょう！🚀✨🎓🦉📝🎤💡💬",
+                            '',
+                            '⚠️🤖 AIはまちがうことがあります。大事な内容は必ずご自身でご確認ください！🔍📢🧐💡🙇‍♂️🙇‍♀️',
+                            '',
+                        ].join('\n')
+                    };
+                    // If no messages, show only hello
+                    if (messages.length === 0) return [helloMsg];
+                    // If first message is not the hello, prepend it
+                    if (!(messages[0].role === 'llm' && messages[0].content && messages[0].content.includes('Type your message to start chatting'))) {
+                        return [helloMsg, ...messages];
+                    }
+                    // Otherwise, just show messages
+                    return messages;
+                })().map((message, index) => (
                     <div
                         key={index}
                         className={`bubble ${message.role === 'user' ? 'user' : 'llm'}`}
