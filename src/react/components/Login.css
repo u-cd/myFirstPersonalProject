@@ -1,6 +1,6 @@
 /* Login Component Styles */
 .login-container {
-    width: 300px;
+    width: 321px;
     height: 100%;
     min-width: 260px;
     max-width: 400px;
@@ -79,12 +79,79 @@
 
 .login-message {
     min-height: 32px;
-    color: rgb(0, 0, 0);
+    /* color: #1976d2; */
+    color: #000000;
     font-size: 1em;
 }
 
+.doc-container {
+    padding: 24px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.doc-close {
+    margin-bottom: 16px;
+}
+
+.doc-scroll {
+    background: #ffffff;
+    /* Scrolling behavior */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    /* Content spacing */
+    /* Wrapping for long words/URLs */
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    /* optional: a subtle border to separate from background */
+    /* border: 1px solid #eee; */
+    /* border-radius: 8px; */
+    scrollbar-width: thin;
+    scrollbar-color: #bbb #ffffff;
+}
+
+/* Ensure markdown content behaves nicely */
+.doc-scroll img,
+.doc-scroll video,
+.doc-scroll iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+.doc-scroll pre {
+    overflow-x: auto;
+    background: #f8f8f8;
+    padding: 8px 10px;
+    border-radius: 6px;
+}
+
+.doc-scroll code {
+    word-break: normal;
+    overflow-wrap: normal;
+}
+
+.login-menu-btn {
+    display: none;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+    background: #fff;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 1.3em;
+    color: blue;
+}
+
+
 /* Mobile Responsive */
 @media screen and (max-width: 768px) {
+    .login-menu-btn {
+        display: block;
+    }
+
     .login-container {
         background: #fff;
         width: 100%;
@@ -98,6 +165,31 @@
 
     .google-login {
         background: #ffffff;
+    }
+
+    .doc-container {
+        padding: 0px;
+        margin-top: 50px;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Close button (doc-button) at top right */
+    .doc-close {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        z-index: 1;
+        padding: 12px;
+        background: #ffffff;
+        border: none;
+        display: flex;
+        font-size: 1.3em;
+    }
+
+    .doc-scroll {
+        padding: 12px;
     }
 }
 

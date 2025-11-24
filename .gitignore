@@ -7,9 +7,6 @@ my-ec2-key*.pem
 # React build output
 public/dist/
 
-# for runteq graduate examination
-README copy.md
-runteq_ERDiagram.md
-runteq_issue.md
+runteq_graduate_examination
 
 spreadsheet
