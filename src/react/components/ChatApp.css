@@ -17,7 +17,6 @@
     z-index: 1;
     background: #fff;
     border: none;
-    padding: 20px;
     cursor: pointer;
 }
 
@@ -54,7 +53,7 @@
     }
 
     .mobile-menu-content {
-        font-size: 1.4em;
+        font-size: 1.6em;
     }
 }
 

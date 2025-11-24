@@ -243,7 +243,7 @@ export default function Login() {
             <div className="main-content">
                 {/* Mobile menu button */}
                 <button
-                    className="mobile-menu-btn"
+                    className="login-menu-btn"
                     onClick={toggleSidebar}
                     aria-label="Open menu"
                 >
@@ -259,7 +259,7 @@ export default function Login() {
                 )}
                 {mainContent === 'terms' && (
                     <div className="doc-container">
-                        <button onClick={showChat} className="doc-back">Close</button>
+                        <button onClick={showChat} className="doc-close">Close</button>
                         <div
                             style={{ maxHeight: docMaxHeight ? `${docMaxHeight}px` : undefined }}
                             className="doc-scroll"
@@ -271,7 +271,7 @@ export default function Login() {
                 )}
                 {mainContent === 'privacy' && (
                     <div className="doc-container">
-                        <button onClick={showChat} className="doc-back">Close</button>
+                        <button onClick={showChat} className="doc-close">Close</button>
                         <div
                             style={{ maxHeight: docMaxHeight ? `${docMaxHeight}px` : undefined }}
                             className="doc-scroll"
