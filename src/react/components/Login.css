@@ -194,6 +194,10 @@
 
 /* Tablet Responsive */
 @media screen and (min-width: 769px) and (max-width: 1024px) {
+    .login-menu-btn {
+        display: block;
+    }
+    
     .login-container {
         background: #fff;
         width: 100%;
@@ -207,5 +211,30 @@
 
     .google-login {
         background: #ffffff;
+    }
+
+    .doc-container {
+        padding: 0px;
+        margin-top: 50px;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Close button (doc-button) at top right */
+    .doc-close {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        z-index: 1;
+        padding: 12px;
+        background: #ffffff;
+        border: none;
+        display: flex;
+        font-size: 1.3em;
+    }
+
+    .doc-scroll {
+        padding: 12px;
     }
 }
