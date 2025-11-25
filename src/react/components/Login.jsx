@@ -136,8 +136,12 @@ export default function Login() {
         const userMessage = { role: 'user', content: messageText };
         setChatMessages(prev => [...prev, userMessage]);
 
+        // Use EC2 public IP for backend API when running in emulator or on device
+        // 問題の部分 API がモバイルアプリ側からどうなるのかよくわからない
+        const API_BASE = 'http://52.194.251.155:3000';
+
         try {
-            const res = await fetch('/', {
+            const res = await fetch(`${API_BASE}/`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
