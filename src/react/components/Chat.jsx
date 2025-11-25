@@ -55,7 +55,7 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
                             '',
                             "**Let's get started!** 🌟 楽しく学びましょう！🚀✨🎓🦉📝🎤💡💬",
                             '',
-                            '⚠️🤖 AIはまちがうことがあります。大事な内容は必ずご自身でご確認ください！🔍📢🧐💡🙇‍♂️🙇‍♀️',
+                            '⚠️🤖 AIはまちがえることがあります。大事な内容は必ずご自身でご確認ください！🔍📢🧐💡🙇‍♂️🙇‍♀️',
                             '',
                         ].join('\n')
                     };
