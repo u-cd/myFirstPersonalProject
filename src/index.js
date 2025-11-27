@@ -1,3 +1,5 @@
+// on the docker, dotenv no need
+// require('dotenv').config();
 const express = require('express');
 const { OpenAI } = require('openai');
 const path = require('path');
@@ -11,7 +13,11 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
+    
 app.use(express.json());
+// Serve built frontend assets first (so /assets/* resolves to dist assets)
+app.use(express.static(path.join(__dirname, '../public/dist')));
+// Serve other public files (markdown, images, etc.)
 app.use(express.static(path.join(__dirname, '../public')));
 
 // Initial system prompt
@@ -121,6 +127,11 @@ app.post('/', async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
+});
+
+// Serve React app for all other routes (SPA fallback)
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/dist/index.html'));
 });
 
 app.listen(port, () => console.log(`Server listening on port ${port}`));

@@ -1,0 +1,240 @@
+/* Login Component Styles */
+.login-container {
+    width: 321px;
+    height: 100%;
+    min-width: 260px;
+    max-width: 400px;
+    background: #f5f5f5;
+    padding: 32px 18px 18px 18px;
+    box-sizing: border-box;
+    border-right: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.login-container h2 {
+    margin-bottom: 16px;
+}
+
+/* Google Login Button */
+.google-login {
+    background: #f5f5f5;
+    padding: 10px 0;
+    color: #222;
+    border: 1px solid #bbb;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: block;
+    transition: background 0.2s, border 0.2s;
+    width: 100%;
+    cursor: pointer;
+}
+
+.google-login:hover {
+    transform: scale(1.01);
+    box-shadow: 0 2px 12px 0 #bbb8;
+}
+
+/* Login Form Styles */
+.login-or {
+    text-align: center;
+    color: #888;
+    margin: 8px 0;
+    font-size: 1em;
+}
+
+.login-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.login-form input[type="email"] {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    outline: none;
+    background: #fff;
+    font-size: 1em;
+}
+
+.login-form button[type="submit"] {
+    padding: 10px 0;
+    border-radius: 8px;
+    background: #bdd;
+    color: #0a2a4a;
+    border: none;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.login-form button[type="submit"]:hover {
+    transform: scale(1.01);
+    box-shadow: 0 2px 12px 0 #bdd6;
+}
+
+.login-message {
+    min-height: 32px;
+    /* color: #1976d2; */
+    color: #000000;
+    font-size: 1em;
+}
+
+.doc-container {
+    padding: 24px;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.doc-close {
+    margin-bottom: 16px;
+}
+
+.doc-scroll {
+    background: #ffffff;
+    /* Scrolling behavior */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    /* Content spacing */
+    /* Wrapping for long words/URLs */
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    /* optional: a subtle border to separate from background */
+    /* border: 1px solid #eee; */
+    /* border-radius: 8px; */
+    scrollbar-width: thin;
+    scrollbar-color: #bbb #ffffff;
+}
+
+/* Ensure markdown content behaves nicely */
+.doc-scroll img,
+.doc-scroll video,
+.doc-scroll iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+.doc-scroll pre {
+    overflow-x: auto;
+    background: #f8f8f8;
+    padding: 8px 10px;
+    border-radius: 6px;
+}
+
+.doc-scroll code {
+    word-break: normal;
+    overflow-wrap: normal;
+}
+
+.login-menu-btn {
+    display: none;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+    background: #fff;
+    border: none;
+    padding: 12px;
+    cursor: pointer;
+    font-size: 1.3em;
+}
+
+
+/* Mobile Responsive */
+@media screen and (max-width: 768px) {
+    .login-menu-btn {
+        display: block;
+    }
+
+    .login-container {
+        background: #fff;
+        width: 100%;
+        min-width: unset;
+        max-width: 400px;
+        margin: 0 auto;
+        border-right: none;
+        height: 100%;
+        justify-content: center;
+    }
+
+    .google-login {
+        background: #ffffff;
+    }
+
+    .doc-container {
+        padding: 0px;
+        margin-top: 50px;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Close button (doc-button) at top right */
+    .doc-close {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        z-index: 1;
+        padding: 12px;
+        background: #ffffff;
+        border: none;
+        display: flex;
+        font-size: 1.3em;
+    }
+
+    .doc-scroll {
+        padding: 12px;
+    }
+}
+
+/* Tablet Responsive */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    .login-menu-btn {
+        display: block;
+    }
+    
+    .login-container {
+        background: #fff;
+        width: 100%;
+        min-width: unset;
+        max-width: 400px;
+        margin: 0 auto;
+        border-right: none;
+        height: 100%;
+        justify-content: center;
+    }
+
+    .google-login {
+        background: #ffffff;
+    }
+
+    .doc-container {
+        padding: 0px;
+        margin-top: 50px;
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    /* Close button (doc-button) at top right */
+    .doc-close {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        z-index: 1;
+        padding: 12px;
+        background: #ffffff;
+        border: none;
+        display: flex;
+        font-size: 1.3em;
+    }
+
+    .doc-scroll {
+        padding: 12px;
+    }
+}
