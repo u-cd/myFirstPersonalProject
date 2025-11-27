@@ -102,6 +102,10 @@ export default function Login() {
             setMessage('You must agree to the Terms of Use and Privacy Policy before signing up.<br>サインアップする前に利用規約とプライバシーポリシーに同意してください。');
             return;
         }
+        if (isSignUp && password.length < 6) {
+            setMessage('Password must be at least 6 characters.<br>パスワードは6文字以上である必要があります。');
+            return;
+        }
 
         setLoading(true);
         try {
