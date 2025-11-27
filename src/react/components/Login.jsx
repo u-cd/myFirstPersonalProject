@@ -115,7 +115,7 @@ export default function Login() {
                 const redirectUrl = isLocalhost
                     ? 'http://localhost:3000'
                     : 'https://aigooooo.com';
-                const { data, error } = await supabase.auth.signUp({
+                const { error } = await supabase.auth.signUp({
                     email,
                     password,
                     options: {
@@ -123,11 +123,9 @@ export default function Login() {
                     }
                 });
                 if (error) {
-                    // console.log('Supabase sign-up error:', error);
-                    setMessage('Sign up failed. Please check your email and password.<br>サインアップに失敗しました。メールアドレスとパスワードを確認してください。');
+                    setMessage('サインアップに失敗しました。メールアドレスとパスワードを確認してください。メールアドレスをすでに登録済みの場合はログインしてください。');
                 } else {
-                    console.log('Supabase sign-up success for email:', data);
-                    setMessage('確認メールを送信しました。迷惑メールフォルダもあわせてご確認ください。もしメールが送信されていない場合すでにメールアドレスが登録されている可能性があります。');
+                    setMessage('確認メールを送信しました。メールが見つからない場合は迷惑メールフォルダもあわせてご確認ください。');
                 }
             } else {
                 // Login flow
