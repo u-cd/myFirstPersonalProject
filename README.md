@@ -27,7 +27,7 @@ AIチャットボットが英語学習をサポートします。
 スマホやパソコンから、暇なときなどいつでもAIと英語で会話ができます。  
 日常的に英語でチャットすることで、知らず知らずのうちに英語力が向上していくイメージです。
 
-会話例
+会話例  
 [![Image from Gyazo](https://i.gyazo.com/0a22da370392cc8771b3a049c8570a5e.png)](https://gyazo.com/0a22da370392cc8771b3a049c8570a5e)
 
 ## ユーザーの獲得について
@@ -81,3 +81,6 @@ AI：OpenAI API
 - 1週間単位で小さな目標を設定し、進捗を確認しながら進めます
 - 1つ1つのタスクに対して目安の所要時間を振っていく形でスケジュールの調整を行います
 - 想定以上に時間がかかる場合は、技術選定の見直しも検討します
+
+## 画面遷移図
+Figma：https://www.figma.com/board/P2QWX1Z0kuKyk7pWxFjvGb/Screen-transition-diagram?node-id=0-1&t=e7SoDy2GQPxRZXmq-1
