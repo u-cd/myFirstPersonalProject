@@ -111,14 +111,23 @@ export default function Login() {
         try {
             if (isSignUp) {
                 // Sign up flow
-                const { error } = await supabase.auth.signUp({
+                const isLocalhost = window.location.hostname === 'localhost';
+                const redirectUrl = isLocalhost
+                    ? 'http://localhost:3000'
+                    : 'https://aigooooo.com';
+                const { data, error } = await supabase.auth.signUp({
                     email,
-                    password
+                    password,
+                    options: {
+                        emailRedirectTo: redirectUrl
+                    }
                 });
                 if (error) {
+                    // console.log('Supabase sign-up error:', error);
                     setMessage('Sign up failed. Please check your email and password.<br>サインアップに失敗しました。メールアドレスとパスワードを確認してください。');
                 } else {
-                    setMessage('Sign up successful! Please check your email to confirm your account.<br>サインアップが完了しました。確認メールが届いていない場合は、迷惑メールフォルダもご確認ください。メール内のリンクからアカウントを有効化してください。');
+                    console.log('Supabase sign-up success for email:', data);
+                    setMessage('確認メールを送信しました。迷惑メールフォルダもあわせてご確認ください。もしメールが送信されていない場合すでにメールアドレスが登録されている可能性があります。');
                 }
             } else {
                 // Login flow
@@ -136,6 +145,48 @@ export default function Login() {
             setMessage((isSignUp ? 'Sign up' : 'Login') + ' failed. Please try again.<br>' + (isSignUp ? 'サインアップ' : 'ログイン') + 'に失敗しました。');
         }
         setLoading(false);
+    };
+
+    // Magic link state
+    const [showMagicForm, setShowMagicForm] = useState(false);
+
+    // Listen for forgot password link click
+    useEffect(() => {
+        const handler = (e) => {
+            if (e.target && e.target.id === 'forgot-password-link') {
+                setShowMagicForm(true);
+                setEmail(email);
+                setMessage('メールアドレスを入力して、"Send magic link" をクリックしてください。');
+            }
+        };
+        document.addEventListener('click', handler);
+        return () => document.removeEventListener('click', handler);
+    }, [email]);
+
+    // Handle password reset request
+    const handleSendMagicLink = async (e) => {
+        e.preventDefault();
+        setMessage('');
+        if (!email) {
+            setMessage('Please enter your email.');
+            return;
+        }
+        // Send magic link (sign-in link) instead of password reset
+        const isLocalhost = window.location.hostname === 'localhost';
+        const redirectUrl = isLocalhost
+            ? 'http://localhost:3000'
+            : 'https://aigooooo.com';
+        const { error } = await supabase.auth.signInWithOtp({
+            email: email,
+            options: {
+                emailRedirectTo: redirectUrl
+            }
+        });
+        if (error) {
+            setMessage('Failed to send magic link. メールの送信に失敗しました。');
+        } else {
+            setMessage('Magic link sent!! メールを送信しました。記載されているリンクからログインしてください。');
+        }
     };
 
     // Anonymous chat functions
@@ -175,39 +226,6 @@ export default function Login() {
 
     const closeSidebar = () => {
         setSidebarOpen(false);
-    };
-
-    // Magic link state
-    const [showMagicForm, setShowMagicForm] = useState(false);
-
-    // Listen for forgot password link click
-    useEffect(() => {
-        const handler = (e) => {
-            if (e.target && e.target.id === 'forgot-password-link') {
-                setShowMagicForm(true);
-                setEmail(email);
-                setMessage('メールアドレスを入力して、"Send magic link" をクリックしてください。');
-            }
-        };
-        document.addEventListener('click', handler);
-        return () => document.removeEventListener('click', handler);
-    }, [email]);
-
-    // Handle password reset request
-    const handleSendMagicLink = async (e) => {
-        e.preventDefault();
-        setMessage('');
-        if (!email) {
-            setMessage('Please enter your email.');
-            return;
-        }
-        // Send magic link (sign-in link) instead of password reset
-        const { error } = await supabase.auth.signInWithOtp({ email: email });
-        if (error) {
-            setMessage('Failed to send magic link. メールの送信に失敗しました。');
-        } else {
-            setMessage('Magic link sent!! メールを送信しました。記載されているリンクからログインしてください。');
-        }
     };
 
     return (
