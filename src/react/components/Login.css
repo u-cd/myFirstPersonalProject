@@ -1,3 +1,32 @@
+/* Toggle Auth Container (Login/Sign up switch) */
+.toggle-auth-container {
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* Toggle Auth Mode Button (Login/Sign up switch) */
+.toggle-auth-mode {
+    background: none;
+    border: none;
+    color: #1976d2;
+    cursor: pointer;
+    padding: 6px 14px;
+    font-size: 1em;
+    border-radius: 6px;
+    /* font-weight: 600; */
+    transition: background 0.15s, color 0.15s;
+}
+
+.toggle-auth-mode:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* .toggle-auth-mode:hover:not(:disabled) {
+    background: #e3f0fa;
+    color: #125ea2;
+} */
+
 /* Login Component Styles */
 .login-container {
     width: 321px;
@@ -13,6 +42,10 @@
     align-items: center;
     justify-content: center;
     gap: 12px;
+    overflow-y: auto;
+    /* min-height: 100vh;
+    max-height: 100vh; */
+    position: relative;
 }
 
 .login-container h2 {
@@ -53,7 +86,8 @@
     gap: 8px;
 }
 
-.login-form input[type="email"] {
+.login-form input[type="email"],
+.login-form input[type="password"] {
     padding: 10px 14px;
     border-radius: 8px;
     border: 1px solid #ddd;
@@ -78,9 +112,8 @@
 }
 
 .login-message {
-    min-height: 32px;
-    /* color: #1976d2; */
-    color: #000000;
+    margin-top: 24px;
+    color: #1976d2;
     font-size: 1em;
 }
 
@@ -197,7 +230,7 @@
     .login-menu-btn {
         display: block;
     }
-    
+
     .login-container {
         background: #fff;
         width: 100%;

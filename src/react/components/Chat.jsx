@@ -42,7 +42,7 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
                             'Originally, this app was created by the developer for my own English learning.',
                             'The goal is to help you study real, natural English easily and comfortably.',
                             '',
-                            'このアプリは **AI英会話シミュレーター** （練習台）です。🤖🇬🇧',
+                            'このアプリは **AI英会話シミュレーター** です。🤖🇬🇧',
                             '',
                             '### I will help you improve your English!',
                             '### あなたの英語学習をサポートします！📚📝',
