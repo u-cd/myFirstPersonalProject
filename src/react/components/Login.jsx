@@ -8,8 +8,10 @@ import './Login.css';
 export default function Login() {
     const [email, setEmail] = useState('');
     const [message, setMessage] = useState('');
+    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [agreed, setAgreed] = useState(false);
+    const [isSignUp, setIsSignUp] = useState(false); // Toggle between login and sign-up
 
     // Anonymous chat state
     const [chatMessages, setChatMessages] = useState([]);
@@ -67,8 +69,9 @@ export default function Login() {
     };
 
     const signInWithGoogle = async () => {
-        if (!agreed) {
-            setMessage('You must agree to the Terms of Use and Privacy Policy before logging in.<br>ログインする前に利用規約とプライバシーポリシーに同意してください。');
+        // Only require agreement for sign up, not login
+        if (isSignUp && !agreed) {
+            setMessage('You must agree to the Terms of Use and Privacy Policy before signing up.<br>サインアップする前に利用規約とプライバシーポリシーに同意してください。');
             return;
         }
         setLoading(true);
@@ -77,7 +80,6 @@ export default function Login() {
             const redirectUrl = isLocalhost
                 ? 'http://localhost:3000'
                 : 'https://aigooooo.com';
-            console.log('redirectUrl: ', redirectUrl);
 
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
@@ -86,46 +88,103 @@ export default function Login() {
 
             if (error) {
                 setMessage('Google login failed.<br>Googleログインに失敗しました。');
-                console.log('Google login error:', error);
             }
         } catch (error) {
             setMessage('Google login failed.<br>Googleログインに失敗しました。');
-            console.log('Google login error:', error);
         }
         setLoading(false);
     };
 
-    const signInWithEmail = async (e) => {
+    const signInOrSignUpWithEmail = async (e) => {
         e.preventDefault();
-        if (!email) return;
-        if (!agreed) {
-            setMessage('You must agree to the Terms of Use and Privacy Policy before logging in.<br>ログインする前に利用規約とプライバシーポリシーに同意してください。');
+        if (!email || !password) return;
+        if (isSignUp && !agreed) {
+            setMessage('You must agree to the Terms of Use and Privacy Policy before signing up.<br>サインアップする前に利用規約とプライバシーポリシーに同意してください。');
+            return;
+        }
+        if (isSignUp && password.length < 6) {
+            setMessage('Password must be at least 6 characters.<br>パスワードは6文字以上である必要があります。');
             return;
         }
 
         setLoading(true);
         try {
-            const isLocalhost = window.location.hostname === 'localhost';
-            const redirectUrl = isLocalhost
-                ? 'http://localhost:3000'  // Vite dev server port
-                : 'https://aigooooo.com';
-
-            const { error } = await supabase.auth.signInWithOtp({
-                email,
-                options: { redirectTo: redirectUrl }
-            });
-
-            if (error) {
-                setMessage('Failed to send sign-in link.<br>サインインリンクの送信に失敗しました。');
-                console.log('Supabase sign-in error:', error);
+            if (isSignUp) {
+                // Sign up flow
+                const isLocalhost = window.location.hostname === 'localhost';
+                const redirectUrl = isLocalhost
+                    ? 'http://localhost:3000'
+                    : 'https://aigooooo.com';
+                const { error } = await supabase.auth.signUp({
+                    email,
+                    password,
+                    options: {
+                        emailRedirectTo: redirectUrl
+                    }
+                });
+                if (error) {
+                    setMessage('サインアップに失敗しました。メールアドレスとパスワードを確認してください。メールアドレスをすでに登録済みの場合はログインしてください。');
+                } else {
+                    setMessage('確認メールを送信しました。メールが見つからない場合は迷惑メールフォルダもあわせてご確認ください。');
+                }
             } else {
-                setMessage('Sign-in link sent! Check your email. If you do not see it, it may be in your spam folder.<br>サインインリンクを送信しました。メールが届かない場合は、迷惑フォルダもご確認ください。');
+                // Login flow
+                const { error } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                if (error) {
+                    setMessage('Login failed. Please check your email and password.<br>ログインに失敗しました。メールアドレスとパスワードを確認してください。<br><span id="forgot-password-link" style="color:#1976d2;cursor:pointer;text-decoration:underline;">パスワードを覚えてないですか？</span>');
+                } else {
+                    setMessage('Login successful! ログイン成功！');
+                }
             }
         } catch (error) {
-            setMessage('Failed to send sign-in link.<br>サインインリンクの送信に失敗しました。');
-            console.log('Supabase sign-in error:', error);
+            setMessage((isSignUp ? 'Sign up' : 'Login') + ' failed. Please try again.<br>' + (isSignUp ? 'サインアップ' : 'ログイン') + 'に失敗しました。');
         }
         setLoading(false);
+    };
+
+    // Magic link state
+    const [showMagicForm, setShowMagicForm] = useState(false);
+
+    // Listen for forgot password link click
+    useEffect(() => {
+        const handler = (e) => {
+            if (e.target && e.target.id === 'forgot-password-link') {
+                setShowMagicForm(true);
+                setEmail(email);
+                setMessage('メールアドレスを入力して、"Send magic link" をクリックしてください。');
+            }
+        };
+        document.addEventListener('click', handler);
+        return () => document.removeEventListener('click', handler);
+    }, [email]);
+
+    // Handle password reset request
+    const handleSendMagicLink = async (e) => {
+        e.preventDefault();
+        setMessage('');
+        if (!email) {
+            setMessage('Please enter your email.');
+            return;
+        }
+        // Send magic link (sign-in link) instead of password reset
+        const isLocalhost = window.location.hostname === 'localhost';
+        const redirectUrl = isLocalhost
+            ? 'http://localhost:3000'
+            : 'https://aigooooo.com';
+        const { error } = await supabase.auth.signInWithOtp({
+            email: email,
+            options: {
+                emailRedirectTo: redirectUrl
+            }
+        });
+        if (error) {
+            setMessage('Failed to send magic link. メールの送信に失敗しました。');
+        } else {
+            setMessage('Magic link sent!! メールを送信しました。記載されているリンクからログインしてください。');
+        }
     };
 
     // Anonymous chat functions
@@ -184,7 +243,7 @@ export default function Login() {
                             dangerouslySetInnerHTML={{ __html: message }}
                         />
 
-                        <h2>Log in or Sign up</h2>
+                        <h2>{isSignUp ? 'Sign up' : 'Log in'}</h2>
 
                         <button
                             className="google-login"
@@ -196,45 +255,100 @@ export default function Login() {
                                 alt="Google"
                                 style={{ width: '20px', verticalAlign: 'middle', marginRight: '8px' }}
                             />
-                            {loading ? 'Signing in...' : 'Continue with Google'}
+                            {loading ? 'Logging in...' : 'Continue with Google'}
                         </button>
 
                         <div className="login-or">or</div>
 
-                        <form className="login-form" onSubmit={signInWithEmail}>
-                            <input
-                                type="email"
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                disabled={loading}
-                                required
-                            />
-                            <button type="submit" disabled={loading || !email}>
-                                {loading ? 'Sending...' : 'Continue with email'}
-                            </button>
-                        </form>
+                        {!showMagicForm ? (
+                            <form className="login-form" onSubmit={signInOrSignUpWithEmail}>
+                                <input
+                                    type="email"
+                                    placeholder="Enter your email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    disabled={loading}
+                                    required
+                                />
+                                <input
+                                    type="password"
+                                    placeholder="Enter your password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    disabled={loading}
+                                    required
+                                />
+                                <button type="submit" disabled={loading || !email || !password}>
+                                    {loading ? (isSignUp ? 'Signing up...' : 'Logging in...') : (isSignUp ? 'Sign up' : 'Continue')}
+                                </button>
+                            </form>
+                        ) : (
+                            <>
+                                <form className="login-form" onSubmit={handleSendMagicLink}>
+                                    <input
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        value={email}
+                                        onChange={e => setEmail(e.target.value)}
+                                        required
+                                    />
+                                    <button type="submit">Send magic link</button>
+                                </form>
+                                <button type="button" className="toggle-auth-mode" onClick={() => { setShowMagicForm(false); setMessage('') }}>Back to login</button>
+                            </>
+                        )}
 
-                        <div style={{ margin: '12px 0 8px 0', fontSize: '0.95em' }}>
-                            <input
-                                type="checkbox"
-                                id="agreePolicies"
-                                checked={agreed}
-                                onChange={e => setAgreed(e.target.checked)}
-                                required
-                                style={{ marginRight: '6px' }}
-                            />
-                            <label htmlFor="agreePolicies">
-                                I agree to the
-                                <a href="#terms" onClick={showTerms} style={{ margin: '0 4px', cursor: 'pointer', textDecoration: 'underline' }}>Terms of Use</a>
-                                and
-                                <a href="#privacy" onClick={showPrivacy} style={{ margin: '0 4px', cursor: 'pointer', textDecoration: 'underline' }}>Privacy Policy</a>
-                                .<br />
-                                <span style={{ fontSize: '0.92em', color: '#555' }}>
-                                    （利用規約およびプライバシーポリシーに同意します）
-                                </span>
-                            </label>
+                        {isSignUp && (
+                            <div style={{ margin: '12px 0 8px 0', fontSize: '0.95em' }}>
+                                <input
+                                    type="checkbox"
+                                    id="agreePolicies"
+                                    checked={agreed}
+                                    onChange={e => setAgreed(e.target.checked)}
+                                    required
+                                    style={{ marginRight: '6px' }}
+                                />
+                                <label htmlFor="agreePolicies">
+                                    I agree to the
+                                    <a href="#terms" onClick={showTerms} style={{ margin: '0 4px', cursor: 'pointer', textDecoration: 'underline' }}>Terms of Use</a>
+                                    and
+                                    <a href="#privacy" onClick={showPrivacy} style={{ margin: '0 4px', cursor: 'pointer', textDecoration: 'underline' }}>Privacy Policy</a>
+                                    .<br />
+                                    <span style={{ fontSize: '0.92em', color: '#555' }}>
+                                        （利用規約およびプライバシーポリシーに同意します）
+                                    </span>
+                                </label>
+                            </div>
+                        )}
+
+                        <div className="toggle-auth-container">
+                            {isSignUp ? (
+                                <>
+                                    Already have an account?（すでにアカウントをお持ちですか？）{' '}
+                                    <button
+                                        type="button"
+                                        className="toggle-auth-mode"
+                                        onClick={() => { setIsSignUp(false); setShowMagicForm(false); setMessage(''); }}
+                                        disabled={loading}
+                                    >
+                                        Log in
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    Don&apos;t have an account?（アカウントをお持ちでないですか？）{' '}
+                                    <button
+                                        type="button"
+                                        className="toggle-auth-mode"
+                                        onClick={() => { setIsSignUp(true); setShowMagicForm(false); setMessage(''); }}
+                                        disabled={loading}
+                                    >
+                                        Sign up（新規登録）
+                                    </button>
+                                </>
+                            )}
                         </div>
+
                     </div>
                 </div>
             </div>

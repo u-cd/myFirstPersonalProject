@@ -42,10 +42,9 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
                             'Originally, this app was created by the developer for my own English learning.',
                             'The goal is to help you study real, natural English easily and comfortably.',
                             '',
-                            'このアプリは **AI英会話シミュレーター** （練習台）です。🤖🇬🇧',
+                            'このアプリは **AI英会話シミュレーター** です。🤖🇬🇧',
                             '',
                             '### I will help you improve your English!',
-                            '### あなたの英語学習をサポートします！📚📝',
                             '',
                             '- 下の入力欄にメッセージを入力して、英語学習を始めましょう！👇💬✍️',
                             '- 英語で書いてみましょう！📝（日本語まじりでもOKです😊）例: "Hello! 今日の天気はどうですか？"🌤️',
@@ -104,9 +103,9 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
                 </button>
             </form>
 
-            <div className="disclaimer">
+            {/* <div className="disclaimer">
                 AI can make mistakes. Check important info.
-            </div>
+            </div> */}
         </>
     );
 }

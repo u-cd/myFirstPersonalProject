@@ -1,6 +1,7 @@
 /* Global Base Styles */
 body {
-    font-family: 'OpenDyslexic', 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
+    /* font-family: 'OpenDyslexic', 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif; */
+    font-family: 'Inter', 'Segoe UI', 'Roboto', Arial, sans-serif;
     background: #fff;
     margin: 0;
     display: flex;
