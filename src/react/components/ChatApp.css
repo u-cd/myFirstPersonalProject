@@ -1,3 +1,20 @@
+/* Thinking emoji animation */
+
+.thinking-emoji {
+    display: inline-block;
+    animation: thinking-spin 1s linear infinite;
+}
+
+@keyframes thinking-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 /* ChatApp Component Styles */
 .main-content {
     flex: 1;
@@ -39,11 +56,10 @@
 }
 
 .mobile-menu-content {
-    padding: 10px 14px;
+    padding: 4px;
     border: none;
     outline: none;
     background: #fff;
-    font-size: 1.4em;
 }
 
 /* Mobile Responsive */
@@ -53,7 +69,7 @@
     }
 
     .mobile-menu-content {
-        font-size: 1.6em;
+        font-size: 1.7em;
     }
 }
 
@@ -64,7 +80,7 @@
     }
 
     .mobile-menu-content {
-        font-size: 1.6em;
+        font-size: 2em;
     }
 }
 

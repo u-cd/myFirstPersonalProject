@@ -20,6 +20,7 @@ export default function Login() {
     const [mainContent, setMainContent] = useState('chat'); // 'chat' | 'terms' | 'privacy'
     const [termsMarkdown, setTermsMarkdown] = useState('');
     const [privacyMarkdown, setPrivacyMarkdown] = useState('');
+    const [isThinking, setIsThinking] = useState(false);
 
     // Dynamic max height for markdown panels based on actual layout
     const docScrollRef = useRef(null);
@@ -194,6 +195,7 @@ export default function Login() {
         // Add user message to state immediately
         const userMessage = { role: 'user', content: messageText };
         setChatMessages(prev => [...prev, userMessage]);
+        setIsThinking(true);
 
         try {
             const res = await fetch('/', {
@@ -211,10 +213,12 @@ export default function Login() {
             // Add AI response to state
             const aiMessage = { role: 'assistant', content: data.reply || data.error };
             setChatMessages(prev => [...prev, aiMessage]);
+            setIsThinking(false);
         } catch (error) {
             console.error('Error sending message:', error);
             const errorMessage = { role: 'assistant', content: 'Error: Failed to send message' };
             setChatMessages(prev => [...prev, errorMessage]);
+            setIsThinking(false);
         }
     };
 
@@ -369,6 +373,7 @@ export default function Login() {
                         messages={chatMessages}
                         onSendMessage={sendAnonymousMessage}
                         currentChatId={chatId}
+                        isThinking={isThinking}
                     />
                 )}
                 {mainContent === 'terms' && (

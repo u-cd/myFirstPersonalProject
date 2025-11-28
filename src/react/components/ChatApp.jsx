@@ -10,6 +10,7 @@ export default function ChatApp({ user }) {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isThinking, setIsThinking] = useState(false);
 
     useEffect(() => {
         initializeApp();
@@ -62,6 +63,7 @@ export default function ChatApp({ user }) {
         // Add user message to state immediately
         const userMessage = { role: 'user', content: messageText };
         setMessages(prev => [...prev, userMessage]);
+        setIsThinking(true);
 
         try {
             const res = await fetch('/', {
@@ -79,6 +81,7 @@ export default function ChatApp({ user }) {
             // Add AI response to state
             const aiMessage = { role: 'assistant', content: data.reply || data.error };
             setMessages(prev => [...prev, aiMessage]);
+            setIsThinking(false);
 
             // Refresh chats list to update with new chat if this was the first message
             await loadChats();
@@ -86,6 +89,7 @@ export default function ChatApp({ user }) {
             console.error('Error sending message:', error);
             const errorMessage = { role: 'assistant', content: 'Error: Failed to send message' };
             setMessages(prev => [...prev, errorMessage]);
+            setIsThinking(false);
         }
     };
 
@@ -143,12 +147,14 @@ export default function ChatApp({ user }) {
                     onClick={toggleSidebar}
                 >
                     <div className="mobile-menu-content">☰</div>
+                    {/* <div className="mobile-menu-content">🍔</div> */}
                 </button>
 
                 <Chat
                     messages={messages}
                     onSendMessage={sendMessage}
                     currentChatId={currentChatId}
+                    isThinking={isThinking}
                 />
             </div>
         </>

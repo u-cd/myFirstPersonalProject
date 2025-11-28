@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
 
-export default function Chat({ messages, onSendMessage, currentChatId }) {
+export default function Chat({ messages, onSendMessage, currentChatId, isThinking }) {
     const [input, setInput] = useState('');
     const chatRef = useRef(null);
 
@@ -30,7 +30,6 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
 
     return (
         <>
-
             <div ref={chatRef} className="chat">
                 {(() => {
                     const helloMsg = {
@@ -58,13 +57,10 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
                             '',
                         ].join('\n')
                     };
-                    // If no messages, show only hello
                     if (messages.length === 0) return [helloMsg];
-                    // If first message is not the hello, prepend it
                     if (!(messages[0].role === 'llm' && messages[0].content && messages[0].content.includes('Type your message to start chatting'))) {
                         return [helloMsg, ...messages];
                     }
-                    // Otherwise, just show messages
                     return messages;
                 })().map((message, index) => (
                     <div
@@ -77,6 +73,11 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
                         }}
                     />
                 ))}
+                {isThinking && (
+                    <div className="bubble llm thinking">
+                        <span className="thinking-emoji" role="img" aria-label="thinking">🤔</span>
+                    </div>
+                )}
             </div>
 
             <form className="chat-form" onSubmit={handleSubmit}>
