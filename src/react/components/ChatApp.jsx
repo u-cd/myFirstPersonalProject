@@ -11,6 +11,18 @@ export default function ChatApp({ user }) {
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isThinking, setIsThinking] = useState(false);
+    const [darkMode, setDarkMode] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return document.body.getAttribute('data-theme') === 'dark';
+        }
+        return false;
+    });
+
+    useEffect(() => {
+        document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+    }, [darkMode]);
+
+    const toggleDarkMode = () => setDarkMode((v) => !v);
 
     useEffect(() => {
         initializeApp();
@@ -141,6 +153,15 @@ export default function ChatApp({ user }) {
             />
 
             <div className="main-content">
+                {/* Dark mode toggle button */}
+                <button
+                    style={{ position: 'fixed', top: 12, right: 12, zIndex: 1001, background: '#222', color: '#fff', border: 'none', borderRadius: 20, padding: '8px 16px', cursor: 'pointer', fontSize: '1em', opacity: 0.85 }}
+                    onClick={toggleDarkMode}
+                    aria-label="Toggle dark mode"
+                >
+                    {darkMode ? '🌙 Dark' : '☀️ Light'}
+                </button>
+
                 {/* Mobile menu button */}
                 <button
                     className="mobile-menu-btn"

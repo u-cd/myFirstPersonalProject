@@ -1,3 +1,47 @@
+/* Dark mode overrides */
+body[data-theme="dark"] .chat {
+    background: #000000;
+    /* color: #eee; */
+    scrollbar-color: #505050 #000000;
+
+}
+
+body[data-theme="dark"] .bubble {
+    background: #000000;
+    color: #fff;
+}
+
+body[data-theme="dark"] .user {
+    background: #2d4a5a;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .llm {
+    color: #fff;
+}
+
+body[data-theme="dark"] .chat-input {
+    background: #000000;
+    color: #fff;
+    border: 1px solid #7f7f7f;
+}
+
+body[data-theme="dark"] .chat-input:focus {
+    border: 1.5px solid rgb(200, 200, 200);
+}
+
+body[data-theme="dark"] .send-btn {
+    color: #fff;
+}
+
+body[data-theme="dark"] .send-btn:hover {
+    background: #333;
+}
+
+body[data-theme="dark"] .disclaimer {
+    color: #aaa;
+}
+
 /* Chat Component Styles */
 .chat {
     flex: 1;

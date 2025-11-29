@@ -1,3 +1,58 @@
+/* Dark mode overrides */
+body[data-theme="dark"] .login-container {
+    background: #000000;
+    color: #ffffff;
+    border-right: 1px dashed #ffffff;
+}
+
+body[data-theme="dark"] .google-login {
+    background: #000000;
+    padding: 10px 0;
+    color: #eeeeee;
+    border: 1px solid #444444;
+}
+
+body[data-theme="dark"] .google-login:hover {
+    box-shadow: 0 2px 12px 0 rgba(64, 64, 64, 0.533);
+}
+
+body[data-theme="dark"] .login-form input[type="email"],
+body[data-theme="dark"] .login-form input[type="password"] {
+    background: #000000;
+    color: #fff;
+    border: 1px solid #444;
+}
+
+body[data-theme="dark"] .login-form button[type="submit"] {
+    background: #2d4a5a;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .login-form button[type="submit"]:hover {
+    box-shadow: 0 2px 12px 0 #222a;
+}
+
+body[data-theme="dark"] .login-message {
+    color: #88c;
+}
+
+body[data-theme="dark"] .doc-container {
+    background: #000000;
+    color: #fff;
+}
+
+
+body[data-theme="dark"] .doc-scroll {
+    background: #000000;
+    scrollbar-color: #505050 #000000;
+}
+
+body[data-theme="dark"] .login-menu-btn {
+    background: #000000;
+    color: #fff;
+}
+
+
 /* Toggle Auth Container (Login/Sign up switch) */
 .toggle-auth-container {
     margin-top: 10px;

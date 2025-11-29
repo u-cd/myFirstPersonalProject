@@ -1,3 +1,52 @@
+/* Dark mode overrides */
+body[data-theme="dark"] .sidebar-content-wrapper {
+    background: #000000;
+    color: #ffffff;
+    border-right: 1px dashed #ffffff;
+}
+
+body[data-theme="dark"] .sidebar-new-chat {
+    color: #ffffff;
+    background: none;
+}
+
+body[data-theme="dark"] .sidebar-new-chat:hover {
+    background: #575757;
+}
+
+body[data-theme="dark"] .sidebar-chats-header {
+    color: #aaa;
+}
+
+body[data-theme="dark"] .sidebar-chat-link {
+    color: #eee;
+    background: none;
+}
+
+body[data-theme="dark"] .sidebar-chat-link:hover {
+    background: #515151;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .sidebar-user-account {
+    color: #eee;
+    border-top: 1px solid #444;
+}
+
+body[data-theme="dark"] .sidebar-user-account:hover {
+    background: #23272b;
+}
+
+body[data-theme="dark"] .sidebar-logout-btn {
+    background: #000000;
+    color: #eee;
+    border-top: 1px solid #444;
+}
+
+body[data-theme="dark"] .sidebar-logout-btn:hover {
+    box-shadow: 0 2px 12px 0 rgb(66, 66, 66);
+}
+
 /* Sidebar Component Styles */
 .sidebar-content-wrapper {
     width: 321px;

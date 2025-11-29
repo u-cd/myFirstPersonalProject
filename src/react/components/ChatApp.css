@@ -1,3 +1,26 @@
+/* Dark mode overrides */
+body[data-theme="dark"] .main-content {
+    background: #000000;
+    /* color: #eee; */
+}
+
+body[data-theme="dark"] .sidebar-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme="dark"] .mobile-menu-btn {
+    background: #000000;
+}
+
+body[data-theme="dark"] .mobile-menu-content {
+    background: #000000;
+    color: #fff;
+}
+
+body[data-theme="dark"] .thinking-emoji {
+    color: #fff;
+}
+
 /* Thinking emoji animation */
 
 .thinking-emoji {
