@@ -144,6 +144,8 @@ export default function ChatApp({ user }) {
                 onSignOut={signOut}
                 isOpen={sidebarOpen}
                 onClose={closeSidebar}
+                darkMode={darkMode}
+                onToggleDarkMode={toggleDarkMode}
             />
 
             {/* Mobile sidebar overlay */}
@@ -153,15 +155,6 @@ export default function ChatApp({ user }) {
             />
 
             <div className="main-content">
-                {/* Dark mode toggle button */}
-                <button
-                    style={{ position: 'fixed', top: 12, right: 12, zIndex: 1001, background: '#222', color: '#fff', border: 'none', borderRadius: 20, padding: '8px 16px', cursor: 'pointer', fontSize: '1em', opacity: 0.85 }}
-                    onClick={toggleDarkMode}
-                    aria-label="Toggle dark mode"
-                >
-                    {darkMode ? '🌙 Dark' : '☀️ Light'}
-                </button>
-
                 {/* Mobile menu button */}
                 <button
                     className="mobile-menu-btn"
