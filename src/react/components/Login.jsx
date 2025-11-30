@@ -20,6 +20,7 @@ export default function Login() {
     const [mainContent, setMainContent] = useState('chat'); // 'chat' | 'terms' | 'privacy'
     const [termsMarkdown, setTermsMarkdown] = useState('');
     const [privacyMarkdown, setPrivacyMarkdown] = useState('');
+    const [isThinking, setIsThinking] = useState(false);
 
     // Dynamic max height for markdown panels based on actual layout
     const docScrollRef = useRef(null);
@@ -194,6 +195,7 @@ export default function Login() {
         // Add user message to state immediately
         const userMessage = { role: 'user', content: messageText };
         setChatMessages(prev => [...prev, userMessage]);
+        setIsThinking(true);
 
         try {
             const res = await fetch('/', {
@@ -211,10 +213,12 @@ export default function Login() {
             // Add AI response to state
             const aiMessage = { role: 'assistant', content: data.reply || data.error };
             setChatMessages(prev => [...prev, aiMessage]);
+            setIsThinking(false);
         } catch (error) {
             console.error('Error sending message:', error);
             const errorMessage = { role: 'assistant', content: 'Error: Failed to send message' };
             setChatMessages(prev => [...prev, errorMessage]);
+            setIsThinking(false);
         }
     };
 
@@ -310,11 +314,11 @@ export default function Login() {
                                 />
                                 <label htmlFor="agreePolicies">
                                     I agree to the
-                                    <a href="#terms" onClick={showTerms} style={{ margin: '0 4px', cursor: 'pointer', textDecoration: 'underline' }}>Terms of Use</a>
+                                    <a href="#terms" onClick={showTerms} className="login-link">Terms of Use</a>
                                     and
-                                    <a href="#privacy" onClick={showPrivacy} style={{ margin: '0 4px', cursor: 'pointer', textDecoration: 'underline' }}>Privacy Policy</a>
+                                    <a href="#privacy" onClick={showPrivacy} className="login-link">Privacy Policy</a>
                                     .<br />
-                                    <span style={{ fontSize: '0.92em', color: '#555' }}>
+                                    <span className="agreement-note">
                                         （利用規約およびプライバシーポリシーに同意します）
                                     </span>
                                 </label>
@@ -327,7 +331,7 @@ export default function Login() {
                                     Already have an account?（すでにアカウントをお持ちですか？）{' '}
                                     <button
                                         type="button"
-                                        className="toggle-auth-mode"
+                                        className="toggle-auth-mode login-link"
                                         onClick={() => { setIsSignUp(false); setShowMagicForm(false); setMessage(''); }}
                                         disabled={loading}
                                     >
@@ -339,7 +343,7 @@ export default function Login() {
                                     Don&apos;t have an account?（アカウントをお持ちでないですか？）{' '}
                                     <button
                                         type="button"
-                                        className="toggle-auth-mode"
+                                        className="toggle-auth-mode login-link"
                                         onClick={() => { setIsSignUp(true); setShowMagicForm(false); setMessage(''); }}
                                         disabled={loading}
                                     >
@@ -369,6 +373,7 @@ export default function Login() {
                         messages={chatMessages}
                         onSendMessage={sendAnonymousMessage}
                         currentChatId={chatId}
+                        isThinking={isThinking}
                     />
                 )}
                 {mainContent === 'terms' && (

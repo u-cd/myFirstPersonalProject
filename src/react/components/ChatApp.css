@@ -1,3 +1,65 @@
+/* Loading screen styles */
+.loading-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #fff;
+}
+
+.loading-text {
+    font-size: 1.3em;
+    color: #333;
+}
+
+body[data-theme="dark"] .loading-screen {
+    background: #000;
+}
+
+body[data-theme="dark"] .loading-text {
+    color: #eee;
+}
+/* Dark mode overrides */
+body[data-theme="dark"] .main-content {
+    background: #000000;
+    /* color: #eee; */
+}
+
+body[data-theme="dark"] .sidebar-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme="dark"] .mobile-menu-btn {
+    background: #000000;
+}
+
+body[data-theme="dark"] .mobile-menu-content {
+    background: #000000;
+    color: #fff;
+}
+
+body[data-theme="dark"] .thinking-emoji {
+    color: #fff;
+}
+
+body[data-theme="dark"] 
+/* Thinking emoji animation */
+
+.thinking-emoji {
+    display: inline-block;
+    animation: thinking-spin 1s linear infinite;
+}
+
+@keyframes thinking-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 /* ChatApp Component Styles */
 .main-content {
     flex: 1;
@@ -39,11 +101,10 @@
 }
 
 .mobile-menu-content {
-    padding: 10px 14px;
+    padding: 4px;
     border: none;
     outline: none;
     background: #fff;
-    font-size: 1.4em;
 }
 
 /* Mobile Responsive */
@@ -53,7 +114,7 @@
     }
 
     .mobile-menu-content {
-        font-size: 1.6em;
+        font-size: 1.7em;
     }
 }
 
@@ -64,7 +125,7 @@
     }
 
     .mobile-menu-content {
-        font-size: 1.6em;
+        font-size: 2em;
     }
 }
 

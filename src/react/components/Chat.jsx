@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
 
-export default function Chat({ messages, onSendMessage, currentChatId }) {
+export default function Chat({ messages, onSendMessage, currentChatId, isThinking }) {
     const [input, setInput] = useState('');
     const chatRef = useRef(null);
 
@@ -30,7 +30,6 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
 
     return (
         <>
-
             <div ref={chatRef} className="chat">
                 {(() => {
                     const helloMsg = {
@@ -58,13 +57,10 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
                             '',
                         ].join('\n')
                     };
-                    // If no messages, show only hello
                     if (messages.length === 0) return [helloMsg];
-                    // If first message is not the hello, prepend it
                     if (!(messages[0].role === 'llm' && messages[0].content && messages[0].content.includes('Type your message to start chatting'))) {
                         return [helloMsg, ...messages];
                     }
-                    // Otherwise, just show messages
                     return messages;
                 })().map((message, index) => (
                     <div
@@ -77,6 +73,11 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
                         }}
                     />
                 ))}
+                {isThinking && (
+                    <div className="bubble llm thinking">
+                        <span className="thinking-emoji" role="img" aria-label="thinking">🤔</span>
+                    </div>
+                )}
             </div>
 
             <form className="chat-form" onSubmit={handleSubmit}>
@@ -95,8 +96,11 @@ export default function Chat({ messages, onSendMessage, currentChatId }) {
                     disabled={!input.trim() || !currentChatId}
                     aria-label="Send"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none"
-                        stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke="var(--send-btn-stroke, #222)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                    >
                         <line x1="22" y1="2" x2="11" y2="13"></line>
                         <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                     </svg>

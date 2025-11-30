@@ -1,3 +1,116 @@
+.sidebar-user-account {
+    padding: 12px 24px 18px 24px;
+    color: #444;
+    font-size: 1em;
+    border-top: 1px solid #eee;
+    min-height: 40px;
+    transition: background 0.2s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.sidebar-user-account:hover {
+    background: #e0e0e0;
+}
+
+/* Container for dark mode toggle and logout button */
+.sidebar-account-actions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-top: 1px solid #eee;
+}
+
+.sidebar-darkmode-toggle,
+.sidebar-logout-btn {
+    padding: 12px 24px 18px 24px;
+    color: #444;
+    font-size: 1em;
+    border: none;
+    background: #fff;
+    min-height: 40px;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+}
+
+.sidebar-darkmode-toggle:hover,
+.sidebar-logout-btn:hover {
+    background: #e0e0e0;
+    color: #222;
+    /* transform: scale(1.01); */
+    /* box-shadow: 0 2px 12px 0 rgba(210, 210, 210, 0.533); */
+}
+
+body[data-theme="dark"] .sidebar-darkmode-toggle,
+body[data-theme="dark"] .sidebar-logout-btn {
+    background: #000000;
+    color: #eee;
+}
+
+body[data-theme="dark"] .sidebar-darkmode-toggle:hover,
+body[data-theme="dark"] .sidebar-logout-btn:hover {
+    background: #3d434b;
+    color: #fff;
+}
+
+
+/* Dark mode overrides */
+body[data-theme="dark"] .sidebar-content-wrapper {
+    background: #000000;
+    color: #ffffff;
+    border-right: 1px dashed #ffffff;
+}
+
+body[data-theme="dark"] .sidebar-new-chat {
+    color: #ffffff;
+    background: none;
+}
+
+body[data-theme="dark"] .sidebar-new-chat:hover {
+    background: #515151;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .sidebar-chats-header {
+    color: #ddd;
+}
+
+body[data-theme="dark"] .sidebar-chat-link {
+    color: #eee;
+    background: none;
+}
+
+body[data-theme="dark"] .sidebar-chat-link:hover {
+    background: #515151;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .sidebar-user-account {
+    color: #eee;
+    border-top: 1px solid #444;
+}
+
+body[data-theme="dark"] .sidebar-user-account:hover {
+    background: #3d434b;
+}
+
+body[data-theme="dark"] .sidebar-account-actions {
+    border-top: 1px solid #444;
+}
+
 /* Sidebar Component Styles */
 .sidebar-content-wrapper {
     width: 321px;
@@ -38,10 +151,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    --sidebar-newchat-fill: #666;
+}
+
+body[data-theme="dark"] .sidebar-new-chat-icon {
+    --sidebar-newchat-fill: #ddd;
 }
 
 .sidebar-new-chat:hover {
-    background: #d6d6d6;
+    background: #eee;
+    color: #1565c0;
 }
 
 .sidebar-content {
@@ -81,45 +200,6 @@
     color: #1565c0;
 }
 
-.sidebar-user-account {
-    padding: 12px 24px 18px 24px;
-    color: #444;
-    font-size: 0.98em;
-    border-top: 1px solid #eee;
-    min-height: 40px;
-    transition: background 0.2s;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-}
-
-.sidebar-user-account:hover {
-    background: #e0e0e0;
-}
-
-/* Sidebar Logout Button */
-.sidebar-logout-btn {
-    background: #ffffff;
-    padding: 12px 24px 18px 24px;
-    color: #444;
-    border: none;
-    border-top: 1px solid #eee;
-    margin-bottom: 8px;
-    display: block;
-    transition: background 0.2s, border 0.2s;
-    font-size: 1em;
-    cursor: pointer;
-    z-index: 1000;
-}
-
-.sidebar-logout-btn:hover {
-    background: #ffffff;
-    transform: scale(1.01);
-    box-shadow: 0 2px 12px 0 rgba(210, 210, 210, 0.533);
-}
-
 /* Mobile Responsive */
 @media screen and (max-width: 768px) {
     .sidebar-content-wrapper {
@@ -135,10 +215,6 @@
 
     .sidebar-content-wrapper.sidebar-open {
         left: 0;
-    }
-
-    .sidebar-logout-btn {
-        background: #ffffff;
     }
 }
 
@@ -178,7 +254,6 @@
     }
 
     .sidebar-logout-btn {
-        background: #ffffff;
         padding: 24px;
         font-size: 1.5em;
     }
