@@ -11,18 +11,6 @@ export default function ChatApp({ user }) {
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [isThinking, setIsThinking] = useState(false);
-    const [darkMode, setDarkMode] = useState(() => {
-        if (typeof window !== 'undefined') {
-            return document.body.getAttribute('data-theme') === 'dark';
-        }
-        return false;
-    });
-
-    useEffect(() => {
-        document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    }, [darkMode]);
-
-    const toggleDarkMode = () => setDarkMode((v) => !v);
 
     useEffect(() => {
         initializeApp();
@@ -123,12 +111,8 @@ export default function ChatApp({ user }) {
 
     if (loading) {
         return (
-            <div className="main-content" style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <div>Loading...</div>
+            <div className="main-content loading-screen">
+                <div className="loading-text">Loading...</div>
             </div>
         );
     }
@@ -144,8 +128,6 @@ export default function ChatApp({ user }) {
                 onSignOut={signOut}
                 isOpen={sidebarOpen}
                 onClose={closeSidebar}
-                darkMode={darkMode}
-                onToggleDarkMode={toggleDarkMode}
             />
 
             {/* Mobile sidebar overlay */}

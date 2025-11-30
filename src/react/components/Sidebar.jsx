@@ -8,10 +8,24 @@ export default function Sidebar({
     onChatSelect,
     onSignOut,
     isOpen,
-    onClose,
-    darkMode,
-    onToggleDarkMode
+    onClose
 }) {
+    // Dark mode state and persistence
+    const [darkMode, setDarkMode] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const stored = localStorage.getItem('darkMode');
+            if (stored !== null) return stored === 'true';
+            return document.body.getAttribute('data-theme') === 'dark';
+        }
+        return false;
+    });
+
+    useEffect(() => {
+        document.body.setAttribute('data-theme', darkMode ? 'dark' : 'light');
+        localStorage.setItem('darkMode', darkMode);
+    }, [darkMode]);
+
+    const toggleDarkMode = () => setDarkMode(v => !v);
     const [showAccountActions, setShowAccountActions] = useState(false);
     const userAccountRef = useRef(null);
     const accountActionsRef = useRef(null);
@@ -89,7 +103,7 @@ export default function Sidebar({
                 <div className="sidebar-account-actions" ref={accountActionsRef}>
                     <button
                         className="sidebar-darkmode-toggle"
-                        onClick={onToggleDarkMode}
+                        onClick={toggleDarkMode}
                         aria-label="Toggle dark mode"
                     >
                         {darkMode ? (

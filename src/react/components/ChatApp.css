@@ -1,3 +1,24 @@
+/* Loading screen styles */
+.loading-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: #fff;
+}
+
+.loading-text {
+    font-size: 1.3em;
+    color: #333;
+}
+
+body[data-theme="dark"] .loading-screen {
+    background: #000;
+}
+
+body[data-theme="dark"] .loading-text {
+    color: #eee;
+}
 /* Dark mode overrides */
 body[data-theme="dark"] .main-content {
     background: #000000;
@@ -21,6 +42,7 @@ body[data-theme="dark"] .thinking-emoji {
     color: #fff;
 }
 
+body[data-theme="dark"] 
 /* Thinking emoji animation */
 
 .thinking-emoji {
