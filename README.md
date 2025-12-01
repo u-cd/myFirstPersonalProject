@@ -100,7 +100,7 @@ Figma：https://www.figma.com/board/P2QWX1Z0kuKyk7pWxFjvGb/Screen-transition-dia
 - _id: MongoDBで自動的に設定されるユニークID
 - userId: チャットを開始したユーザーのID
 - title: チャットのタイトル
-- timesstamp: チャットの作成日時
+- timestamp: チャットの作成日時
 
 #### chatMessages
 メッセージのテーブル
