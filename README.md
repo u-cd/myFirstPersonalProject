@@ -84,7 +84,7 @@ AI：OpenAI API
 Figma：https://www.figma.com/board/P2QWX1Z0kuKyk7pWxFjvGb/Screen-transition-diagram?node-id=0-1&t=e7SoDy2GQPxRZXmq-1
 
 ## ER図
-[![Image from Gyazo](https://i.gyazo.com/7aa5ad0e089efc3ff23befdebc192148.png)](https://gyazo.com/7aa5ad0e089efc3ff23befdebc192148)
+[![Image from Gyazo](https://i.gyazo.com/dca0c4d4b9bd6e9a18ba41e2f9a7765e.png)](https://gyazo.com/dca0c4d4b9bd6e9a18ba41e2f9a7765e)
 
 ### テーブル詳細
 #### users
