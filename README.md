@@ -84,7 +84,7 @@ AI：OpenAI API
 Figma：https://www.figma.com/board/P2QWX1Z0kuKyk7pWxFjvGb/Screen-transition-diagram?node-id=0-1&t=e7SoDy2GQPxRZXmq-1
 
 ## ER図
-[![Image from Gyazo](https://i.gyazo.com/61b840a6e93911535732f4bc7b5125d1.png)](https://gyazo.com/61b840a6e93911535732f4bc7b5125d1)
+[![Image from Gyazo](https://i.gyazo.com/7aa5ad0e089efc3ff23befdebc192148.png)](https://gyazo.com/7aa5ad0e089efc3ff23befdebc192148)
 
 ### テーブル詳細
 #### users
@@ -95,12 +95,18 @@ Figma：https://www.figma.com/board/P2QWX1Z0kuKyk7pWxFjvGb/Screen-transition-dia
 - created_at: ユーザーが作成されたタイムスタンプ
 - last_sign_in_at: ユーザーが最後にサインインしたタイムスタンプ
 
+#### chats
+チャット（セッション）のテーブル
+- _id: MongoDBで自動的に設定されるユニークID
+- userId: チャットを開始したユーザーのID
+- title: チャットのタイトル
+- timesstamp: チャットの作成日時
+
 #### chatMessages
-メインのチャットメッセージのデータベースです
-- id: MongoDBで自動的に設定されるユニークID
+メッセージのテーブル
+- _id: MongoDBで自動的に設定されるユニークID
 - chatId: チャット（セッション）ID
 - userId: メッセージを送ったユーザーのID（Supabase のユーザーIDを使用）
 - role: OpenAI API にリクエストを送るときに使用される変数 (user or assistant)
-- content: 各メッセージの本文
-- timestamp: タイムスタンプ
-- title: チャットのタイトル
+- content: メッセージの本文
+- timestamp: メッセージ送信日時
