@@ -89,9 +89,9 @@ export default function Sidebar({
                     const linkText = chat.title && chat.title.trim() ? chat.title.trim() : 'Untitled chat';
                     return (
                         <button
-                            key={chat.chatId}
+                            key={chat._id}
                             className="sidebar-chat-link"
-                            onClick={() => handleChatSelect(chat.chatId)}
+                            onClick={() => handleChatSelect(chat._id)}
                         >
                             {linkText}
                         </button>

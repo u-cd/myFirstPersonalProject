@@ -8,7 +8,6 @@
 }
 
 .loading-text {
-    font-size: 1.3em;
     color: #333;
 }
 
@@ -19,6 +18,7 @@ body[data-theme="dark"] .loading-screen {
 body[data-theme="dark"] .loading-text {
     color: #eee;
 }
+
 /* Dark mode overrides */
 body[data-theme="dark"] .main-content {
     background: #000000;
