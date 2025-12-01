@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase-config';
 import Sidebar from './Sidebar';
 import Chat from './Chat';
-import { v4 as uuidv4 } from 'uuid';
+// import { v4 as uuidv4 } from 'uuid'; deleted when chat collection created
 
 export default function ChatApp({ user }) {
     const [chats, setChats] = useState([]);
@@ -18,14 +18,15 @@ export default function ChatApp({ user }) {
 
     const initializeApp = async () => {
         await loadChats();
-        // Start with a new chat
-        startNewChat();
+        // Do not set chatId on load; wait for user to send first message
+        setCurrentChatId(null);
+        setMessages([]);
         setLoading(false);
     };
 
     const loadChats = async () => {
         try {
-            const res = await fetch(`/chats-with-last-date-and-title?userId=${encodeURIComponent(user.id)}`);
+            const res = await fetch(`/chats-with-title?userId=${encodeURIComponent(user.id)}`);
             const data = await res.json();
 
             if (data.chats) {
@@ -37,8 +38,7 @@ export default function ChatApp({ user }) {
     };
 
     const startNewChat = () => {
-        const newChatId = uuidv4();
-        setCurrentChatId(newChatId);
+        setCurrentChatId(null);
         setMessages([]);
     };
 
@@ -58,7 +58,7 @@ export default function ChatApp({ user }) {
     };
 
     const sendMessage = async (messageText) => {
-        if (!messageText.trim() || !currentChatId) return;
+        if (!messageText.trim()) return;
 
         // Add user message to state immediately
         const userMessage = { role: 'user', content: messageText };
@@ -77,6 +77,11 @@ export default function ChatApp({ user }) {
             });
 
             const data = await res.json();
+
+            // If this was the first message, set the new chatId from backend
+            if (!currentChatId && data.chatId) {
+                setCurrentChatId(data.chatId);
+            }
 
             // Add AI response to state
             const aiMessage = { role: 'assistant', content: data.reply || data.error };
@@ -149,7 +154,6 @@ export default function ChatApp({ user }) {
                 <Chat
                     messages={messages}
                     onSendMessage={sendMessage}
-                    currentChatId={currentChatId}
                     isThinking={isThinking}
                 />
             </div>

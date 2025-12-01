@@ -34,7 +34,7 @@ const systemPrompt = {
 
 // Endpoint to get all messages for a chatId
 app.get('/chat-history', async (req, res) => {
-    const chatId = req.query.chatId;
+    const chatId = req.query.chatId; // This should be the Chat _id
     const userId = req.query.userId;
     if (!chatId || !userId) return res.status(400).json({ error: 'Missing chatId or userId' });
     try {
@@ -46,7 +46,7 @@ app.get('/chat-history', async (req, res) => {
 });
 
 // Endpoint to get all chat IDs with their last message date and title (only userId's), sorted by date descending
-app.get('/chats-with-last-date-and-title', async (req, res) => {
+app.get('/chats-with-title', async (req, res) => {
     const userId = req.query.userId;
     if (!userId) return res.status(400).json({ error: 'Missing userId' });
     try {
@@ -61,49 +61,34 @@ app.get('/chats-with-last-date-and-title', async (req, res) => {
 // POST / for chatbot
 app.post('/', async (req, res) => {
     const userMessage = req.body.message;
-    const chatId = req.body.chatId;
+    let chatId = req.body.chatId; // This should be the Chat _id or null
     const userId = req.body.userId; // Optional - can be null for logged-out users
-    if (!userMessage || !chatId) return res.status(400).json({ error: 'Missing message or chatId' });
+    if (!userMessage) return res.status(400).json({ error: 'Missing message' });
     try {
-        // Get all messages for this chatId (and userId if provided)
-        const query = userId ? { chatId, userId } : { chatId };
-        const allMessages = await ChatMessage.find(query).sort({ timestamp: 1 }).lean();
-
-        // If this is the first user message, create a chat document with generated title
-        if (allMessages.length === 0) {
-            // Save user message to DB (userId can be null for anonymous users)
-            await ChatMessage.create({ chatId, userId: userId || null, role: 'user', content: userMessage });
-
-            // Prepare context for LLM
-            const inputHistory = [systemPrompt, { role: 'user', content: userMessage }];
-            // Get assistant response
-            const response = await openai.responses.create({
-                model: 'gpt-5-chat-latest',
-                input: inputHistory
-            });
-            // Save assistant response to DB
-            await ChatMessage.create({ chatId, userId: userId || null, role: 'assistant', content: response.output_text });
-
+        // If chatId is null, create a new chat and use its _id
+        if (!chatId) {
             // Generate chat title
             const titlePrompt = [
                 {
                     role: 'developer',
-                    content: 'Generate a short, descriptive chat title (max 8 words) based on the following user and assistant messages. Respond ONLY with the title.'
+                    content: 'Generate a short, descriptive chat title (max 8 words) based on the following user message. Respond ONLY with the title.'
                 },
-                { role: 'user', content: userMessage },
-                { role: 'assistant', content: response.output_text }
+                { role: 'user', content: userMessage }
             ];
             const titleResponse = await openai.responses.create({
                 model: 'gpt-5-chat-latest',
                 input: titlePrompt
             });
-            // Save chat metadata in Chat collection
-            await Chat.create({ chatId, userId: userId || null, title: titleResponse.output_text });
-
-            return res.json({ reply: response.output_text });
+            // Create chat document
+            const chatDoc = await Chat.create({ userId: userId || null, title: titleResponse.output_text });
+            chatId = chatDoc._id;
         }
 
-        // Otherwise, save user message and get assistant response as usual
+        // Get all messages for this chatId (and userId if provided)
+        const query = userId ? { chatId, userId } : { chatId };
+        const allMessages = await ChatMessage.find(query).sort({ timestamp: 1 }).lean();
+
+        // Save user message to DB (userId can be null for anonymous users)
         await ChatMessage.create({ chatId, userId: userId || null, role: 'user', content: userMessage });
 
         // Prepare context for LLM
@@ -119,7 +104,7 @@ app.post('/', async (req, res) => {
         // Save assistant response to DB
         await ChatMessage.create({ chatId, userId: userId || null, role: 'assistant', content: response.output_text });
 
-        res.json({ reply: response.output_text });
+        res.json({ reply: response.output_text, chatId });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

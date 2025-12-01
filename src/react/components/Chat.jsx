@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
 
-export default function Chat({ messages, onSendMessage, currentChatId, isThinking }) {
+export default function Chat({ messages, onSendMessage, isThinking }) {
     const [input, setInput] = useState('');
     const chatRef = useRef(null);
 
@@ -15,7 +15,7 @@ export default function Chat({ messages, onSendMessage, currentChatId, isThinkin
     const handleSubmit = (e) => {
         e.preventDefault();
         const messageText = input.trim();
-        if (!messageText || !currentChatId) return;
+        if (!messageText) return;
 
         onSendMessage(messageText);
         setInput('');
@@ -88,12 +88,11 @@ export default function Chat({ messages, onSendMessage, currentChatId, isThinkin
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Type your English..."
-                    disabled={!currentChatId}
                 />
                 <button
                     type="submit"
                     className="send-btn"
-                    disabled={!input.trim() || !currentChatId}
+                    disabled={!input.trim()}
                     aria-label="Send"
                 >
                     <svg

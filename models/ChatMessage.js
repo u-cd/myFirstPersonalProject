@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const chatMessageSchema = new mongoose.Schema({
-    chatId: String,
+    chatId: { type: mongoose.Schema.Types.ObjectId, ref: 'Chat', required: true },
     userId: String, // Supabase user.id
     role: String,
     content: String,
