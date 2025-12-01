@@ -5,6 +5,7 @@ const { OpenAI } = require('openai');
 const path = require('path');
 const mongoose = require('mongoose');
 const ChatMessage = require('../models/ChatMessage');
+const Chat = require('../models/Chat');
 const app = express();
 const port = process.env.PORT || 3000;
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -13,7 +14,7 @@ const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 mongoose.connect(process.env.MONGODB_URI)
     .then(() => console.log('Connected to MongoDB'))
     .catch(err => console.error('MongoDB connection error:', err));
-    
+
 app.use(express.json());
 // Serve built frontend assets first (so /assets/* resolves to dist assets)
 app.use(express.static(path.join(__dirname, '../public/dist')));
@@ -49,26 +50,9 @@ app.get('/chats-with-last-date-and-title', async (req, res) => {
     const userId = req.query.userId;
     if (!userId) return res.status(400).json({ error: 'Missing userId' });
     try {
-        // Get all unique chatIds for this user
-        const chatIds = await ChatMessage.distinct('chatId', { userId });
-        // For each chatId, get its last message timestamp and title (from first assistant message)
-        const chatInfos = await Promise.all(chatIds.map(async chatId => {
-            const lastMsg = await ChatMessage.findOne({ chatId, userId }).sort({ timestamp: -1 }).lean();
-            // Find the first assistant message with a title for this chat
-            const titleMsg = await ChatMessage.findOne({ chatId, userId, role: 'assistant', title: { $exists: true, $ne: null } }).sort({ timestamp: 1 }).lean();
-            return {
-                chatId,
-                lastDate: lastMsg && lastMsg.timestamp ? lastMsg.timestamp : null,
-                title: titleMsg && titleMsg.title ? titleMsg.title : null
-            };
-        }));
-        // Sort by lastDate descending (newest first)
-        chatInfos.sort((a, b) => {
-            if (!a.lastDate) return 1;
-            if (!b.lastDate) return -1;
-            return new Date(b.lastDate) - new Date(a.lastDate);
-        });
-        res.json({ chats: chatInfos });
+        // Get all chats for this user, ordered by timestamp descending (newest first)
+        const chats = await Chat.find({ userId }).sort({ timestamp: -1 }).lean();
+        res.json({ chats });
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
@@ -81,29 +65,26 @@ app.post('/', async (req, res) => {
     const userId = req.body.userId; // Optional - can be null for logged-out users
     if (!userMessage || !chatId) return res.status(400).json({ error: 'Missing message or chatId' });
     try {
-        // Save user message to DB (userId can be null for anonymous users)
-        await ChatMessage.create({ chatId, userId: userId || null, role: 'user', content: userMessage });
-
         // Get all messages for this chatId (and userId if provided)
         const query = userId ? { chatId, userId } : { chatId };
         const allMessages = await ChatMessage.find(query).sort({ timestamp: 1 }).lean();
 
-        // Prepare context for LLM
-        const cleanedHistory = allMessages.map(msg => ({ role: msg.role, content: msg.content }));
-        const inputHistory = [systemPrompt, ...cleanedHistory.slice(-20)];
+        // If this is the first user message, create a chat document with generated title
+        if (allMessages.length === 0) {
+            // Save user message to DB (userId can be null for anonymous users)
+            await ChatMessage.create({ chatId, userId: userId || null, role: 'user', content: userMessage });
 
-        // Get assistant response
-        const response = await openai.responses.create({
-            model: 'gpt-5-chat-latest',
-            input: inputHistory
-        });
+            // Prepare context for LLM
+            const inputHistory = [systemPrompt, { role: 'user', content: userMessage }];
+            // Get assistant response
+            const response = await openai.responses.create({
+                model: 'gpt-5-chat-latest',
+                input: inputHistory
+            });
+            // Save assistant response to DB
+            await ChatMessage.create({ chatId, userId: userId || null, role: 'assistant', content: response.output_text });
 
-        // Save assistant response to DB (userId can be null for anonymous users)
-        const assistantMsg = await ChatMessage.create({ chatId, userId: userId || null, role: 'assistant', content: response.output_text });
-
-        // If this is the first exchange (user + assistant), generate a chat title
-        if (allMessages.length === 1) {
-            // Use both user and assistant first message for title
+            // Generate chat title
             const titlePrompt = [
                 {
                     role: 'developer',
@@ -116,12 +97,27 @@ app.post('/', async (req, res) => {
                 model: 'gpt-5-chat-latest',
                 input: titlePrompt
             });
-            // Save title to the first assistant message for this chat
-            await ChatMessage.updateOne(
-                { _id: assistantMsg._id },
-                { $set: { title: titleResponse.output_text } }
-            );
+            // Save chat metadata in Chat collection
+            await Chat.create({ chatId, userId: userId || null, title: titleResponse.output_text });
+
+            return res.json({ reply: response.output_text });
         }
+
+        // Otherwise, save user message and get assistant response as usual
+        await ChatMessage.create({ chatId, userId: userId || null, role: 'user', content: userMessage });
+
+        // Prepare context for LLM
+        const cleanedHistory = allMessages.map(msg => ({ role: msg.role, content: msg.content }));
+        const inputHistory = [systemPrompt, ...cleanedHistory.slice(-19), { role: 'user', content: userMessage }];
+
+        // Get assistant response
+        const response = await openai.responses.create({
+            model: 'gpt-5-chat-latest',
+            input: inputHistory
+        });
+
+        // Save assistant response to DB
+        await ChatMessage.create({ chatId, userId: userId || null, role: 'assistant', content: response.output_text });
 
         res.json({ reply: response.output_text });
     } catch (err) {
