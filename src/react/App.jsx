@@ -16,8 +16,19 @@ function App() {
 
         // Listen for auth changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange(
-            (event, session) => {
-                setUser(session?.user || null);
+            (_event, session) => {
+                const newUser = session?.user || null;
+                // Only update if user actually changed
+                setUser(prevUser => {
+                    if (
+                        (!prevUser && !newUser) ||
+                        (prevUser && newUser && prevUser.id === newUser.id)
+                    ) {
+                        console.log('almond');
+                        return prevUser; // No change, skip re-render
+                    }
+                    return newUser;
+                });
                 setLoading(false);
             }
         );
@@ -28,12 +39,8 @@ function App() {
     if (loading) {
         return (
             <div className="app-layout">
-                <div className="main-content" style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }}>
-                    <div>Loading...</div>
+                <div className="main-content loading-screen">
+                    <div className="loading-text">Loading...</div>
                 </div>
             </div>
         );
