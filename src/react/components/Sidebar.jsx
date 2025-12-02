@@ -3,7 +3,6 @@ import React, { useState, useRef, useEffect } from 'react';
 export default function Sidebar({
     user,
     chats,
-    currentChatId,
     onNewChat,
     onChatSelect,
     onSignOut,
