@@ -21,6 +21,7 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
         setInput('');
     };
 
+    // send message by enter key
     const handleKeyDown = (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
@@ -62,17 +63,54 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                         return [helloMsg, ...messages];
                     }
                     return messages;
-                })().map((message, index) => (
-                    <div
-                        key={index}
-                        className={`bubble ${message.role === 'user' ? 'user' : 'llm'}`}
-                        dangerouslySetInnerHTML={{
-                            __html: message.role === 'user'
-                                ? message.content.replace(/\n/g, '<br>')
-                                : marked.parse(message.content)
-                        }}
-                    />
-                ))}
+                })().map((message, index) => {
+                    if (message.role === 'user') {
+                        return (
+                            <div
+                                key={index}
+                                className="bubble user"
+                                dangerouslySetInnerHTML={{ __html: message.content.replace(/\n/g, '<br>') }}
+                            />
+                        );
+                    }
+                    // For llm messages, detect code blocks and render specially
+                    const rawHtml = marked.parse(message.content);
+                    // Simple code block detection: look for <pre><code> in the HTML
+                    if (rawHtml.includes('<pre><code')) {
+                        // Split HTML into code blocks and normal text
+                        // Use DOMParser for robust parsing
+                        const parser = new window.DOMParser();
+                        const doc = parser.parseFromString(`<div>${rawHtml}</div>`, 'text/html');
+                        const children = Array.from(doc.body.firstChild.childNodes);
+                        return (
+                            <div key={index} className="bubble llm">
+                                {children.map((node, i) => {
+                                    if (node.nodeName === 'PRE') {
+                                        // Code block
+                                        return (
+                                            <pre key={i} className="chat-code-block">
+                                                <code>{node.textContent}</code>
+                                            </pre>
+                                        );
+                                    } else {
+                                        // Other HTML
+                                        return (
+                                            <span key={i} dangerouslySetInnerHTML={{ __html: node.outerHTML || node.textContent }} />
+                                        );
+                                    }
+                                })}
+                            </div>
+                        );
+                    }
+                    // Otherwise, normal markdown
+                    return (
+                        <div
+                            key={index}
+                            className="bubble llm"
+                            dangerouslySetInnerHTML={{ __html: rawHtml }}
+                        />
+                    );
+                })}
                 {isThinking && (
                     <div className="bubble llm thinking">
                         <span className="thinking-emoji" role="img" aria-label="thinking">🤔</span>
@@ -81,13 +119,20 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
             </div>
 
             <form className="chat-form" onSubmit={handleSubmit}>
-                <input
+                <textarea
                     className="chat-input"
-                    type="text"
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={e => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Type your English..."
+                    rows={1}
+                    style={{ resize: 'none', overflow: 'hidden' }}
+                    ref={el => {
+                        if (el) {
+                            el.style.height = 'auto';
+                            el.style.height = el.scrollHeight + 'px';
+                        }
+                    }}
                 />
                 <button
                     type="submit"

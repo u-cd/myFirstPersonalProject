@@ -1,9 +1,39 @@
+/* Code block styling for chat LLM responses */
+.chat-code-block {
+    background: #f5f5f5;
+    color: #222;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
+    font-size: 0.98em;
+    margin: 8px 0;
+    overflow-x: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: block;
+    scrollbar-width: thin;
+}
+
+.chat-code-block code {
+    background: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    display: block;
+    white-space: pre; /* keep long lines; enable internal horizontal scroll */
+}
+
+body[data-theme="dark"] .chat-code-block {
+    background: #23272e;
+    color: #e6e6e6;
+}
+
 /* Dark mode overrides */
 body[data-theme="dark"] .chat {
     background: #000000;
     /* color: #eee; */
     scrollbar-color: #505050 #000000;
-
 }
 
 body[data-theme="dark"] .bubble {
@@ -20,14 +50,19 @@ body[data-theme="dark"] .llm {
     color: #fff;
 }
 
+body[data-theme="dark"] .chat-form {
+    background: #000000;
+    color: #fff;
+    border: 1px solid #666;
+}
+
+body[data-theme="dark"] .chat-form:focus-within {
+    border: 1.5px solid rgb(200, 200, 200);
+}
+
 body[data-theme="dark"] .chat-input {
     background: #000000;
     color: #fff;
-    border: 1px solid #7f7f7f;
-}
-
-body[data-theme="dark"] .chat-input:focus {
-    border: 1.5px solid rgb(200, 200, 200);
 }
 
 body[data-theme="dark"] .send-btn {
@@ -47,6 +82,7 @@ body[data-theme="dark"] .disclaimer {
 .chat {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden; /* avoid chat-wide horizontal scrollbar */
     width: 50vw;
     margin: 0 auto;
     padding: 24px 16px 16px 16px;
@@ -67,6 +103,8 @@ body[data-theme="dark"] .disclaimer {
     margin-bottom: 2px;
     position: relative;
     animation: fadein 0.2s;
+    max-width: 100%;
+    box-sizing: border-box; /* include padding in width to avoid leaching into chat padding */
 }
 
 @keyframes fadein {
@@ -91,33 +129,33 @@ body[data-theme="dark"] .disclaimer {
 .llm {
     color: #222;
     align-self: flex-start;
-    border-bottom-left-radius: 4px;
 }
 
 /* Form and Input Styles */
 .chat-form {
     display: flex;
     gap: 8px;
-    padding: 16px;
     width: 50vw;
     margin: 0 auto;
+    border: 1px solid #ddd;
+    transition: border 0.2s;
+    /* margin-bottom: 16px; */
+    padding: 15px;
+}
+
+.chat-form:focus-within {
+    border: 1.5px solid #555;
 }
 
 .chat-input {
     flex: 1;
     font-size: 1rem;
-    padding: 10px 14px;
-    border-radius: 100px;
-    border: 1px solid #ddd;
-    outline: none;
     background: #ffffff;
-    transition: border 0.2s;
+    padding: 10px 14px;
+    outline: none;
+    border: none;
     width: 100%;
     box-sizing: border-box;
-}
-
-.chat-input:focus {
-    border: 1.5px solid #555;
 }
 
 /* Send Button */
@@ -161,9 +199,9 @@ body[data-theme="dark"] .disclaimer {
 
     .chat-form {
         box-sizing: border-box;
-        width: 100%;
+        width: 90vw;
         max-width: 100%;
-        padding: 0px 16px;
+        padding: 0;
         margin-bottom: 16px;
         gap: 0;
     }
@@ -208,10 +246,9 @@ body[data-theme="dark"] .disclaimer {
 
     .chat-form {
         box-sizing: border-box;
-        width: 100%;
-        max-width: 100%;
-        padding: 0px 32px;
-        margin: 0;
+        width: 90vw;
+        padding: 15px;
+        margin: auto;
         gap: 0;
     }
 

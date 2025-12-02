@@ -47,7 +47,7 @@ body[data-theme="dark"]
 
 .thinking-emoji {
     display: inline-block;
-    animation: thinking-spin 1s linear infinite;
+    animation: thinking-spin 2s linear infinite;
 }
 
 @keyframes thinking-spin {
