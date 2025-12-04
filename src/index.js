@@ -59,6 +59,43 @@ app.get('/chats-with-title', async (req, res) => {
 });
 
 // POST / for chatbot
+// AI-powered input prediction endpoint
+app.post('/writing-suggestions', async (req, res) => {
+    const { context, input } = req.body;
+    // context: last LLM message as string (no role), input: current user input as string
+    if (typeof input !== 'string' || typeof context !== 'string') {
+        return res.status(400).json({ error: 'Missing or invalid input/context' });
+    }
+    // Debug: log actual context and input
+    console.log('--- writing-suggestions request ---');
+    console.log('context:', context);
+    console.log('input:', input);
+    try {
+        // Compose OpenAI input: system prompt, context, and input as plain strings
+        const systemPrompt = {
+            role: 'developer',
+            content: [
+                "You are an autocomplete engine for a chat app.",
+                "This is the last message from the chat: \"" + context + "\".",
+                "This is the user's unfinished input: \"" + input + "\".",
+                "Suggest ONLY 3 possible next words or short phrases (in English) that could follow the user's input, based on the chat context. Respond ONLY with the suggestions, comma separated. Do NOT generate a full sentence, reply, or explanation."
+            ].join(' ')
+        };
+        const response = await openai.responses.create({
+            model: 'gpt-5-chat-latest',
+            input: [systemPrompt]
+        });
+        // Parse suggestions from output_text
+        let suggestions = [];
+        if (response.output_text) {
+            suggestions = response.output_text.split(',').map(s => s.trim()).filter(Boolean);
+        }
+        res.json({ suggestions });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 app.post('/', async (req, res) => {
     const userMessage = req.body.message;
     let chatId = req.body.chatId; // This should be the Chat _id or null

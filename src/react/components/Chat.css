@@ -1,3 +1,111 @@
+/* Suggestions toggle button styles */
+.suggestions-toggle-btn {
+    align-self: center;
+    margin-left: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #2d4a5a;
+    color: #cceeff;
+    border: none;
+    border-radius: 16px;
+    padding: 6px 16px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-bottom: 4px;
+    font-size: 1em;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+}
+
+.suggestions-toggle-btn.enabled {
+    background: #2d4a5a;
+    color: #cceeff;
+}
+
+.suggestions-toggle-btn.disabled {
+    background: #ccc;
+    color: #333;
+}
+
+.suggestions-toggle-btn:focus {
+    box-shadow: 0 0 0 2px #cceeff;
+}
+
+body[data-theme="dark"] .suggestions-toggle-btn {
+    background: #23272e;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .suggestions-toggle-btn.enabled {
+    background: #2d4a5a;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .suggestions-toggle-btn.disabled {
+    background: #444;
+    color: #aaa;
+}
+
+/* Suggestions dropdown for input prediction */
+.chat-suggestions {
+    position: absolute;
+    left: auto;
+    right: 0;
+    bottom: 100%;
+    top: auto;
+    z-index: 10;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-top: 2px;
+    padding: 0;
+    list-style: none;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.chat-suggestions .suggestion {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.15s;
+}
+
+.chat-suggestions .suggestion:hover,
+.chat-suggestions .suggestion.selected {
+    background: #e6f0fa;
+}
+
+.chat-suggestions .loading {
+    color: #888;
+    font-style: italic;
+    padding: 8px 16px;
+}
+
+body[data-theme="dark"] .chat-suggestions {
+    background: #23272e;
+    color: #e6e6e6;
+    border: 1px solid #444;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
+}
+
+body[data-theme="dark"] .chat-suggestions .suggestion {
+    color: #e6e6e6;
+}
+
+body[data-theme="dark"] .chat-suggestions .suggestion:hover,
+body[data-theme="dark"] .chat-suggestions .suggestion.selected {
+    background: #2d4a5a;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .chat-suggestions .loading {
+    color: #aaa;
+}
+
 /* Code block styling for chat LLM responses */
 .chat-code-block {
     background: #f5f5f5;
@@ -21,7 +129,8 @@
     font-size: inherit;
     padding: 0;
     display: block;
-    white-space: pre; /* keep long lines; enable internal horizontal scroll */
+    white-space: pre;
+    /* keep long lines; enable internal horizontal scroll */
 }
 
 body[data-theme="dark"] .chat-code-block {
@@ -82,7 +191,8 @@ body[data-theme="dark"] .disclaimer {
 .chat {
     flex: 1;
     overflow-y: auto;
-    overflow-x: hidden; /* avoid chat-wide horizontal scrollbar */
+    overflow-x: hidden;
+    /* avoid chat-wide horizontal scrollbar */
     width: 50vw;
     margin: 0 auto;
     padding: 24px 16px 16px 16px;
@@ -104,7 +214,8 @@ body[data-theme="dark"] .disclaimer {
     position: relative;
     animation: fadein 0.2s;
     max-width: 100%;
-    box-sizing: border-box; /* include padding in width to avoid leaching into chat padding */
+    box-sizing: border-box;
+    /* include padding in width to avoid leaching into chat padding */
 }
 
 @keyframes fadein {
@@ -141,6 +252,7 @@ body[data-theme="dark"] .disclaimer {
     transition: border 0.2s;
     /* margin-bottom: 16px; */
     padding: 15px;
+    position: relative;
 }
 
 .chat-form:focus-within {

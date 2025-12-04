@@ -1,8 +1,26 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
 
+// Debounce hook
+function useDebouncedEffect(effect, deps, delay) {
+    useEffect(() => {
+        const handler = setTimeout(() => effect(), delay);
+        return () => clearTimeout(handler);
+    }, [...(deps || []), delay]);
+}
+
 export default function Chat({ messages, onSendMessage, isThinking }) {
     const [input, setInput] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+    const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
+    const [suggestionsEnabled, setSuggestionsEnabled] = useState(() => {
+        // Persist toggle in localStorage
+        const saved = localStorage.getItem('writingSuggestionsEnabled');
+        return saved === null ? true : saved === 'true';
+    });
+    const inputRef = useRef(null);
     const chatRef = useRef(null);
 
     // Auto-scroll to bottom when new messages arrive
@@ -11,6 +29,57 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
             chatRef.current.scrollTop = chatRef.current.scrollHeight;
         }
     }, [messages]);
+
+    // Debounced writing suggestions API call
+    useDebouncedEffect(() => {
+        if (!suggestionsEnabled) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            setSelectedSuggestion(-1);
+            return;
+        }
+        if (!input.trim()) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            setSelectedSuggestion(-1);
+            return;
+        }
+        // Get last LLM message for context (as plain string, no role)
+        let context = '';
+        if (messages && messages.length > 0) {
+            // Find last message from LLM/assistant
+            for (let i = messages.length - 1; i >= 0; i--) {
+                if (messages[i].role === 'llm' || messages[i].role === 'assistant') {
+                    context = messages[i].content;
+                    break;
+                }
+            }
+        }
+        let ignore = false;
+        setIsLoadingSuggestions(true);
+        fetch('/writing-suggestions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ context, input }),
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (!ignore) {
+                    setSuggestions(data.suggestions || []);
+                    setShowSuggestions(true);
+                    setSelectedSuggestion(-1);
+                }
+            })
+            .catch(() => {
+                if (!ignore) setSuggestions([]);
+            })
+            .finally(() => {
+                if (!ignore) setIsLoadingSuggestions(false);
+            });
+        return () => { ignore = true; };
+    }, [input, messages, suggestionsEnabled], 1500);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -21,12 +90,51 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
         setInput('');
     };
 
-    // send message by enter key
+    // select suggestions, send message by enter
     const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (showSuggestions && suggestions.length > 0) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setSelectedSuggestion(s => Math.min(suggestions.length - 1, s + 1));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setSelectedSuggestion(s => Math.max(0, s - 1));
+            } else if (e.key === 'Tab') {
+                if (selectedSuggestion >= 0 && selectedSuggestion < suggestions.length) {
+                    e.preventDefault();
+                    const needsSpace = input && !input.endsWith(' ');
+                    const suggestionText = (needsSpace ? ' ' : '') + suggestions[selectedSuggestion].replace(input, '');
+                    setInput(input + suggestionText);
+                    setShowSuggestions(false);
+                    setSuggestions([]);
+                    setSelectedSuggestion(-1);
+                }
+            } else if (e.key === 'Enter' && !e.shiftKey) {
+                if (selectedSuggestion >= 0 && selectedSuggestion < suggestions.length) {
+                    e.preventDefault();
+                    const needsSpace = input && !input.endsWith(' ');
+                    const suggestionText = (needsSpace ? ' ' : '') + suggestions[selectedSuggestion].replace(input, '');
+                    setInput(input + suggestionText);
+                    setShowSuggestions(false);
+                    setSuggestions([]);
+                    setSelectedSuggestion(-1);
+                } else {
+                    e.preventDefault();
+                    handleSubmit(e);
+                }
+            }
+        } else if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSubmit(e);
         }
+    };
+
+    // Toggle handler
+    const handleToggleSuggestions = () => {
+        setSuggestionsEnabled(prev => {
+            localStorage.setItem('writingSuggestionsEnabled', !prev);
+            return !prev;
+        });
     };
 
     return (
@@ -132,8 +240,54 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                             el.style.height = 'auto';
                             el.style.height = el.scrollHeight + 'px';
                         }
+                        inputRef.current = el;
                     }}
+                    autoComplete="off"
                 />
+                {/* Suggestions toggle button inside chat form */}
+                <button
+                    type="button"
+                    onClick={handleToggleSuggestions}
+                    className={`suggestions-toggle-btn${suggestionsEnabled ? ' enabled' : ' disabled'}`}
+                    aria-pressed={suggestionsEnabled}
+                    aria-label={suggestionsEnabled ? 'Disable writing suggestions' : 'Enable writing suggestions'}
+                    title={suggestionsEnabled ? 'Click to turn off writing suggestions' : 'Click to turn on writing suggestions'}
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22" height="22" viewBox="0 0 24 24" fill="none"
+                        stroke={suggestionsEnabled ? '#cceeff' : '#888'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                        style={{ marginRight: 4 }}
+                    >
+                        <path d="M9 18h6" />
+                        <path d="M10 22h4" />
+                        <path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.5 4.5-3.5 5.5a2 2 0 0 1-1.5 1.5v2h-4v-2a2 2 0 0 1-1.5-1.5C6.5 13.5 5 11.5 5 9a7 7 0 0 1 7-7z" />
+                    </svg>
+                </button>
+                {showSuggestions && suggestions.length > 0 && (
+                    <ul className="chat-suggestions">
+                        {isLoadingSuggestions ? (
+                            <li className="suggestion loading">Thinking next phrase...</li>
+                        ) : (
+                            suggestions.map((s, i) => (
+                                <li
+                                    key={i}
+                                    className={`suggestion${selectedSuggestion === i ? ' selected' : ''}`}
+                                    onMouseDown={e => {
+                                        e.preventDefault();
+                                        const needsSpace = input && !input.endsWith(' ');
+                                        const suggestionText = (needsSpace ? ' ' : '') + s.replace(input, '');
+                                        setInput(input + suggestionText);
+                                        setShowSuggestions(false);
+                                        setSuggestions([]);
+                                        setSelectedSuggestion(-1);
+                                        if (inputRef.current) inputRef.current.focus();
+                                    }}
+                                >{s}</li>
+                            ))
+                        )}
+                    </ul>
+                )}
                 <button
                     type="submit"
                     className="send-btn"
@@ -150,10 +304,6 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                     </svg>
                 </button>
             </form>
-
-            {/* <div className="disclaimer">
-                AI can make mistakes. Check important info.
-            </div> */}
         </>
     );
 }
