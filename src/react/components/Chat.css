@@ -1,40 +1,35 @@
 /* Suggestions toggle button styles */
 .suggestions-toggle-btn {
     align-self: center;
-    margin-left: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
-
-    background: #2d4a5a;
-    color: #cceeff;
+    background: #ffffff;
+    /* color: #cceeff; */
     border: none;
-    border-radius: 16px;
-    padding: 6px 16px;
+    border-radius: 50%;
     font-weight: 600;
     cursor: pointer;
-    margin-bottom: 4px;
     font-size: 1em;
     transition: background 0.2s, color 0.2s;
     outline: none;
+
+    width: 40px;
+    height: 40px;
 }
 
 .suggestions-toggle-btn.enabled {
-    background: #2d4a5a;
-    color: #cceeff;
+    background: #e6f0fa;
+    color: #174a6a;
 }
 
 .suggestions-toggle-btn.disabled {
-    background: #ccc;
+    /* background: #ccc; */
     color: #333;
 }
 
-.suggestions-toggle-btn:focus {
-    box-shadow: 0 0 0 2px #cceeff;
-}
-
 body[data-theme="dark"] .suggestions-toggle-btn {
-    background: #23272e;
+    background: #000000;
     color: #cceeff;
 }
 
@@ -44,7 +39,7 @@ body[data-theme="dark"] .suggestions-toggle-btn.enabled {
 }
 
 body[data-theme="dark"] .suggestions-toggle-btn.disabled {
-    background: #444;
+    /* background: #444; */
     color: #aaa;
 }
 
@@ -245,7 +240,7 @@ body[data-theme="dark"] .disclaimer {
 /* Form and Input Styles */
 .chat-form {
     display: flex;
-    gap: 8px;
+    /* gap: 8px; */
     width: 50vw;
     margin: 0 auto;
     border: 1px solid #ddd;
@@ -276,12 +271,12 @@ body[data-theme="dark"] .disclaimer {
     color: #222;
     border: none;
     border-radius: 50%;
-    padding: 0;
     width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    align-self: center;
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.2s;

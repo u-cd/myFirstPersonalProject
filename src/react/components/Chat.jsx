@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
+import Tooltip from './Tooltip';
 
 // Debounce hook
 function useDebouncedEffect(effect, deps, delay) {
@@ -245,25 +246,26 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                     autoComplete="off"
                 />
                 {/* Suggestions toggle button inside chat form */}
-                <button
-                    type="button"
-                    onClick={handleToggleSuggestions}
-                    className={`suggestions-toggle-btn${suggestionsEnabled ? ' enabled' : ' disabled'}`}
-                    aria-pressed={suggestionsEnabled}
-                    aria-label={suggestionsEnabled ? 'Disable writing suggestions' : 'Enable writing suggestions'}
-                    title={suggestionsEnabled ? 'Click to turn off writing suggestions' : 'Click to turn on writing suggestions'}
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="22" height="22" viewBox="0 0 24 24" fill="none"
-                        stroke={suggestionsEnabled ? '#cceeff' : '#888'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                        style={{ marginRight: 4 }}
+                {/* Suggestions toggle button inside chat form with custom tooltip */}
+                <Tooltip text={suggestionsEnabled ? 'Turn off writing suggestions' : 'Turn on writing suggestions'} position="top">
+                    <button
+                        type="button"
+                        onClick={handleToggleSuggestions}
+                        className={`suggestions-toggle-btn${suggestionsEnabled ? ' enabled' : ' disabled'}`}
+                        aria-pressed={suggestionsEnabled}
+                        aria-label={suggestionsEnabled ? 'Disable writing suggestions' : 'Enable writing suggestions'}
                     >
-                        <path d="M9 18h6" />
-                        <path d="M10 22h4" />
-                        <path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.5 4.5-3.5 5.5a2 2 0 0 1-1.5 1.5v2h-4v-2a2 2 0 0 1-1.5-1.5C6.5 13.5 5 11.5 5 9a7 7 0 0 1 7-7z" />
-                    </svg>
-                </button>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="22" height="22" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                        >
+                            <path d="M9 18h6" />
+                            <path d="M10 22h4" />
+                            <path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.5 4.5-3.5 5.5a2 2 0 0 1-1.5 1.5v2h-4v-2a2 2 0 0 1-1.5-1.5C6.5 13.5 5 11.5 5 9a7 7 0 0 1 7-7z" />
+                        </svg>
+                    </button>
+                </Tooltip>
                 {showSuggestions && suggestions.length > 0 && (
                     <ul className="chat-suggestions">
                         {isLoadingSuggestions ? (
