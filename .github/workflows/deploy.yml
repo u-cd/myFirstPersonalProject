@@ -23,5 +23,6 @@ jobs:
           ssh -o StrictHostKeyChecking=no ubuntu@52.194.251.155 '
             cd myFirstPersonalProject &&
             git pull &&
+            docker-compose build &&
             docker-compose up -d
           '
