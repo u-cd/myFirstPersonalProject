@@ -1,11 +1,12 @@
 node_modules
 npm-debug.log
-.env
-my-ec2-key.pem
-spreadsheet
-runteq_graduate_examination
 .DS_Store
 Dockerfile
 .dockerignore
 .git
 .gitignore
+
+.env
+my-ec2-key.pem
+spreadsheet
+runteq_graduate_examination
