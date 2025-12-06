@@ -2,6 +2,8 @@ FROM node:20-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
+# for rect build output
+RUN mkdir -p /usr/src/app/public/dist 
 
 # Install app dependencies
 COPY package*.json ./
