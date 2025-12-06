@@ -1,4 +1,4 @@
-# need ssh security group changed to allow github actions ip ranges
+# need ssh security group change
 name: Deploy to EC2
 
 on:
