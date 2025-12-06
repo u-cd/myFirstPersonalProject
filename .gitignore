@@ -4,9 +4,6 @@ node_modules/
 .env
 my-ec2-key*.pem
 
-# React build output
-public/dist/
-
 runteq_graduate_examination
 
 spreadsheet
