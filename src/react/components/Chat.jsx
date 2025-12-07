@@ -1,8 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
+import Tooltip from './Tooltip';
+
+// Debounce hook
+function useDebouncedEffect(effect, deps, delay) {
+    useEffect(() => {
+        const handler = setTimeout(() => effect(), delay);
+        return () => clearTimeout(handler);
+    }, [...(deps || []), delay]);
+}
 
 export default function Chat({ messages, onSendMessage, isThinking }) {
     const [input, setInput] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
+    const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
+    const [suggestionsEnabled, setSuggestionsEnabled] = useState(() => {
+        // Persist toggle in localStorage
+        const saved = localStorage.getItem('writingSuggestionsEnabled');
+        return saved === null ? true : saved === 'true';
+    });
+    const inputRef = useRef(null);
     const chatRef = useRef(null);
 
     // Auto-scroll to bottom when new messages arrive
@@ -11,6 +30,57 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
             chatRef.current.scrollTop = chatRef.current.scrollHeight;
         }
     }, [messages]);
+
+    // Debounced writing suggestions API call
+    useDebouncedEffect(() => {
+        if (!suggestionsEnabled) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            setSelectedSuggestion(-1);
+            return;
+        }
+        if (!input.trim()) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            setSelectedSuggestion(-1);
+            return;
+        }
+        // Get last LLM message for context (as plain string, no role)
+        let context = '';
+        if (messages && messages.length > 0) {
+            // Find last message from LLM/assistant
+            for (let i = messages.length - 1; i >= 0; i--) {
+                if (messages[i].role === 'llm' || messages[i].role === 'assistant') {
+                    context = messages[i].content;
+                    break;
+                }
+            }
+        }
+        let ignore = false;
+        setIsLoadingSuggestions(true);
+        fetch('/writing-suggestions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ context, input }),
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (!ignore) {
+                    setSuggestions(data.suggestions || []);
+                    setShowSuggestions(true);
+                    setSelectedSuggestion(-1);
+                }
+            })
+            .catch(() => {
+                if (!ignore) setSuggestions([]);
+            })
+            .finally(() => {
+                if (!ignore) setIsLoadingSuggestions(false);
+            });
+        return () => { ignore = true; };
+    }, [input, messages, suggestionsEnabled], 1500);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -21,11 +91,51 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
         setInput('');
     };
 
+    // select suggestions, send message by enter
     const handleKeyDown = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (showSuggestions && suggestions.length > 0) {
+            if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                setSelectedSuggestion(s => Math.min(suggestions.length - 1, s + 1));
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                setSelectedSuggestion(s => Math.max(0, s - 1));
+            } else if (e.key === 'Tab') {
+                if (selectedSuggestion >= 0 && selectedSuggestion < suggestions.length) {
+                    e.preventDefault();
+                    const needsSpace = input && !input.endsWith(' ');
+                    const suggestionText = (needsSpace ? ' ' : '') + suggestions[selectedSuggestion].replace(input, '');
+                    setInput(input + suggestionText);
+                    setShowSuggestions(false);
+                    setSuggestions([]);
+                    setSelectedSuggestion(-1);
+                }
+            } else if (e.key === 'Enter' && !e.shiftKey) {
+                if (selectedSuggestion >= 0 && selectedSuggestion < suggestions.length) {
+                    e.preventDefault();
+                    const needsSpace = input && !input.endsWith(' ');
+                    const suggestionText = (needsSpace ? ' ' : '') + suggestions[selectedSuggestion].replace(input, '');
+                    setInput(input + suggestionText);
+                    setShowSuggestions(false);
+                    setSuggestions([]);
+                    setSelectedSuggestion(-1);
+                } else {
+                    e.preventDefault();
+                    handleSubmit(e);
+                }
+            }
+        } else if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             handleSubmit(e);
         }
+    };
+
+    // Toggle handler
+    const handleToggleSuggestions = () => {
+        setSuggestionsEnabled(prev => {
+            localStorage.setItem('writingSuggestionsEnabled', !prev);
+            return !prev;
+        });
     };
 
     return (
@@ -62,17 +172,54 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                         return [helloMsg, ...messages];
                     }
                     return messages;
-                })().map((message, index) => (
-                    <div
-                        key={index}
-                        className={`bubble ${message.role === 'user' ? 'user' : 'llm'}`}
-                        dangerouslySetInnerHTML={{
-                            __html: message.role === 'user'
-                                ? message.content.replace(/\n/g, '<br>')
-                                : marked.parse(message.content)
-                        }}
-                    />
-                ))}
+                })().map((message, index) => {
+                    if (message.role === 'user') {
+                        return (
+                            <div
+                                key={index}
+                                className="bubble user"
+                                dangerouslySetInnerHTML={{ __html: message.content.replace(/\n/g, '<br>') }}
+                            />
+                        );
+                    }
+                    // For llm messages, detect code blocks and render specially
+                    const rawHtml = marked.parse(message.content);
+                    // Simple code block detection: look for <pre><code> in the HTML
+                    if (rawHtml.includes('<pre><code')) {
+                        // Split HTML into code blocks and normal text
+                        // Use DOMParser for robust parsing
+                        const parser = new window.DOMParser();
+                        const doc = parser.parseFromString(`<div>${rawHtml}</div>`, 'text/html');
+                        const children = Array.from(doc.body.firstChild.childNodes);
+                        return (
+                            <div key={index} className="bubble llm">
+                                {children.map((node, i) => {
+                                    if (node.nodeName === 'PRE') {
+                                        // Code block
+                                        return (
+                                            <pre key={i} className="chat-code-block">
+                                                <code>{node.textContent}</code>
+                                            </pre>
+                                        );
+                                    } else {
+                                        // Other HTML
+                                        return (
+                                            <span key={i} dangerouslySetInnerHTML={{ __html: node.outerHTML || node.textContent }} />
+                                        );
+                                    }
+                                })}
+                            </div>
+                        );
+                    }
+                    // Otherwise, normal markdown
+                    return (
+                        <div
+                            key={index}
+                            className="bubble llm"
+                            dangerouslySetInnerHTML={{ __html: rawHtml }}
+                        />
+                    );
+                })}
                 {isThinking && (
                     <div className="bubble llm thinking">
                         <span className="thinking-emoji" role="img" aria-label="thinking">🤔</span>
@@ -81,14 +228,68 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
             </div>
 
             <form className="chat-form" onSubmit={handleSubmit}>
-                <input
+                <textarea
                     className="chat-input"
-                    type="text"
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={e => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Type your English..."
+                    rows={1}
+                    style={{ resize: 'none', overflow: 'hidden' }}
+                    ref={el => {
+                        if (el) {
+                            el.style.height = 'auto';
+                            el.style.height = el.scrollHeight + 'px';
+                        }
+                        inputRef.current = el;
+                    }}
+                    autoComplete="off"
                 />
+                {/* Suggestions toggle button inside chat form */}
+                {/* Suggestions toggle button inside chat form with custom tooltip */}
+                <Tooltip text={suggestionsEnabled ? 'Turn off writing suggestions' : 'Turn on writing suggestions'} position="top">
+                    <button
+                        type="button"
+                        onClick={handleToggleSuggestions}
+                        className={`suggestions-toggle-btn${suggestionsEnabled ? ' enabled' : ' disabled'}`}
+                        aria-pressed={suggestionsEnabled}
+                        aria-label={suggestionsEnabled ? 'Disable writing suggestions' : 'Enable writing suggestions'}
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="22" height="22" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                        >
+                            <path d="M9 18h6" />
+                            <path d="M10 22h4" />
+                            <path d="M12 2a7 7 0 0 1 7 7c0 2.5-1.5 4.5-3.5 5.5a2 2 0 0 1-1.5 1.5v2h-4v-2a2 2 0 0 1-1.5-1.5C6.5 13.5 5 11.5 5 9a7 7 0 0 1 7-7z" />
+                        </svg>
+                    </button>
+                </Tooltip>
+                {showSuggestions && suggestions.length > 0 && (
+                    <ul className="chat-suggestions">
+                        {isLoadingSuggestions ? (
+                            <li className="suggestion loading">Thinking next phrase...</li>
+                        ) : (
+                            suggestions.map((s, i) => (
+                                <li
+                                    key={i}
+                                    className={`suggestion${selectedSuggestion === i ? ' selected' : ''}`}
+                                    onMouseDown={e => {
+                                        e.preventDefault();
+                                        const needsSpace = input && !input.endsWith(' ');
+                                        const suggestionText = (needsSpace ? ' ' : '') + s.replace(input, '');
+                                        setInput(input + suggestionText);
+                                        setShowSuggestions(false);
+                                        setSuggestions([]);
+                                        setSelectedSuggestion(-1);
+                                        if (inputRef.current) inputRef.current.focus();
+                                    }}
+                                >{s}</li>
+                            ))
+                        )}
+                    </ul>
+                )}
                 <button
                     type="submit"
                     className="send-btn"
@@ -105,10 +306,6 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                     </svg>
                 </button>
             </form>
-
-            {/* <div className="disclaimer">
-                AI can make mistakes. Check important info.
-            </div> */}
         </>
     );
 }

@@ -1,9 +1,143 @@
+/* Suggestions toggle button styles */
+.suggestions-toggle-btn {
+    align-self: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    /* color: #cceeff; */
+    border: none;
+    border-radius: 50%;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.2s, color 0.2s;
+    outline: none;
+
+    width: 40px;
+    height: 40px;
+}
+
+.suggestions-toggle-btn.enabled {
+    background: #e6f0fa;
+    color: #174a6a;
+}
+
+.suggestions-toggle-btn.disabled {
+    /* background: #ccc; */
+    color: #333;
+}
+
+body[data-theme="dark"] .suggestions-toggle-btn {
+    background: #000000;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .suggestions-toggle-btn.enabled {
+    background: #2d4a5a;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .suggestions-toggle-btn.disabled {
+    /* background: #444; */
+    color: #aaa;
+}
+
+/* Suggestions dropdown for input prediction */
+.chat-suggestions {
+    position: absolute;
+    left: auto;
+    right: 0;
+    bottom: 100%;
+    top: auto;
+    z-index: 10;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-top: 2px;
+    padding: 0;
+    list-style: none;
+    max-height: 180px;
+    overflow-y: auto;
+}
+
+.chat-suggestions .suggestion {
+    padding: 8px 16px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background 0.15s;
+}
+
+.chat-suggestions .suggestion:hover,
+.chat-suggestions .suggestion.selected {
+    background: #e6f0fa;
+}
+
+.chat-suggestions .loading {
+    color: #888;
+    font-style: italic;
+    padding: 8px 16px;
+}
+
+body[data-theme="dark"] .chat-suggestions {
+    background: #23272e;
+    color: #e6e6e6;
+    border: 1px solid #444;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.32);
+}
+
+body[data-theme="dark"] .chat-suggestions .suggestion {
+    color: #e6e6e6;
+}
+
+body[data-theme="dark"] .chat-suggestions .suggestion:hover,
+body[data-theme="dark"] .chat-suggestions .suggestion.selected {
+    background: #2d4a5a;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .chat-suggestions .loading {
+    color: #aaa;
+}
+
+/* Code block styling for chat LLM responses */
+.chat-code-block {
+    background: #f5f5f5;
+    color: #222;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
+    font-size: 0.98em;
+    margin: 8px 0;
+    overflow-x: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: block;
+    scrollbar-width: thin;
+}
+
+.chat-code-block code {
+    background: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    display: block;
+    white-space: pre;
+    /* keep long lines; enable internal horizontal scroll */
+}
+
+body[data-theme="dark"] .chat-code-block {
+    background: #23272e;
+    color: #e6e6e6;
+}
+
 /* Dark mode overrides */
 body[data-theme="dark"] .chat {
     background: #000000;
     /* color: #eee; */
     scrollbar-color: #505050 #000000;
-
 }
 
 body[data-theme="dark"] .bubble {
@@ -20,14 +154,19 @@ body[data-theme="dark"] .llm {
     color: #fff;
 }
 
+body[data-theme="dark"] .chat-form {
+    background: #000000;
+    color: #fff;
+    border: 1px solid #666;
+}
+
+body[data-theme="dark"] .chat-form:focus-within {
+    border: 1.5px solid rgb(200, 200, 200);
+}
+
 body[data-theme="dark"] .chat-input {
     background: #000000;
     color: #fff;
-    border: 1px solid #7f7f7f;
-}
-
-body[data-theme="dark"] .chat-input:focus {
-    border: 1.5px solid rgb(200, 200, 200);
 }
 
 body[data-theme="dark"] .send-btn {
@@ -47,6 +186,8 @@ body[data-theme="dark"] .disclaimer {
 .chat {
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    /* avoid chat-wide horizontal scrollbar */
     width: 50vw;
     margin: 0 auto;
     padding: 24px 16px 16px 16px;
@@ -67,6 +208,9 @@ body[data-theme="dark"] .disclaimer {
     margin-bottom: 2px;
     position: relative;
     animation: fadein 0.2s;
+    max-width: 100%;
+    box-sizing: border-box;
+    /* include padding in width to avoid leaching into chat padding */
 }
 
 @keyframes fadein {
@@ -91,33 +235,34 @@ body[data-theme="dark"] .disclaimer {
 .llm {
     color: #222;
     align-self: flex-start;
-    border-bottom-left-radius: 4px;
 }
 
 /* Form and Input Styles */
 .chat-form {
     display: flex;
-    gap: 8px;
-    padding: 16px;
+    /* gap: 8px; */
     width: 50vw;
     margin: 0 auto;
+    border: 1px solid #ddd;
+    transition: border 0.2s;
+    /* margin-bottom: 16px; */
+    padding: 15px;
+    position: relative;
+}
+
+.chat-form:focus-within {
+    border: 1.5px solid #555;
 }
 
 .chat-input {
     flex: 1;
     font-size: 1rem;
-    padding: 10px 14px;
-    border-radius: 100px;
-    border: 1px solid #ddd;
-    outline: none;
     background: #ffffff;
-    transition: border 0.2s;
+    padding: 10px 14px;
+    outline: none;
+    border: none;
     width: 100%;
     box-sizing: border-box;
-}
-
-.chat-input:focus {
-    border: 1.5px solid #555;
 }
 
 /* Send Button */
@@ -126,12 +271,12 @@ body[data-theme="dark"] .disclaimer {
     color: #222;
     border: none;
     border-radius: 50%;
-    padding: 0;
     width: 40px;
     height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
+    align-self: center;
     font-size: 1rem;
     cursor: pointer;
     transition: background 0.2s;
@@ -161,9 +306,9 @@ body[data-theme="dark"] .disclaimer {
 
     .chat-form {
         box-sizing: border-box;
-        width: 100%;
+        width: 90vw;
         max-width: 100%;
-        padding: 0px 16px;
+        padding: 0;
         margin-bottom: 16px;
         gap: 0;
     }
@@ -208,10 +353,9 @@ body[data-theme="dark"] .disclaimer {
 
     .chat-form {
         box-sizing: border-box;
-        width: 100%;
-        max-width: 100%;
-        padding: 0px 32px;
-        margin: 0;
+        width: 90vw;
+        padding: 15px;
+        margin: auto;
         gap: 0;
     }
 

@@ -15,7 +15,7 @@ export default function Login() {
 
     // Anonymous chat state
     const [chatMessages, setChatMessages] = useState([]);
-    const [chatId] = useState(() => uuidv4());
+    const [chatId, setChatId] = useState(null); // Start as null, set after first message
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [mainContent, setMainContent] = useState('chat'); // 'chat' | 'terms' | 'privacy'
     const [termsMarkdown, setTermsMarkdown] = useState('');
@@ -190,7 +190,7 @@ export default function Login() {
 
     // Anonymous chat functions
     const sendAnonymousMessage = async (messageText) => {
-        if (!messageText.trim() || !chatId) return;
+        if (!messageText.trim()) return;
 
         // Add user message to state immediately
         const userMessage = { role: 'user', content: messageText };
@@ -203,12 +203,17 @@ export default function Login() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     message: messageText,
-                    chatId: chatId
+                    chatId: chatId // null for first message, then set
                     // No userId for anonymous users
                 })
             });
 
             const data = await res.json();
+
+            // If this was the first message, set the new chatId from backend
+            if (!chatId && data.chatId) {
+                setChatId(data.chatId);
+            }
 
             // Add AI response to state
             const aiMessage = { role: 'assistant', content: data.reply || data.error };
@@ -372,7 +377,6 @@ export default function Login() {
                     <Chat
                         messages={chatMessages}
                         onSendMessage={sendAnonymousMessage}
-                        currentChatId={chatId}
                         isThinking={isThinking}
                     />
                 )}

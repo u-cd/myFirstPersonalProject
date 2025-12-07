@@ -127,7 +127,6 @@ export default function ChatApp({ user }) {
             <Sidebar
                 user={user}
                 chats={chats}
-                currentChatId={currentChatId}
                 onNewChat={startNewChat}
                 onChatSelect={loadChatHistory}
                 onSignOut={signOut}
