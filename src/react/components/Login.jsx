@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '../supabase-config';
 import Chat from './Chat';
-import { v4 as uuidv4 } from 'uuid';
 import './Login.css';
 
 export default function Login() {
@@ -260,7 +259,7 @@ export default function Login() {
                             disabled={loading}
                         >
                             <img
-                                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                                src="/google-color-svgrepo-com.svg"
                                 alt="Google"
                                 style={{ width: '20px', verticalAlign: 'middle', marginRight: '8px' }}
                             />

@@ -9,6 +9,6 @@ services:
     env_file:
       - .env
     volumes:
-    # mount public/dist (react generated files) for development
-    # delete if not need.
-      - ./public/dist:/usr/src/app/public/dist
+      # mount public/dist (react generated files) for development
+      # use read-only to avoid accidental writes; remove in production
+      - ./public/dist:/usr/src/app/public/dist:ro

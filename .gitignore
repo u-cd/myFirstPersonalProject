@@ -3,7 +3,8 @@ node_modules/
 # secret files
 .env
 my-ec2-key*.pem
+spreadsheet
 
 runteq_graduate_examination
 
-spreadsheet
+.github\workflows\deploy.yml

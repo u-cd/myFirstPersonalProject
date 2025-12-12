@@ -119,6 +119,8 @@ body[data-theme="dark"] .login-menu-btn {
     /* min-height: 100vh;
     max-height: 100vh; */
     position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: #bbb #ffffff;
 }
 
 .login-container h2 {
