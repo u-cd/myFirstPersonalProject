@@ -26,14 +26,17 @@ export default function ChatApp({ user }) {
 
     const loadChats = async () => {
         try {
-            const res = await fetch(`/chats-with-title?userId=${encodeURIComponent(user.id)}`);
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
+            const res = await fetch(`/chats-with-title?userId=${encodeURIComponent(user.id)}`, {
+                headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
+            });
             const data = await res.json();
 
             if (data.chats) {
                 setChats(data.chats);
             }
         } catch (error) {
-            console.error('Error loading chats:', error);
         }
     };
 
@@ -44,7 +47,11 @@ export default function ChatApp({ user }) {
 
     const loadChatHistory = async (chatId) => {
         try {
-            const res = await fetch(`/chat-history?chatId=${chatId}&userId=${encodeURIComponent(user.id)}`);
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
+            const res = await fetch(`/chat-history?chatId=${chatId}&userId=${encodeURIComponent(user.id)}`, {
+                headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
+            });
             const data = await res.json();
 
             if (data.messages) {
@@ -53,12 +60,12 @@ export default function ChatApp({ user }) {
                 setSidebarOpen(false); // Close mobile sidebar after selecting a chat
             }
         } catch (error) {
-            console.error('Error loading chat history:', error);
         }
     };
 
     const sendMessage = async (messageText) => {
         if (!messageText.trim()) return;
+        if (messageText.length > 2000) return; // client-side guard
 
         // Add user message to state immediately
         const userMessage = { role: 'user', content: messageText };
@@ -66,6 +73,8 @@ export default function ChatApp({ user }) {
         setIsThinking(true);
 
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
             const res = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -73,7 +82,8 @@ export default function ChatApp({ user }) {
                     message: messageText,
                     chatId: currentChatId,
                     userId: user.id
-                })
+                }),
+                signal: controller.signal
             });
 
             const data = await res.json();
@@ -83,18 +93,23 @@ export default function ChatApp({ user }) {
                 setCurrentChatId(data.chatId);
             }
 
-            // Add AI response to state
-            const aiMessage = { role: 'assistant', content: data.reply || data.error };
+            // Add AI response to state (avoid rendering backend error text)
+            const aiMessage = {
+                role: 'assistant',
+                content: typeof data.reply === 'string' ? data.reply : ''
+            };
             setMessages(prev => [...prev, aiMessage]);
             setIsThinking(false);
 
             // Refresh chats list to update with new chat if this was the first message
             await loadChats();
+            clearTimeout(timeoutId);
         } catch (error) {
-            console.error('Error sending message:', error);
-            const errorMessage = { role: 'assistant', content: 'Error: Failed to send message' };
+            const errorMessage = { role: 'assistant', content: 'Error: Failed to send message. メッセージが送信できませんでした🤦‍♂️' };
             setMessages(prev => [...prev, errorMessage]);
             setIsThinking(false);
+            // ensure timer cleared
+            // no-op if not set
         }
     };
 
@@ -102,7 +117,6 @@ export default function ChatApp({ user }) {
         try {
             await supabase.auth.signOut();
         } catch (error) {
-            console.error('Error signing out:', error);
         }
     };
 

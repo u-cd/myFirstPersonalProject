@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 import Tooltip from './Tooltip';
 
 // Debounce hook
@@ -45,6 +46,13 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
             setSelectedSuggestion(-1);
             return;
         }
+        // Client-side input length guard (match backend ~2000)
+        if (input.length > 2000) {
+            setSuggestions([]);
+            setShowSuggestions(false);
+            setSelectedSuggestion(-1);
+            return;
+        }
         // Get last LLM message for context (as plain string, no role)
         let context = '';
         if (messages && messages.length > 0) {
@@ -58,12 +66,16 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
         }
         let ignore = false;
         setIsLoadingSuggestions(true);
+        // Abort if taking too long
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
         fetch('/writing-suggestions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ context, input }),
+            signal: controller.signal,
         })
             .then(res => res.json())
             .then(data => {
@@ -77,15 +89,20 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                 if (!ignore) setSuggestions([]);
             })
             .finally(() => {
+                clearTimeout(timeoutId);
                 if (!ignore) setIsLoadingSuggestions(false);
             });
-        return () => { ignore = true; };
+        return () => { ignore = true; clearTimeout(timeoutId); controller.abort(); };
     }, [input, messages, suggestionsEnabled], 1500);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         const messageText = input.trim();
         if (!messageText) return;
+        // Client-side message length check
+        if (messageText.length > 2000) {
+            return;
+        }
 
         onSendMessage(messageText);
         setInput('');
@@ -178,18 +195,19 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                             <div
                                 key={index}
                                 className="bubble user"
-                                dangerouslySetInnerHTML={{ __html: message.content.replace(/\n/g, '<br>') }}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.content.replace(/\n/g, '<br>')) }}
                             />
                         );
                     }
                     // For llm messages, detect code blocks and render specially
                     const rawHtml = marked.parse(message.content);
+                    const sanitizedHtml = DOMPurify.sanitize(rawHtml);
                     // Simple code block detection: look for <pre><code> in the HTML
-                    if (rawHtml.includes('<pre><code')) {
+                    if (sanitizedHtml.includes('<pre><code')) {
                         // Split HTML into code blocks and normal text
                         // Use DOMParser for robust parsing
                         const parser = new window.DOMParser();
-                        const doc = parser.parseFromString(`<div>${rawHtml}</div>`, 'text/html');
+                        const doc = parser.parseFromString(`<div>${sanitizedHtml}</div>`, 'text/html');
                         const children = Array.from(doc.body.firstChild.childNodes);
                         return (
                             <div key={index} className="bubble llm">
@@ -216,7 +234,7 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                         <div
                             key={index}
                             className="bubble llm"
-                            dangerouslySetInnerHTML={{ __html: rawHtml }}
+                            dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
                         />
                     );
                 })}
