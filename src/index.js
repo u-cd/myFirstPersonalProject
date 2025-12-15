@@ -61,8 +61,10 @@ app.use(
 );
 app.use(cors({
     origin: ['https://aigooooo.com', /^https?:\/\/localhost(:\d+)?$/],
-    methods: ['GET','POST'],
-    credentials: true
+    methods: ['GET','POST','OPTIONS'],
+    allowedHeaders: ['Content-Type','Authorization'],
+    credentials: true,
+    maxAge: 600
 }));
 app.use(express.json({ limit: '1mb' }));
 const limiter = rateLimit({ windowMs: 60_000, max: 60 });
