@@ -1,18 +1,33 @@
-# this is test file (do nothing for now)
 name: CI
 
-on: [push, pull_request]
+on: 
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
 
 jobs:
-  build:
+  build-and-test:
+    name: Build & Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - run: npm install
-      - run: npm run build
-      # - run: npm run lint   # Uncomment if you use linting
-      - run: npm audit --audit-level=high
-      - run: npm test       # Uncomment when you add tests
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linting
+        run: npm run lint
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Run tests
+        run: npm test

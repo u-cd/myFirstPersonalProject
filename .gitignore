@@ -6,5 +6,3 @@ my-ec2-key*.pem
 spreadsheet
 
 runteq_graduate_examination
-
-.github\workflows\deploy.yml
