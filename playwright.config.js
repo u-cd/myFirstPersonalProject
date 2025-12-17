@@ -81,9 +81,8 @@ export default defineConfig({
   // Command: docker-compose up
   // Then run tests with existing server
   webServer: {
-    command: 'docker compose up',
     url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: true,
     timeout: 180 * 1000, // 3 minutes for Docker container startup
   },
 });
