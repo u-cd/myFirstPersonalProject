@@ -21,8 +21,11 @@ test.describe('Authenticated Chat Features', () => {
     await page.goto('/');
     await page.waitForLoadState('networkidle');
     
-    // Verify we're logged in
-    await expect(page.locator('.sidebar-user-account')).toContainText(TEST_EMAIL, { timeout: 5000 });
+    // Wait a bit for auth state to apply
+    await page.waitForTimeout(2000);
+    
+    // Verify we're logged in - if not, auth.setup.js needs to run first
+    await expect(page.locator('.sidebar-user-account')).toContainText(TEST_EMAIL, { timeout: 10000 });
   });
 
   test('should start with new chat, send message, and appear in sidebar', async ({ page }) => {

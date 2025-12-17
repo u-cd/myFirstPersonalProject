@@ -51,8 +51,11 @@ export default defineConfig({
     {
       name: 'setup',
       testMatch: '**/auth.setup.js',
+      use: { 
+        ...devices['Desktop Chrome'],
+      },
     },
-    // Authenticated tests - use saved state
+    // Authenticated tests - use saved state (run BEFORE unauthenticated to avoid session invalidation)
     {
       name: 'authenticated',
       testMatch: '**/chat-features.spec.js',
@@ -62,13 +65,14 @@ export default defineConfig({
       },
       dependencies: ['setup'],
     },
-    // Unauthenticated tests - test login flow without saved state
+    // Unauthenticated tests - test login flow without saved state (run LAST to avoid invalidating auth session)
     {
       name: 'unauthenticated',
       testMatch: '**/auth.spec.js',
       use: { 
         ...devices['Desktop Chrome'],
       },
+      dependencies: ['authenticated'],
     },
   ],
 
