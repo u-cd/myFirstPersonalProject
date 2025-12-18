@@ -1,5 +1,5 @@
 {
-    "name": "myFirstPersonalProject",
+    "name": "myfirstpersonalproject",
     "version": "1.0.0",
     "description": "Minimal Express app containerized with Docker",
     "main": "src/index.js",
