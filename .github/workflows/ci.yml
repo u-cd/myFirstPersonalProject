@@ -27,73 +27,8 @@ jobs:
       # - name: Run linting
       #   run: npm run lint
 
-      - name: Build frontend
-        run: npm run build
+      # - name: Build frontend
+      #   run: npm run build
 
-      # - name: Run unit tests
-      #   run: npm test
-
-  # E2E tests disabled: MongoDB Atlas restricts access by IP address.
-  # GitHub Actions runners use dynamic IPs that cannot be whitelisted.
-  # e2e-tests:
-  #   name: E2E Tests
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v4
-
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v4
-  #       with:
-  #         node-version: '24'
-  #         cache: 'npm'
-
-  #     - name: Install dependencies
-  #       run: npm ci
-
-  #     - name: Install Playwright browsers
-  #       run: npx playwright install chromium --with-deps
-
-  #     - name: Create .env file
-  #       run: |
-  #         echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
-  #         echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
-  #         echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
-  #         echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-  #         echo "VITE_SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
-  #         echo "VITE_SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}" >> .env
-
-  #     - name: Start application with Docker Compose
-  #       run: docker compose up -d --build
-
-  #     - name: Wait for application to be ready
-  #       run: |
-  #         echo "Waiting for application to be ready..."
-  #         timeout 120 bash -c 'until curl -f http://localhost:3000 > /dev/null 2>&1; do sleep 2; done'
-  #         echo "Application is ready!"
-
-  #     - name: Run E2E tests
-  #       env:
-  #         TEST_EMAIL: ${{ secrets.TEST_EMAIL }}
-  #         TEST_PASSWORD: ${{ secrets.TEST_PASSWORD }}
-  #       run: npm run test:e2e
-
-  #     - name: Upload Playwright report
-  #       if: always()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: playwright-report
-  #         path: playwright-report/
-  #         retention-days: 30
-
-  #     - name: Upload test results
-  #       if: always()
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: test-results
-  #         path: test-results/
-  #         retention-days: 30
-
-  #     - name: Stop Docker Compose
-  #       if: always()
-  #       run: docker compose down
+      - name: Run Vitest tests
+        run: npm run vitest

@@ -17,7 +17,7 @@ COPY . .
 # uncomment while mount volume from docker-compose (need manual build)
 # RUN npm run build
 
-# Create a non-root user and use it
+# Create a non-root user and use it (for security best practices)
 # uncomment because i don't like this
 # RUN adduser -D appuser && chown -R appuser:appuser /usr/src/app
 # USER appuser
