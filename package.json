@@ -7,7 +7,6 @@
         "vitest": "vitest run",
         "playwright": "playwright test",
         "playwright:ui": "playwright test --ui",
-        "dev": "vite",
         "build": "vite build",
         "lint": "eslint .",
         "security:audit": "npm audit --audit-level=moderate",
