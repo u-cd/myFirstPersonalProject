@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase-config';
 import Sidebar from './Sidebar';
 import Chat from './Chat';
-// import { v4 as uuidv4 } from 'uuid'; deleted when chat collection created
 
 export default function ChatApp({ user }) {
     const [chats, setChats] = useState([]);
