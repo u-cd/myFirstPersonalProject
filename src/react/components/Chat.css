@@ -189,6 +189,7 @@ body[data-theme="dark"] .disclaimer {
     overflow-x: hidden;
     /* avoid chat-wide horizontal scrollbar */
     width: 50vw;
+    max-width: 800px;
     margin: 0 auto;
     padding: 24px 16px 16px 16px;
     display: flex;
@@ -242,6 +243,7 @@ body[data-theme="dark"] .disclaimer {
     display: flex;
     /* gap: 8px; */
     width: 50vw;
+    max-width: 800px;
     margin: 0 auto;
     border: 1px solid #ddd;
     transition: border 0.2s;
@@ -295,7 +297,7 @@ body[data-theme="dark"] .disclaimer {
 }
 
 /* Mobile Responsive */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1024px) {
     .chat {
         box-sizing: border-box;
         width: 100%;
@@ -338,95 +340,5 @@ body[data-theme="dark"] .disclaimer {
         width: 44px;
         height: 44px;
         flex-shrink: 0;
-    }
-}
-
-/* Tablet Responsive */
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-    .chat {
-        box-sizing: border-box;
-        width: 100%;
-        max-width: 100%;
-        padding: 60px 32px 16px 32px;
-        margin: 0;
-    }
-
-    .chat-form {
-        box-sizing: border-box;
-        width: 90vw;
-        padding: 15px;
-        margin: auto;
-        gap: 0;
-    }
-
-    .disclaimer {
-        font-size: 1em;
-        margin: 24px 0;
-    }
-
-    .bubble {
-        padding: 10px 14px;
-        font-size: 1.3rem;
-        line-height: 1.8;
-    }
-
-    .llm.bubble {
-        padding-left: 0;
-        padding-right: 0;
-    }
-
-    .chat-input {
-        font-size: 1.2rem;
-        padding: 12px 14px;
-    }
-
-    .send-btn {
-        width: 44px;
-        height: 44px;
-        flex-shrink: 0;
-    }
-}
-
-/* Desktop Responsive */
-@media screen and (min-width: 1025px) {
-    .chat {
-        width: 50vw;
-        max-width: 800px;
-    }
-
-    .chat-form {
-        width: 50vw;
-        max-width: 800px;
-    }
-}
-
-/* Large Desktop */
-@media screen and (min-width: 1440px) {
-    .chat {
-        width: 45vw;
-        max-width: 900px;
-    }
-
-    .chat-form {
-        width: 45vw;
-        max-width: 900px;
-    }
-}
-
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-    .bubble {
-        animation: none;
-    }
-}
-
-/* High contrast mode support */
-@media (prefers-contrast: high) {
-    .bubble {
-        border: 2px solid;
-    }
-
-    .chat-input {
-        border: 2px solid;
     }
 }

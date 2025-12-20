@@ -10,3 +10,8 @@ Dockerfile
 my-ec2-key.pem
 spreadsheet
 runteq_graduate_examination
+
+// uncomment the following lines because syntax error happens
+// e2e/.auth/
+// e2e/test-results/
+// e2e/playwright-report/

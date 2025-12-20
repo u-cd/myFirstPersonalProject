@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:24-alpine
 
 # Create app directory
 WORKDIR /usr/src/app
@@ -7,13 +7,20 @@ RUN mkdir -p /usr/src/app/public/dist
 
 # Install app dependencies
 COPY package*.json ./
-RUN npm install --include=dev
+ENV NODE_ENV=production
+RUN npm ci --omit=dev
 
 # Bundle app source
 COPY . .
 
 # Build React application
-RUN npm run build
+# uncomment while mount volume from docker-compose (need manual build)
+# RUN npm run build
+
+# Create a non-root user and use it (for security best practices)
+# uncomment because i don't like this
+# RUN adduser -D appuser && chown -R appuser:appuser /usr/src/app
+# USER appuser
 
 EXPOSE 3000
 

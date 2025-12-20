@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import DOMPurify from 'dompurify';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '../supabase-config';
 import Chat from './Chat';
-import { v4 as uuidv4 } from 'uuid';
 import './Login.css';
 
 export default function Login() {
@@ -191,6 +191,7 @@ export default function Login() {
     // Anonymous chat functions
     const sendAnonymousMessage = async (messageText) => {
         if (!messageText.trim()) return;
+        if (messageText.length > 2000) return; // client-side guard
 
         // Add user message to state immediately
         const userMessage = { role: 'user', content: messageText };
@@ -198,6 +199,8 @@ export default function Login() {
         setIsThinking(true);
 
         try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
             const res = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -205,7 +208,8 @@ export default function Login() {
                     message: messageText,
                     chatId: chatId // null for first message, then set
                     // No userId for anonymous users
-                })
+                }),
+                signal: controller.signal
             });
 
             const data = await res.json();
@@ -215,13 +219,16 @@ export default function Login() {
                 setChatId(data.chatId);
             }
 
-            // Add AI response to state
-            const aiMessage = { role: 'assistant', content: data.reply || data.error };
+            // Add AI response to state (avoid rendering backend error text)
+            const aiMessage = {
+                role: 'assistant',
+                content: typeof data.reply === 'string' ? data.reply : ''
+            };
             setChatMessages(prev => [...prev, aiMessage]);
+            clearTimeout(timeoutId);
             setIsThinking(false);
         } catch (error) {
-            console.error('Error sending message:', error);
-            const errorMessage = { role: 'assistant', content: 'Error: Failed to send message' };
+            const errorMessage = { role: 'assistant', content: 'Error: Failed to send message. メッセージが送信できませんでした🤦‍♂️' };
             setChatMessages(prev => [...prev, errorMessage]);
             setIsThinking(false);
         }
@@ -249,7 +256,7 @@ export default function Login() {
                     <div className="login-container">
                         <div
                             className="login-message"
-                            dangerouslySetInnerHTML={{ __html: message }}
+                               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
                         />
 
                         <h2>{isSignUp ? 'Sign up' : 'Log in'}</h2>
@@ -260,7 +267,7 @@ export default function Login() {
                             disabled={loading}
                         >
                             <img
-                                src="https://www.svgrepo.com/show/475656/google-color.svg"
+                                src="/google-color-svgrepo-com.svg"
                                 alt="Google"
                                 style={{ width: '20px', verticalAlign: 'middle', marginRight: '8px' }}
                             />

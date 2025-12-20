@@ -108,7 +108,8 @@ body[data-theme="dark"]
 }
 
 /* Mobile Responsive */
-@media screen and (max-width: 768px) {
+/* and tablet, so set max 1024px, but usualy should set max 768px and create separate tablet responsive style! */
+@media screen and (max-width: 1024px) {
     .mobile-menu-btn {
         display: block;
     }
@@ -119,7 +120,7 @@ body[data-theme="dark"]
 }
 
 /* Tablet Responsive */
-@media screen and (min-width: 769px) and (max-width: 1024px) {
+/* @media screen and (min-width: 769px) and (max-width: 1024px) {
     .mobile-menu-btn {
         display: block;
     }
@@ -127,11 +128,4 @@ body[data-theme="dark"]
     .mobile-menu-content {
         font-size: 2em;
     }
-}
-
-/* Desktop Responsive */
-@media screen and (min-width: 1025px) {
-    .mobile-menu-btn {
-        display: none;
-    }
-}
+} */

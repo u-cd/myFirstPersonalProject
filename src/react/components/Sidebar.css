@@ -111,10 +111,14 @@ body[data-theme="dark"] .sidebar-account-actions {
     border-top: 1px solid #444;
 }
 
+body[data-theme="dark"] .sidebar-content {
+    scrollbar-color: #505050 #000000;
+}
+
 /* Sidebar Component Styles */
 .sidebar-content-wrapper {
     width: 321px;
-    /* background: #f5f5f5; */
+    position: relative;
     background: #fff;
     height: 100%;
     padding: 0;
@@ -170,7 +174,7 @@ body[data-theme="dark"] .sidebar-new-chat-icon {
     gap: 16px;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: #bbb #f5f5f5;
+    scrollbar-color: #bbb #ffffff;
 }
 
 .sidebar-chats-header {
@@ -201,7 +205,7 @@ body[data-theme="dark"] .sidebar-new-chat-icon {
 }
 
 /* Mobile Responsive */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1024px) {
     .sidebar-content-wrapper {
         position: fixed;
         top: 0;
@@ -215,61 +219,5 @@ body[data-theme="dark"] .sidebar-new-chat-icon {
 
     .sidebar-content-wrapper.sidebar-open {
         left: 0;
-    }
-}
-
-/* Tablet Responsive */
-@media screen and (min-width: 769px) and (max-width: 1024px) {
-    .sidebar-content-wrapper {
-        position: fixed;
-        top: 0;
-        left: -600px;
-        background: #fff;
-        width: 450px;
-        height: 100%;
-        z-index: 1000;
-        transition: left 0.3s ease;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
-    }
-
-    .sidebar-content-wrapper.sidebar-open {
-        left: 0;
-    }
-
-    .sidebar-new-chat {
-        font-size: 1.5em;
-    }
-
-    .sidebar-chats-header {
-        font-size: 1.35em;
-    }
-
-    .sidebar-chat-link {
-        font-size: 1.4em;
-    }
-
-    .sidebar-user-account {
-        padding: 24px;
-        font-size: 1.5em;
-    }
-
-    .sidebar-logout-btn {
-        padding: 24px;
-        font-size: 1.5em;
-    }
-}
-
-/* Desktop Responsive */
-@media screen and (min-width: 1025px) {
-    .sidebar-content-wrapper {
-        width: 300px;
-        position: relative;
-    }
-}
-
-/* Accessibility improvements */
-@media (prefers-reduced-motion: reduce) {
-    .sidebar-content-wrapper {
-        transition: none;
     }
 }
