@@ -98,11 +98,11 @@ app.get('/chat-history', authenticate, async (req, res) => {
     if (!req.authUser || String(req.authUser.id) !== String(userId)) {
         return res.status(400).json({ error: '' });
     }
-    if (!isObjectId(chatId) || !(isObjectId(userId) || isUUID(userId))) {
-        return res.status(400).json({ error: '' });
-    }
     try {
-        const messages = await ChatMessage.find({ chatId, userId }).sort({ timestamp: 1 }).lean();
+        const messages = await ChatMessage.find({
+            chatId: { $eq: chatId },
+            userId: { $eq: userId },
+        }).sort({ timestamp: 1 }).lean();
         res.status(200).json({ messages });
     } catch (err) {
         res.status(500).json({ error: '' });
@@ -116,10 +116,9 @@ app.get('/chats-with-title', authenticate, async (req, res) => {
     if (!req.authUser || String(req.authUser.id) !== String(userId)) {
         return res.status(400).json({ error: '' });
     }
-    if (!(isObjectId(userId) || isUUID(userId))) return res.status(400).json({ error: '' });
     try {
         // Get all chats for this user, ordered by timestamp descending (newest first)
-        const chats = await Chat.find({ userId }).sort({ timestamp: -1 }).lean();
+        const chats = await Chat.find({ userId: { $eq: userId } }).sort({ timestamp: -1 }).lean();
         res.status(200).json({ chats });
     } catch (err) {
         res.status(500).json({ error: '' });
@@ -165,10 +164,8 @@ app.post('/writing-suggestions', async (req, res) => {
 app.post('/', async (req, res) => {
     const userMessage = req.body.message;
     let chatId = req.body.chatId; // This should be the Chat _id or null
-    const userId = req.body.userId; // Optional - can be null for logged-out users
+    let userId = req.body.userId; // Optional - can be null for logged-out users
     if (!isNonEmptyString(userMessage, 2000)) return res.status(400).json({ error: '' });
-    if (chatId && !isObjectId(String(chatId))) return res.status(400).json({ error: '' });
-    if (userId && !(isObjectId(String(userId)) || isUUID(String(userId)))) return res.status(400).json({ error: '' });
     try {
         const safeMessage = userMessage.trim();
         // If chatId is null, create a new chat and use its _id
@@ -191,7 +188,9 @@ app.post('/', async (req, res) => {
         }
 
         // Get all messages for this chatId (and userId if provided)
-        const query = userId ? { chatId, userId } : { chatId };
+        const query = userId
+            ? { chatId: { $eq: chatId }, userId: { $eq: userId } }
+            : { chatId: { $eq: chatId } };
         const allMessages = await ChatMessage.find(query).sort({ timestamp: 1 }).lean();
 
         // Save user message to DB (userId can be null for anonymous users)

@@ -18,8 +18,8 @@
 - Validation: see small guards in [src/app.js](../src/app.js) (`isObjectId`, `isUUID`, `isNonEmptyString`). Error bodies intentionally minimal (`{ error: '' }`).
 
 ## Data Models (Mongo/Mongoose)
-- [models/Chat.js](models/Chat.js): `userId?`, `title?`, `timestamp` (+ index on `{ userId, timestamp }`).
-- [models/ChatMessage.js](models/ChatMessage.js): `chatId`, `userId?`, `role` (`user|assistant`), `content` (≤2000), `timestamp` (+ compound index on `{ chatId, userId, timestamp }`).
+- [models/Chat.js](../models/Chat.js): `userId?`, `title?`, `timestamp` (+ index on `{ userId, timestamp }`).
+- [models/ChatMessage.js](../models/ChatMessage.js): `chatId`, `userId?`, `role` (`user|assistant`), `content` (≤2000), `timestamp` (+ compound index on `{ chatId, userId, timestamp }`).
 
 ## Frontend Patterns
 
@@ -42,7 +42,7 @@ npm run build
 ```bash
 docker-compose up --build
 ```
-- Unit tests (Vitest): UI + API with OpenAI/mongoose mocked; see [__tests__](__tests__) and [vitest.config.js](vitest.config.js).
+- Unit tests (Vitest): UI + API with OpenAI/mongoose mocked; see [__tests__](../__tests__) and [vitest.config.js](../vitest.config.js).
 ```bash
 npm run vitest
 ```
@@ -54,7 +54,7 @@ npm run playwright:ui
 ```
 
 ## Conventions & Notes
-- CSP and CORS: configured in [src/app.js](src/app.js); allow `localhost` and production domain.
+- CSP and CORS: configured in [src/app.js](../src/app.js); allow `localhost` and production domain.
 - Static serving order: `public/dist` first, then `public`; SPA fallback for `/.*` to `index.html`.
 - OpenAI usage: `OpenAI().responses.create({ model: 'gpt-5-chat-latest', input })`; system prompt mixes English/Japanese and suggests improved phrasing.
 - Dockerfile expects prebuilt frontend (compose mounts `public/dist` read-only); Node runs `src/index.js`.
