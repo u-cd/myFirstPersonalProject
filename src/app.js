@@ -84,8 +84,6 @@ const systemPrompt = {
 };
 
 // Lightweight input validators
-const isObjectId = (v) => typeof v === 'string' && mongoose.Types.ObjectId.isValid(v);
-const isUUID = (v) => typeof v === 'string' && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
 const isNonEmptyString = (v, max = 2000) => typeof v === 'string' && v.trim().length > 0 && v.length <= max;
 const isStringMax = (v, max) => typeof v === 'string' && v.length <= max;
 
