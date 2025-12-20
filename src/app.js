@@ -102,7 +102,10 @@ app.get('/chat-history', authenticate, async (req, res) => {
         return res.status(400).json({ error: '' });
     }
     try {
-        const messages = await ChatMessage.find({ chatId, userId }).sort({ timestamp: 1 }).lean();
+        const messages = await ChatMessage.find({
+            chatId: { $eq: chatId },
+            userId: { $eq: userId },
+        }).sort({ timestamp: 1 }).lean();
         res.status(200).json({ messages });
     } catch (err) {
         res.status(500).json({ error: '' });
