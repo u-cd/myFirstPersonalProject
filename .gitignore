@@ -5,8 +5,6 @@ node_modules/
 my-ec2-key*.pem
 spreadsheet
 
-runteq_graduate_examination
-
 # Playwright E2E test artifacts
 e2e/.auth/
 e2e/test-results/
