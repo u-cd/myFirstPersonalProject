@@ -213,6 +213,108 @@ app.post('/', async (req, res) => {
     }
 });
 
+
+// Room model
+const Room = require('../models/Room');
+
+// Send a message to a room
+app.post('/rooms/:roomId/messages', authenticate, async (req, res) => {
+    const roomId = req.params.roomId;
+    const userId = req.authUser.id;
+    const { content } = req.body;
+    if (!roomId || !userId || typeof content !== 'string' || !content.trim() || content.length > 2000) {
+        return res.status(400).json({ error: '' });
+    }
+    try {
+        // Only allow if user is a participant
+        const room = await Room.findById(roomId);
+        if (!room || !room.participants.includes(userId)) {
+            return res.status(400).json({ error: '' });
+        }
+        const message = await ChatMessage.create({
+            roomId,
+            userId,
+            role: 'user',
+            content: content.trim(),
+        });
+        room.updatedAt = new Date();
+        await room.save();
+        res.status(201).json({ message });
+    } catch (err) {
+        res.status(500).json({ error: '' });
+    }
+});
+
+// Fetch messages for a room
+app.get('/rooms/:roomId/messages', authenticate, async (req, res) => {
+    const roomId = req.params.roomId;
+    const userId = req.authUser.id;
+    if (!roomId || !userId) return res.status(400).json({ error: '' });
+    try {
+        // Only allow if user is a participant
+        const room = await Room.findById(roomId);
+        if (!room || !room.participants.includes(userId)) {
+            return res.status(400).json({ error: '' });
+        }
+        const messages = await ChatMessage.find({ roomId }).sort({ timestamp: 1 }).lean();
+        res.status(200).json({ messages });
+    } catch (err) {
+        res.status(500).json({ error: '' });
+    }
+});
+
+// List rooms user can join or has joined
+app.get('/rooms', authenticate, async (req, res) => {
+    const userId = req.authUser.id;
+    if (!userId) return res.status(400).json({ error: '' });
+    try {
+        // Find rooms where user is a participant
+        const rooms = await Room.find({ participants: userId }).sort({ updatedAt: -1, createdAt: -1 }).lean();
+        res.status(200).json({ rooms });
+    } catch (err) {
+        res.status(500).json({ error: '' });
+    }
+});
+
+// Join an existing room
+app.post('/rooms/:roomId/join', authenticate, async (req, res) => {
+    const roomId = req.params.roomId;
+    const userId = req.authUser.id;
+    if (!roomId || !userId) return res.status(400).json({ error: '' });
+    try {
+        const room = await Room.findById(roomId);
+        if (!room) return res.status(404).json({ error: '' });
+        if (!room.participants.includes(userId)) {
+            room.participants.push(userId);
+            room.updatedAt = new Date();
+            await room.save();
+        }
+        res.status(200).json({ room });
+    } catch (err) {
+        res.status(500).json({ error: '' });
+    }
+});
+
+// Create a new room
+app.post('/rooms', authenticate, async (req, res) => {
+    const { name, settings } = req.body;
+    const ownerId = req.authUser.id;
+    if (!ownerId) return res.status(400).json({ error: '' });
+    try {
+        // Create room with owner as first participant
+        const room = await Room.create({
+            name: name || '',
+            participants: [ownerId],
+            ownerId,
+            settings: settings || {},
+        });
+        res.status(201).json({ room });
+    } catch (err) {
+        res.status(500).json({ error: '' });
+    }
+});
+
+
 // Serve React app for all other routes (SPA fallback)
 app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../public/dist/index.html'));

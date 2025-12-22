@@ -1,0 +1,9 @@
+/* Layout for RoomChatApp */
+.room-chat-app-flex {
+	display: flex;
+}
+
+.room-chat-sidebar {
+	width: 321px;
+    border-right: 1px dashed #000000;
+}
