@@ -11,7 +11,7 @@ function useDebouncedEffect(effect, deps, delay) {
     }, [...(deps || []), delay]);
 }
 
-export default function MainChat({ user, currentChatId, setCurrentChatId }) {
+export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
     const [messages, setMessages] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isThinking, setIsThinking] = useState(false);
@@ -27,10 +27,14 @@ export default function MainChat({ user, currentChatId, setCurrentChatId }) {
     const inputRef = useRef(null);
     const chatRef = useRef(null);
 
+    // Only fetch history if user is defined
     useEffect(() => {
-        if (currentChatId) fetchMessages(currentChatId);
-        else setMessages([]);
-    }, [currentChatId]);
+        if (user && currentChatId) {
+            fetchMessages(currentChatId);
+        } else {
+            setMessages([]);
+        }
+    }, [user, currentChatId]);
 
     useEffect(() => {
         if (chatRef.current) {
@@ -39,6 +43,7 @@ export default function MainChat({ user, currentChatId, setCurrentChatId }) {
     }, [messages]);
 
     const fetchMessages = async (chatId) => {
+        if (!user) return;
         setLoading(true);
         try {
             const { data: sessionData } = await supabase.auth.getSession();
@@ -124,14 +129,13 @@ export default function MainChat({ user, currentChatId, setCurrentChatId }) {
         try {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 15000);
+            const body = user
+                ? { message: messageText, currentChatId, userId: user.id }
+                : { message: messageText, currentChatId };
             const res = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: messageText,
-                    chatId: currentChatId,
-                    userId: user.id
-                }),
+                body: JSON.stringify(body),
                 signal: controller.signal
             });
             const data = await res.json();
@@ -146,7 +150,7 @@ export default function MainChat({ user, currentChatId, setCurrentChatId }) {
             setIsThinking(false);
             clearTimeout(timeoutId);
         } catch (error) {
-            setMessages(prev => [...prev, { role: 'assistant', content: 'Error: Failed to send message🤦‍♂️.' }]);
+            setMessages(prev => [...prev, { role: 'assistant', content: 'Error: Failed to send message🤦‍♂️' }]);
             setIsThinking(false);
         }
     };

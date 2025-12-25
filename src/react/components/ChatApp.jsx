@@ -13,7 +13,9 @@ export default function ChatApp({ user }) {
 
     // User account block (can be expanded later)
     const handleSignOut = async () => {
-        if (window.supabase) await window.supabase.auth.signOut();
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {}
     };
 
     // Layout: topbar + mode-dependent main area

@@ -15,7 +15,9 @@ export default function Login() {
 
     // Anonymous solo chat state
     const [chatMessages, setChatMessages] = useState([]);
-    const [chatId, setChatId] = useState(null); // Start as null, set after first message
+
+    const [currentChatId, setCurrentChatId] = useState(null); // For SoloChat
+    
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [mainContent, setMainContent] = useState('chat'); // 'chat' | 'terms' | 'privacy'
     const [termsMarkdown, setTermsMarkdown] = useState('');
@@ -381,11 +383,7 @@ export default function Login() {
                 </button>
 
                 {mainContent === 'chat' && (
-                    <SoloChat
-                        messages={chatMessages}
-                        onSendMessage={sendAnonymousMessage}
-                        isThinking={isThinking}
-                    />
+                    <SoloChat currentChatId={currentChatId} setCurrentChatId={setCurrentChatId} />
                 )}
                 {mainContent === 'terms' && (
                     <div className="doc-container">
