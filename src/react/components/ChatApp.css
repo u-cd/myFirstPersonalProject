@@ -1,67 +1,5 @@
-/* Loading screen styles */
-.loading-screen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background: #fff;
-}
-
-.loading-text {
-    color: #333;
-}
-
-body[data-theme="dark"] .loading-screen {
-    background: #000;
-}
-
-body[data-theme="dark"] .loading-text {
-    color: #eee;
-}
-
-/* Dark mode overrides */
-body[data-theme="dark"] .main-content {
-    background: #000000;
-    /* color: #eee; */
-}
-
-body[data-theme="dark"] .sidebar-overlay {
-    background: rgba(0, 0, 0, 0.5);
-}
-
-body[data-theme="dark"] .mobile-menu-btn {
-    background: #000000;
-}
-
-body[data-theme="dark"] .mobile-menu-content {
-    background: #000000;
-    color: #fff;
-}
-
-body[data-theme="dark"] .thinking-emoji {
-    color: #fff;
-}
-
-body[data-theme="dark"] 
-/* Thinking emoji animation */
-
-.thinking-emoji {
-    display: inline-block;
-    animation: thinking-spin 2s linear infinite;
-}
-
-@keyframes thinking-spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
 /* ChatApp Component Styles */
-.main-content {
+.chatapp-root {
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -69,6 +7,92 @@ body[data-theme="dark"]
     height: 100%;
     overflow: hidden;
 }
+
+
+
+
+/* Top bar */
+.chatapp-topbar {
+    display: flex;
+    width: 100vw;
+    height: 10%;
+
+    /* border-bottom: 1px dashed #000; */
+}
+
+.mode-switcher {
+    display: flex;
+
+}
+
+.mode-switcher .active {
+    border: 2px dashed #000;
+    border-bottom: none;
+}
+
+.mode-switcher button {
+    font-weight: normal;
+
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 160px;
+
+    border-bottom: 2px dashed #000;
+}
+
+.sidebar-mode-switcher button:hover {
+    background: #eee;
+}
+
+.something-flexible-space {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    border-bottom: 2px dashed #000;
+}
+
+/* .rainbow-text {
+    background: linear-gradient(90deg, #ff3e3e, #ffea00, #00ff85, #00cfff, #a259ff, #ff3e3e 100%);
+    background-size: 200% auto;
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+} */
+
+.user-account {
+    display: flex;
+    margin-left: auto;
+    /* align-items: center; */
+    /* gap: 24px */
+
+    border-bottom: 2px dashed #000;
+}
+
+.user-account-email {
+    display: flex;
+    align-items: center;
+    margin: 0 8px;
+}
+
+.user-account button {
+    background: none;
+    border: none;
+    cursor: pointer;
+
+    width: 100px;
+}
+
+.user-account button:hover {
+    background: #eee;
+}
+
+
+
+
 
 /* Mobile menu button */
 .mobile-menu-btn {
@@ -129,3 +153,132 @@ body[data-theme="dark"]
         font-size: 2em;
     }
 } */
+
+
+
+
+
+/* Container for dark mode toggle and logout button */
+.sidebar-account-actions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1001;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    border-top: 1px solid #eee;
+}
+
+.sidebar-darkmode-toggle,
+.sidebar-logout-btn {
+    padding: 12px 24px 18px 24px;
+    color: #444;
+    font-size: 1em;
+    border: none;
+    background: #fff;
+    min-height: 40px;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+}
+
+.sidebar-darkmode-toggle:hover,
+.sidebar-logout-btn:hover {
+    background: #e0e0e0;
+    color: #222;
+    /* transform: scale(1.01); */
+    /* box-shadow: 0 2px 12px 0 rgba(210, 210, 210, 0.533); */
+}
+
+body[data-theme="dark"] .sidebar-darkmode-toggle,
+body[data-theme="dark"] .sidebar-logout-btn {
+    background: #000000;
+    color: #eee;
+}
+
+body[data-theme="dark"] .sidebar-darkmode-toggle:hover,
+body[data-theme="dark"] .sidebar-logout-btn:hover {
+    background: #3d434b;
+    color: #fff;
+}
+
+body[data-theme="dark"] .sidebar-user-account {
+    color: #eee;
+    border-top: 1px solid #444;
+}
+
+body[data-theme="dark"] .sidebar-user-account:hover {
+    background: #3d434b;
+}
+
+body[data-theme="dark"] .sidebar-account-actions {
+    border-top: 1px solid #444;
+}
+
+
+/* Loading screen styles */
+.loading-screen {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-text {
+    color: #333;
+}
+
+body[data-theme="dark"] .loading-screen {
+    background: #000;
+}
+
+body[data-theme="dark"] .loading-text {
+    color: #eee;
+}
+
+/* Dark mode overrides */
+body[data-theme="dark"] .main-content {
+    background: #000000;
+    /* color: #eee; */
+}
+
+body[data-theme="dark"] .sidebar-overlay {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+body[data-theme="dark"] .mobile-menu-btn {
+    background: #000000;
+}
+
+body[data-theme="dark"] .mobile-menu-content {
+    background: #000000;
+    color: #fff;
+}
+
+body[data-theme="dark"] .thinking-emoji {
+    color: #fff;
+}
+
+body[data-theme="dark"] 
+/* Thinking emoji animation */
+
+.thinking-emoji {
+    display: inline-block;
+    animation: thinking-spin 2s linear infinite;
+}
+
+@keyframes thinking-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

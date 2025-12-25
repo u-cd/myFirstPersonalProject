@@ -83,59 +83,59 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom }) {
   };
 
   return (
-    <div className="room-list">
-      <form
-        onSubmit={e => {
-          e.preventDefault();
-          handleCreateRoom(newRoomName);
-        }}
-      >
-        <input
-          type="text"
-          placeholder="New room name"
-          value={newRoomName}
-          onChange={e => setNewRoomName(e.target.value)}
-        />
-        <button type="submit">Create Room</button>
-      </form>
+    <div className="sidebar">
+        <div className="sidebar-fixed-top">
+            <form
+                onSubmit={e => {
+                e.preventDefault();
+                handleCreateRoom(newRoomName);
+                }}
+            >
+                <input
+                type="text"
+                placeholder="New room name"
+                value={newRoomName}
+                onChange={e => setNewRoomName(e.target.value)}
+                />
+                <button type="submit">Create Room</button>
+            </form>
 
-      <form
-        style={{ marginTop: 12 }}
-        onSubmit={e => {
-          e.preventDefault();
-          handleJoinRoom(joinRoomId);
-        }}
-      >
-        <input
-          type="text"
-          placeholder="Join room by ID"
-          value={joinRoomId}
-          onChange={e => setJoinRoomId(e.target.value)}
-        />
-        <button type="submit">Join Room</button>
-      </form>
+            <form
+                onSubmit={e => {
+                e.preventDefault();
+                handleJoinRoom(joinRoomId);
+                }}
+            >
+                <input
+                type="text"
+                placeholder="Join room by ID"
+                value={joinRoomId}
+                onChange={e => setJoinRoomId(e.target.value)}
+                />
+                <button type="submit">Join Room</button>
+            </form>
+        </div>
       
-      <h2>Rooms</h2>
-      {loading ? (
-        <div>Loading rooms...</div>
-      ) : (
-        <ul>
-          {rooms.length === 0 ? (
-            <li style={{ color: '#888' }}>No rooms found</li>
-          ) : (
-            rooms.map(room => (
-              <li key={room._id || room.id}>
-                <button
-                  onClick={() => handleSelectRoom(room)}
-                  style={{ fontWeight: currentRoom && currentRoom._id === room._id ? 'bold' : 'normal' }}
-                >
-                  {room.name || 'Untitled'} ({room.participants?.length || 0} users)
-                </button>
-              </li>
-            ))
-          )}
-        </ul>
-      )}
+        <div className="sidebar-chats-header">Rooms</div>
+        <div className="sidebar-content">
+            {loading ? (
+                <div className="sidebar-loading">Loading rooms...</div>
+            ) : (
+                rooms.length === 0 ? (
+                    <div>No rooms found</div>
+                ) : (
+                    rooms.map(room => (
+                        <button
+                            key={room._id || room.id}
+                            className="sidebar-chat-link"
+                            onClick={() => handleSelectRoom(room)}
+                        >
+                            {room.name || 'Untitled'} ({room.participants?.length || 0} users)
+                        </button>
+                    ))
+                )
+            )}
+        </div>
     </div>
   );
 }

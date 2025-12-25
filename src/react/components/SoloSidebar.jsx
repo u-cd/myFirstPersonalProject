@@ -34,7 +34,7 @@ export default function SoloSidebar({ user, currentChatId, setCurrentChatId }) {
     };
 
     return (
-        <div className="sidebar-content-wrapper">
+        <div className="sidebar">
             <div className="sidebar-fixed-top">
                 <button className="sidebar-new-chat" onClick={handleNewChat}>
                     <span className="sidebar-new-chat-icon" aria-hidden="true">
@@ -45,8 +45,9 @@ export default function SoloSidebar({ user, currentChatId, setCurrentChatId }) {
                     </span>
                     New chat
                 </button>
-                <div className="sidebar-chats-header">Chats</div>
             </div>
+
+            <div className="sidebar-chats-header">Chats</div>
             <div className="sidebar-content">
                 {loading ? (
                     <div className="sidebar-loading">Loading chats...</div>
@@ -58,7 +59,6 @@ export default function SoloSidebar({ user, currentChatId, setCurrentChatId }) {
                                 key={chat._id}
                                 className="sidebar-chat-link"
                                 onClick={() => handleChatSelect(chat._id)}
-                                style={{ fontWeight: currentChatId === chat._id ? 'bold' : 'normal' }}
                             >
                                 {linkText}
                             </button>

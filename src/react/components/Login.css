@@ -204,17 +204,15 @@ body[data-theme="dark"] .login-menu-btn {
 
 .doc-scroll {
     background: #ffffff;
-    /* Scrolling behavior */
+    padding: 16px;
+
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    /* Content spacing */
-    /* Wrapping for long words/URLs */
+
     word-break: break-word;
     overflow-wrap: anywhere;
-    /* optional: a subtle border to separate from background */
-    /* border: 1px solid #eee; */
-    /* border-radius: 8px; */
+
     scrollbar-width: thin;
     scrollbar-color: #bbb #ffffff;
 }

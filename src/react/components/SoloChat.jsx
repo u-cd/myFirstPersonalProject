@@ -202,57 +202,59 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
 
     return (
         <div className="chat" ref={chatRef}>
-            {messages.length === 0 ? (
-                <div style={{ color: '#888' }}>No messages yet</div>
-            ) : (
-                messages.map((message, index) => {
-                    if (message.role === 'user') {
+            <div className="chat-messages">
+                {messages.length === 0 ? (
+                    <div style={{ color: '#888' }}>No messages yet</div>
+                ) : (
+                    messages.map((message, index) => {
+                        if (message.role === 'user') {
+                            return (
+                                <div
+                                    key={index}
+                                    className="bubble user"
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.content.replace(/\n/g, '<br>')) }}
+                                />
+                            );
+                        }
+                        const rawHtml = marked.parse(message.content);
+                        const sanitizedHtml = DOMPurify.sanitize(rawHtml);
+                        if (sanitizedHtml.includes('<pre><code')) {
+                            const parser = new window.DOMParser();
+                            const doc = parser.parseFromString(`<div>${sanitizedHtml}</div>`, 'text/html');
+                            const children = Array.from(doc.body.firstChild.childNodes);
+                            return (
+                                <div key={index} className="bubble llm">
+                                    {children.map((node, i) => {
+                                        if (node.nodeName === 'PRE') {
+                                            return (
+                                                <pre key={i} className="chat-code-block">
+                                                    <code>{node.textContent}</code>
+                                                </pre>
+                                            );
+                                        } else {
+                                            return (
+                                                <span key={i} dangerouslySetInnerHTML={{ __html: node.outerHTML || node.textContent }} />
+                                            );
+                                        }
+                                    })}
+                                </div>
+                            );
+                        }
                         return (
                             <div
                                 key={index}
-                                className="bubble user"
-                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.content.replace(/\n/g, '<br>')) }}
+                                className="bubble llm"
+                                dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
                             />
                         );
-                    }
-                    const rawHtml = marked.parse(message.content);
-                    const sanitizedHtml = DOMPurify.sanitize(rawHtml);
-                    if (sanitizedHtml.includes('<pre><code')) {
-                        const parser = new window.DOMParser();
-                        const doc = parser.parseFromString(`<div>${sanitizedHtml}</div>`, 'text/html');
-                        const children = Array.from(doc.body.firstChild.childNodes);
-                        return (
-                            <div key={index} className="bubble llm">
-                                {children.map((node, i) => {
-                                    if (node.nodeName === 'PRE') {
-                                        return (
-                                            <pre key={i} className="chat-code-block">
-                                                <code>{node.textContent}</code>
-                                            </pre>
-                                        );
-                                    } else {
-                                        return (
-                                            <span key={i} dangerouslySetInnerHTML={{ __html: node.outerHTML || node.textContent }} />
-                                        );
-                                    }
-                                })}
-                            </div>
-                        );
-                    }
-                    return (
-                        <div
-                            key={index}
-                            className="bubble llm"
-                            dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-                        />
-                    );
-                })
-            )}
-            {isThinking && (
-                <div className="bubble llm thinking">
-                    <span className="thinking-emoji" role="img" aria-label="thinking">🤔</span>
-                </div>
-            )}
+                    })
+                )}
+                {isThinking && (
+                    <div className="bubble llm thinking">
+                        <span className="thinking-emoji" role="img" aria-label="thinking">🤔</span>
+                    </div>
+                )}
+            </div>
             <form className="chat-form" onSubmit={handleSubmit}>
                 <textarea
                     className="chat-input"

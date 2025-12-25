@@ -268,8 +268,6 @@ app.post('/rooms/:roomId/messages', authenticate, async (req, res) => {
                 content: '[CURRENT USER MESSAGE TO TRANSLATE]: ' + content.trim()
             }
         ];
-        console.log('---------------------------');
-        console.log('inputHistory:', inputHistory);
 
         // Get AI response
         const response = await openai.responses.create({

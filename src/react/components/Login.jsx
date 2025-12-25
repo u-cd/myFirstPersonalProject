@@ -17,7 +17,7 @@ export default function Login() {
     const [chatMessages, setChatMessages] = useState([]);
 
     const [currentChatId, setCurrentChatId] = useState(null); // For SoloChat
-    
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [mainContent, setMainContent] = useState('chat'); // 'chat' | 'terms' | 'privacy'
     const [termsMarkdown, setTermsMarkdown] = useState('');
@@ -253,126 +253,123 @@ export default function Login() {
             />
 
             {/* Sidebar with login */}
-            <div id="sidebar">
-                <div className={`sidebar-content-wrapper ${sidebarOpen ? 'sidebar-open' : ''}`}>
-                    <div className="login-container">
-                        <div
-                            className="login-message"
-                               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
+            <div>
+                <div className={`login-container ${sidebarOpen ? 'sidebar-open' : ''}`}>
+                    <div
+                        className="login-message"
+                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
+                    />
+
+                    <h2>{isSignUp ? 'Sign up' : 'Log in'}</h2>
+
+                    <button
+                        className="google-login"
+                        onClick={signInWithGoogle}
+                        disabled={loading}
+                    >
+                        <img
+                            src="/google-color-svgrepo-com.svg"
+                            alt="Google"
+                            style={{ width: '20px', verticalAlign: 'middle', marginRight: '8px' }}
                         />
+                        {loading ? 'Logging in...' : 'Continue with Google'}
+                    </button>
 
-                        <h2>{isSignUp ? 'Sign up' : 'Log in'}</h2>
+                    <div className="login-or">or</div>
 
-                        <button
-                            className="google-login"
-                            onClick={signInWithGoogle}
-                            disabled={loading}
-                        >
-                            <img
-                                src="/google-color-svgrepo-com.svg"
-                                alt="Google"
-                                style={{ width: '20px', verticalAlign: 'middle', marginRight: '8px' }}
+                    {!showMagicForm ? (
+                        <form className="login-form" onSubmit={signInOrSignUpWithEmail}>
+                            <input
+                                type="email"
+                                placeholder="Enter your email"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                disabled={loading}
+                                required
                             />
-                            {loading ? 'Logging in...' : 'Continue with Google'}
-                        </button>
-
-                        <div className="login-or">or</div>
-
-                        {!showMagicForm ? (
-                            <form className="login-form" onSubmit={signInOrSignUpWithEmail}>
+                            <input
+                                type="password"
+                                placeholder="Enter your password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={loading}
+                                required
+                            />
+                            <button type="submit" disabled={loading || !email || !password}>
+                                {loading ? (isSignUp ? 'Signing up...' : 'Logging in...') : (isSignUp ? 'Sign up' : 'Continue')}
+                            </button>
+                        </form>
+                    ) : (
+                        <>
+                            <form className="login-form" onSubmit={handleSendMagicLink}>
                                 <input
                                     type="email"
                                     placeholder="Enter your email"
                                     value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    disabled={loading}
+                                    onChange={e => setEmail(e.target.value)}
                                     required
                                 />
-                                <input
-                                    type="password"
-                                    placeholder="Enter your password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    disabled={loading}
-                                    required
-                                />
-                                <button type="submit" disabled={loading || !email || !password}>
-                                    {loading ? (isSignUp ? 'Signing up...' : 'Logging in...') : (isSignUp ? 'Sign up' : 'Continue')}
-                                </button>
+                                <button type="submit">Send magic link</button>
                             </form>
+                            <button type="button" className="toggle-auth-mode" onClick={() => { setShowMagicForm(false); setMessage('') }}>Back to login</button>
+                        </>
+                    )}
+
+                    {isSignUp && (
+                        <div style={{ margin: '12px 0 8px 0', fontSize: '0.95em' }}>
+                            <input
+                                type="checkbox"
+                                id="agreePolicies"
+                                checked={agreed}
+                                onChange={e => setAgreed(e.target.checked)}
+                                required
+                                style={{ marginRight: '6px' }}
+                            />
+                            <label htmlFor="agreePolicies">
+                                I agree to the
+                                <a href="#terms" onClick={showTerms} className="login-link">Terms of Use</a>
+                                and
+                                <a href="#privacy" onClick={showPrivacy} className="login-link">Privacy Policy</a>
+                                .<br />
+                                <span className="agreement-note">
+                                    （利用規約およびプライバシーポリシーに同意します）
+                                </span>
+                            </label>
+                        </div>
+                    )}
+
+                    <div className="toggle-auth-container">
+                        {isSignUp ? (
+                            <>
+                                Already have an account?（すでにアカウントをお持ちですか？）{' '}
+                                <button
+                                    type="button"
+                                    className="toggle-auth-mode login-link"
+                                    onClick={() => { setIsSignUp(false); setShowMagicForm(false); setMessage(''); }}
+                                    disabled={loading}
+                                >
+                                    Log in
+                                </button>
+                            </>
                         ) : (
                             <>
-                                <form className="login-form" onSubmit={handleSendMagicLink}>
-                                    <input
-                                        type="email"
-                                        placeholder="Enter your email"
-                                        value={email}
-                                        onChange={e => setEmail(e.target.value)}
-                                        required
-                                    />
-                                    <button type="submit">Send magic link</button>
-                                </form>
-                                <button type="button" className="toggle-auth-mode" onClick={() => { setShowMagicForm(false); setMessage('') }}>Back to login</button>
+                                Don&apos;t have an account?（アカウントをお持ちでないですか？）{' '}
+                                <button
+                                    type="button"
+                                    className="toggle-auth-mode login-link"
+                                    onClick={() => { setIsSignUp(true); setShowMagicForm(false); setMessage(''); }}
+                                    disabled={loading}
+                                >
+                                    Sign up（新規登録）
+                                </button>
                             </>
                         )}
-
-                        {isSignUp && (
-                            <div style={{ margin: '12px 0 8px 0', fontSize: '0.95em' }}>
-                                <input
-                                    type="checkbox"
-                                    id="agreePolicies"
-                                    checked={agreed}
-                                    onChange={e => setAgreed(e.target.checked)}
-                                    required
-                                    style={{ marginRight: '6px' }}
-                                />
-                                <label htmlFor="agreePolicies">
-                                    I agree to the
-                                    <a href="#terms" onClick={showTerms} className="login-link">Terms of Use</a>
-                                    and
-                                    <a href="#privacy" onClick={showPrivacy} className="login-link">Privacy Policy</a>
-                                    .<br />
-                                    <span className="agreement-note">
-                                        （利用規約およびプライバシーポリシーに同意します）
-                                    </span>
-                                </label>
-                            </div>
-                        )}
-
-                        <div className="toggle-auth-container">
-                            {isSignUp ? (
-                                <>
-                                    Already have an account?（すでにアカウントをお持ちですか？）{' '}
-                                    <button
-                                        type="button"
-                                        className="toggle-auth-mode login-link"
-                                        onClick={() => { setIsSignUp(false); setShowMagicForm(false); setMessage(''); }}
-                                        disabled={loading}
-                                    >
-                                        Log in
-                                    </button>
-                                </>
-                            ) : (
-                                <>
-                                    Don&apos;t have an account?（アカウントをお持ちでないですか？）{' '}
-                                    <button
-                                        type="button"
-                                        className="toggle-auth-mode login-link"
-                                        onClick={() => { setIsSignUp(true); setShowMagicForm(false); setMessage(''); }}
-                                        disabled={loading}
-                                    >
-                                        Sign up（新規登録）
-                                    </button>
-                                </>
-                            )}
-                        </div>
-
                     </div>
                 </div>
             </div>
 
             {/* Main content area: solo chat or policy docs */}
-            <div className="main-content">
+            <div style={{ flex: 1 }}>
                 {/* Mobile menu button */}
                 <button
                     className="login-menu-btn"

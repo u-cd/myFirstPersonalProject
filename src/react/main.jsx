@@ -6,6 +6,7 @@ import './components/Login.css'
 import './components/Chat.css'
 import './components/Sidebar.css'
 import './components/ChatApp.css'
+import './components/Solo.css'
 import './components/Room.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(

@@ -6,6 +6,7 @@ export default function RoomChat({ user, currentRoom }) {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [input, setInput] = useState('');
   const chatRef = useRef(null);
+  const inputRef = useRef(null);
 
 
   // Fetch messages when currentRoomId changes
@@ -75,8 +76,23 @@ export default function RoomChat({ user, currentRoom }) {
     } catch (e) {}
   };
 
+  const handleInputChange = (e) => {
+    setInput(e.target.value);
+    if (inputRef.current) {
+        inputRef.current.style.height = 'auto';
+        inputRef.current.style.height = inputRef.current.scrollHeight + 'px';
+    }
+};
+
+const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        handleSend(e);
+    }
+};
+
   return (
-    <div className="roomchat-main" style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <div className="chat">
       {!currentRoom ? (
         <div>Select a room to start chatting.</div>
       ) : (
@@ -85,7 +101,7 @@ export default function RoomChat({ user, currentRoom }) {
           <div className="participants">
             Participants: {currentRoom.participants?.join(', ')}
           </div>
-          <div className="chat-messages" ref={chatRef} style={{ flex: 1, overflowY: 'auto' }}>
+          <div className="chat-messages" ref={chatRef}>
             {loadingMessages ? (
               <div>Loading messages...</div>
             ) : messages.length === 0 ? (
@@ -93,21 +109,38 @@ export default function RoomChat({ user, currentRoom }) {
             ) : (
               messages.map(msg => (
                 <div key={msg._id || msg.id} className={msg.userId === user?.id ? 'my-message' : 'other-message'}>
-                  <strong>{msg.userId}:</strong> {msg.content}
+                  {/* <strong>{msg.userId}:</strong> {msg.content} */}
+                  {msg.content}
                 </div>
               ))
             )}
           </div>
-          <form className="room-chat-form" onSubmit={handleSend} style={{ display: 'flex' }}>
-            <input
-              type="text"
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              placeholder="Type your English..."
-              className="room-chat-input"
-              style={{ flex: 1 }}
+          <form className="chat-form" onSubmit={handleSend}>
+            <textarea
+                className="chat-input"
+                value={input}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
+                placeholder="Type your English..."
+                rows={1}
+                ref={inputRef}
+                autoComplete="off"
             />
-            <button type="submit">Send</button>
+            <button
+                type="submit"
+                className="send-btn"
+                disabled={!input.trim()}
+                aria-label="Send"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22" height="22" viewBox="0 0 24 24" fill="none"
+                    stroke="var(--send-btn-stroke, #222)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                >
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
           </form>
         </>
       )}

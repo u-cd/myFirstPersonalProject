@@ -1,9 +1,24 @@
 /* Layout for RoomChatApp */
-.room-chat-app-flex {
-	display: flex;
-}
+/* Try to use the solo mode style as much as possible */
+.my-message {
+	background-color: #bdd;
+	align-self: flex-end;
+	border-radius: 12px 12px 0 12px;
+	padding: 8px 12px;
+	margin: 4px 0;
+	max-width: 70%;
 
-.room-chat-sidebar {
-	width: 321px;
-    border-right: 1px dashed #000000;
+	word-break: break-word;
+    white-space: pre-wrap;
+}
+.other-message {
+	background-color: #f0f0f0;
+	align-self: flex-start;
+	border-radius: 12px 12px 12px 0;
+	padding: 8px 12px;
+	margin: 4px 0;
+	max-width: 70%;
+
+	word-break: break-word;
+    white-space: pre-wrap;
 }

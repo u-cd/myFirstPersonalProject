@@ -35,7 +35,7 @@ function App() {
     if (loading) {
         return (
             <div className="app-layout">
-                <div className="main-content loading-screen">
+                <div className="loading-screen">
                     <div className="loading-text">Loading...</div>
                 </div>
             </div>

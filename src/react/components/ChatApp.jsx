@@ -20,23 +20,27 @@ export default function ChatApp({ user }) {
 
     // Layout: topbar + mode-dependent main area
     return (
-        <div className="chatapp-root" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+        <div className="chatapp-root">
             {/* Top bar: mode switcher + user account */}
-            <div className="chatapp-topbar" style={{ display: 'flex', width: '100vw', borderBottom: '1px solid #eee' }}>
-                <div className="sidebar-mode-switcher" style={{ display: 'flex' }}>
+            <div className="chatapp-topbar">
+                <div className="mode-switcher">
                     <button
                         onClick={() => setMode('main')}
                         className={mode === 'main' ? 'active' : ''}
-                        style={{ fontWeight: mode === 'main' ? 'bold' : 'normal' }}
-                    >Main Chat</button>
+                    >Solo Chat</button>
                     <button
                         onClick={() => setMode('rooms')}
                         className={mode === 'rooms' ? 'active' : ''}
-                        style={{ fontWeight: mode === 'rooms' ? 'bold' : 'normal' }}
                     >Rooms</button>
                 </div>
-                <div className="sidebar-user-account" style={{ cursor: 'pointer' }}>
-                    {user.email || 'No email'}
+                <div className="something-flexible-space">
+                    <span className="rainbow-text">rainbow</span>
+
+                </div>
+                <div className="user-account">
+                    <span className="user-account-email">
+                        {user.email || 'No email'}
+                    </span>
                     <button onClick={handleSignOut}>Log out</button>
                 </div>
             </div>
