@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import RoomList from './RoomList';
 
 export default function Sidebar({
     user,
@@ -7,7 +8,9 @@ export default function Sidebar({
     onChatSelect,
     onSignOut,
     isOpen,
-    onClose
+    onClose,
+    mode,
+    setMode
 }) {
     // Dark mode state and persistence
     const [darkMode, setDarkMode] = useState(() => {
@@ -67,36 +70,57 @@ export default function Sidebar({
 
     return (
         <div className={`sidebar-content-wrapper ${isOpen ? 'sidebar-open' : ''}`}>
-            <div className="sidebar-fixed-top">
-                <button className="sidebar-new-chat" onClick={handleNewChat}>
-                    <span className="sidebar-new-chat-icon" aria-hidden="true">
-                        <svg
-                            width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
-                            style={{ verticalAlign: 'middle', marginRight: '8px' }}
-                        >
-                            <rect x="9" y="4" width="2" height="12" rx="1" fill="var(--sidebar-newchat-fill, #666)" />
-                            <rect x="4" y="9" width="12" height="2" rx="1" fill="var(--sidebar-newchat-fill, #666)" />
-                        </svg>
-                    </span>
-                    New chat
-                </button>
-                <div className="sidebar-chats-header">Chats</div>
+            {/* Mode Switcher */}
+            <div className="sidebar-mode-switcher" style={{ display: 'flex', gap: 8, margin: '8px 0' }}>
+                <button
+                    onClick={() => setMode('main')}
+                    className={mode === 'main' ? 'active' : ''}
+                    style={{ fontWeight: mode === 'main' ? 'bold' : 'normal' }}
+                >Main Chat</button>
+                <button
+                    onClick={() => setMode('rooms')}
+                    className={mode === 'rooms' ? 'active' : ''}
+                    style={{ fontWeight: mode === 'rooms' ? 'bold' : 'normal' }}
+                >Rooms</button>
             </div>
 
-            <div className="sidebar-content">
-                {chats.map(chat => {
-                    const linkText = chat.title && chat.title.trim() ? chat.title.trim() : 'Untitled chat';
-                    return (
-                        <button
-                            key={chat._id}
-                            className="sidebar-chat-link"
-                            onClick={() => handleChatSelect(chat._id)}
-                        >
-                            {linkText}
+            {mode === 'main' ? (
+                <>
+                    <div className="sidebar-fixed-top">
+                        <button className="sidebar-new-chat" onClick={handleNewChat}>
+                            <span className="sidebar-new-chat-icon" aria-hidden="true">
+                                <svg
+                                    width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"
+                                    style={{ verticalAlign: 'middle', marginRight: '8px' }}
+                                >
+                                    <rect x="9" y="4" width="2" height="12" rx="1" fill="var(--sidebar-newchat-fill, #666)" />
+                                    <rect x="4" y="9" width="12" height="2" rx="1" fill="var(--sidebar-newchat-fill, #666)" />
+                                </svg>
+                            </span>
+                            New chat
                         </button>
-                    );
-                })}
-            </div>
+                        <div className="sidebar-chats-header">Chats</div>
+                    </div>
+                    <div className="sidebar-content">
+                        {chats.map(chat => {
+                            const linkText = chat.title && chat.title.trim() ? chat.title.trim() : 'Untitled chat';
+                            return (
+                                <button
+                                    key={chat._id}
+                                    className="sidebar-chat-link"
+                                    onClick={() => handleChatSelect(chat._id)}
+                                >
+                                    {linkText}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </>
+            ) : (
+                <div className="sidebar-content">
+                    <RoomList user={user} />
+                </div>
+            )}
 
             {showAccountActions && (
                 <div className="sidebar-account-actions" ref={accountActionsRef}>

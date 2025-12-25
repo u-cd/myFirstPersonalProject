@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { supabase } from '../supabase-config';
 import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 import Tooltip from './Tooltip';
@@ -11,19 +12,29 @@ function useDebouncedEffect(effect, deps, delay) {
     }, [...(deps || []), delay]);
 }
 
-export default function Chat({ messages, onSendMessage, isThinking }) {
+export default function Chat({ user, currentChatId, setCurrentChatId }) {
+    const [messages, setMessages] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [isThinking, setIsThinking] = useState(false);
     const [input, setInput] = useState('');
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
     const [selectedSuggestion, setSelectedSuggestion] = useState(-1);
     const [suggestionsEnabled, setSuggestionsEnabled] = useState(() => {
-        // Persist toggle in localStorage
         const saved = localStorage.getItem('writingSuggestionsEnabled');
         return saved === null ? true : saved === 'true';
     });
     const inputRef = useRef(null);
     const chatRef = useRef(null);
+
+
+
+    // Fetch messages when chatId changes
+    useEffect(() => {
+        if (currentChatId) fetchMessages(currentChatId);
+        else setMessages([]);
+    }, [currentChatId]);
 
     // Auto-scroll to bottom when new messages arrive
     useEffect(() => {
@@ -31,6 +42,27 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
             chatRef.current.scrollTop = chatRef.current.scrollHeight;
         }
     }, [messages]);
+
+
+
+    const fetchMessages = async (chatId) => {
+        setLoading(true);
+        try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
+            const res = await fetch(`/chat-history?chatId=${chatId}&userId=${encodeURIComponent(user.id)}`, {
+                headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
+            });
+            const data = await res.json();
+            if (data.messages) setMessages(data.messages);
+            else setMessages([]);
+        } catch (e) {
+            setMessages([]);
+        }
+        setLoading(false);
+    };
+
+
 
     // Debounced writing suggestions API call
     useDebouncedEffect(() => {
@@ -95,17 +127,43 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
         return () => { ignore = true; clearTimeout(timeoutId); controller.abort(); };
     }, [input, messages, suggestionsEnabled], 1500);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         const messageText = input.trim();
         if (!messageText) return;
-        // Client-side message length check
-        if (messageText.length > 2000) {
-            return;
-        }
-
-        onSendMessage(messageText);
+        if (messageText.length > 2000) return;
+        setMessages(prev => [...prev, { role: 'user', content: messageText }]);
+        setIsThinking(true);
         setInput('');
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+            const res = await fetch('/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: messageText,
+                    chatId: currentChatId,
+                    userId: user.id
+                }),
+                signal: controller.signal
+            });
+            const data = await res.json();
+            if (!currentChatId && data.chatId) {
+                setCurrentChatId(data.chatId);
+            }
+            const aiMessage = {
+                role: 'assistant',
+                content: typeof data.reply === 'string' ? data.reply : ''
+            };
+            setMessages(prev => [...prev, aiMessage]);
+            setIsThinking(false);
+            await fetchChats();
+            clearTimeout(timeoutId);
+        } catch (error) {
+            setMessages(prev => [...prev, { role: 'assistant', content: 'Error: Failed to send message🤦‍♂️.' }]);
+            setIsThinking(false);
+        }
     };
 
     // select suggestions, send message by enter
@@ -156,95 +214,61 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
     };
 
     return (
-        <>
-            <div ref={chatRef} className="chat">
-                {(() => {
-                    const helloMsg = {
-                        role: 'llm',
-                        content: [
-                            '# Welcome to ai語!',
-                            'This is an **AI English conversation tutor**.',
-                            '',
-                            'Originally, this app was created by the developer for my own English learning.',
-                            'The goal is to help you study real, natural English easily and comfortably.',
-                            '',
-                            'このアプリは **AI英会話シミュレーター** です。🤖🇬🇧',
-                            '',
-                            '### I will help you improve your English!',
-                            '',
-                            '- 下の入力欄にメッセージを入力して、英語学習を始めましょう！👇💬✍️',
-                            '- 英語で書いてみましょう！📝（日本語まじりでもOKです😊）例: "Hello! 今日の天気はどうですか？"🌤️',
-                            '- 分からないことがあれば、いつでも質問してください！❓🙋‍♂️🙋‍♀️',
-                            '',
-                            '---',
-                            '',
-                            "**Let's get started!** 🌟 楽しく学びましょう！🚀✨🎓🦉📝🎤💡💬",
-                            '',
-                            '⚠️🤖 AIはまちがえることがあります。大事な内容は必ずご自身でご確認ください！🔍📢🧐💡🙇‍♂️🙇‍♀️',
-                            '',
-                        ].join('\n')
-                    };
-                    if (messages.length === 0) return [helloMsg];
-                    if (!(messages[0].role === 'llm' && messages[0].content && messages[0].content.includes('Type your message to start chatting'))) {
-                        return [helloMsg, ...messages];
-                    }
-                    return messages;
-                })().map((message, index) => {
-                    if (message.role === 'user') {
+        <div className="chat-main-area">
+            <div className="chat" ref={chatRef}>
+                {messages.length === 0 ? (
+                    <div style={{ color: '#888' }}>No messages yet</div>
+                ) : (
+                    messages.map((message, index) => {
+                        if (message.role === 'user') {
+                            return (
+                                <div
+                                    key={index}
+                                    className="bubble user"
+                                    dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.content.replace(/\n/g, '<br>')) }}
+                                />
+                            );
+                        }
+                        // For llm messages, detect code blocks and render specially
+                        const rawHtml = marked.parse(message.content);
+                        const sanitizedHtml = DOMPurify.sanitize(rawHtml);
+                        if (sanitizedHtml.includes('<pre><code')) {
+                            const parser = new window.DOMParser();
+                            const doc = parser.parseFromString(`<div>${sanitizedHtml}</div>`, 'text/html');
+                            const children = Array.from(doc.body.firstChild.childNodes);
+                            return (
+                                <div key={index} className="bubble llm">
+                                    {children.map((node, i) => {
+                                        if (node.nodeName === 'PRE') {
+                                            return (
+                                                <pre key={i} className="chat-code-block">
+                                                    <code>{node.textContent}</code>
+                                                </pre>
+                                            );
+                                        } else {
+                                            return (
+                                                <span key={i} dangerouslySetInnerHTML={{ __html: node.outerHTML || node.textContent }} />
+                                            );
+                                        }
+                                    })}
+                                </div>
+                            );
+                        }
                         return (
                             <div
                                 key={index}
-                                className="bubble user"
-                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message.content.replace(/\n/g, '<br>')) }}
+                                className="bubble llm"
+                                dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
                             />
                         );
-                    }
-                    // For llm messages, detect code blocks and render specially
-                    const rawHtml = marked.parse(message.content);
-                    const sanitizedHtml = DOMPurify.sanitize(rawHtml);
-                    // Simple code block detection: look for <pre><code> in the HTML
-                    if (sanitizedHtml.includes('<pre><code')) {
-                        // Split HTML into code blocks and normal text
-                        // Use DOMParser for robust parsing
-                        const parser = new window.DOMParser();
-                        const doc = parser.parseFromString(`<div>${sanitizedHtml}</div>`, 'text/html');
-                        const children = Array.from(doc.body.firstChild.childNodes);
-                        return (
-                            <div key={index} className="bubble llm">
-                                {children.map((node, i) => {
-                                    if (node.nodeName === 'PRE') {
-                                        // Code block
-                                        return (
-                                            <pre key={i} className="chat-code-block">
-                                                <code>{node.textContent}</code>
-                                            </pre>
-                                        );
-                                    } else {
-                                        // Other HTML
-                                        return (
-                                            <span key={i} dangerouslySetInnerHTML={{ __html: node.outerHTML || node.textContent }} />
-                                        );
-                                    }
-                                })}
-                            </div>
-                        );
-                    }
-                    // Otherwise, normal markdown
-                    return (
-                        <div
-                            key={index}
-                            className="bubble llm"
-                            dangerouslySetInnerHTML={{ __html: sanitizedHtml }}
-                        />
-                    );
-                })}
+                    })
+                )}
                 {isThinking && (
                     <div className="bubble llm thinking">
                         <span className="thinking-emoji" role="img" aria-label="thinking">🤔</span>
                     </div>
                 )}
             </div>
-
             <form className="chat-form" onSubmit={handleSubmit}>
                 <textarea
                     className="chat-input"
@@ -263,8 +287,6 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                     }}
                     autoComplete="off"
                 />
-                {/* Suggestions toggle button inside chat form */}
-                {/* Suggestions toggle button inside chat form with custom tooltip */}
                 <Tooltip text={suggestionsEnabled ? 'Turn off writing suggestions' : 'Turn on writing suggestions'} position="top">
                     <button
                         type="button"
@@ -324,6 +346,6 @@ export default function Chat({ messages, onSendMessage, isThinking }) {
                     </svg>
                 </button>
             </form>
-        </>
+        </div>
     );
 }

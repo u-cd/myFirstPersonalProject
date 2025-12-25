@@ -217,6 +217,29 @@ app.post('/', async (req, res) => {
 // Room model
 const Room = require('../models/Room');
 
+// Special system prompt for room chat (group AI)
+const roomSystemPrompt = {
+    role: 'developer',
+    content: [
+        'You are an AI English group conversation assistant.',
+        'This is a group chat room for collaborative English learning.',
+        'Below is the conversation history for context. At the end, you will see the CURRENT USER MESSAGE to translate.',
+        'Translate the user\'s message into natural, fluent English. Do NOT reply with anything else. Do NOT add any explanation, commentary, or extra words. ONLY output the English translation.'
+    ].join('\n')
+};
+
+// Alternative prompt: enhance user message (not just translate)
+const roomEnhancePrompt = {
+    role: 'developer',
+    content: [
+        'You are an AI English group conversation assistant.',
+        'This is a group chat room for collaborative English learning.',
+        'Below is the conversation history for context. At the end, you will see the CURRENT USER MESSAGE to translate.',
+        'Your task: Aggressively and boldly enhance, expand, and transform ONLY the CURRENT USER MESSAGE. Be creative, powerful, and even a little crazy—add wild ideas, dramatic flair, humor, or unexpected twists. Make the message as expressive, engaging, and memorable as possible.',
+        'IMPORTANT: Do NOT reply with anything except the enhanced English version of the CURRENT USER MESSAGE. Do NOT add any explanation, commentary, or extra words. Do NOT continue the conversation. ONLY output the enhanced English version.'
+    ].join('\n')
+};
+
 // Send a message to a room
 app.post('/rooms/:roomId/messages', authenticate, async (req, res) => {
     const roomId = req.params.roomId;
@@ -231,15 +254,39 @@ app.post('/rooms/:roomId/messages', authenticate, async (req, res) => {
         if (!room || !room.participants.includes(userId)) {
             return res.status(400).json({ error: '' });
         }
-        const message = await ChatMessage.create({
+
+        // Fetch last 10 messages for context (room only)
+        const prevMessages = await ChatMessage.find({ roomId }).sort({ timestamp: 1 }).lean();
+        // Separate context and current message for the LLM
+        // Only provide previous messages as context, and clearly mark the current message to be translated
+        const contextHistory = prevMessages.slice(-9).map(msg => ({ role: msg.role, content: msg.content }));
+        const inputHistory = [
+            roomSystemPrompt,
+            ...contextHistory,
+            {
+                role: 'user',
+                content: '[CURRENT USER MESSAGE TO TRANSLATE]: ' + content.trim()
+            }
+        ];
+        console.log('---------------------------');
+        console.log('inputHistory:', inputHistory);
+
+        // Get AI response
+        const response = await openai.responses.create({
+            model: 'gpt-5-chat-latest',
+            input: inputHistory
+        });
+
+        // Store only the AI message
+        const aiMessage = await ChatMessage.create({
             roomId,
             userId,
             role: 'user',
-            content: content.trim(),
+            content: response.output_text
         });
         room.updatedAt = new Date();
         await room.save();
-        res.status(201).json({ message });
+        res.status(201).json({ message: aiMessage });
     } catch (err) {
         res.status(500).json({ error: '' });
     }
