@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase-config';
 
-export default function RoomList({ user, currentRoom, setCurrentRoom }) {
+export default function RoomSidebar({ user, currentRoom, setCurrentRoom }) {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newRoomName, setNewRoomName] = useState('');

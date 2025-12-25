@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '../supabase-config';
-import Chat from './Chat';
+import SoloChat from './SoloChat';
 import './Login.css';
 
 export default function Login() {
@@ -13,7 +13,7 @@ export default function Login() {
     const [agreed, setAgreed] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false); // Toggle between login and sign-up
 
-    // Anonymous chat state
+    // Anonymous solo chat state
     const [chatMessages, setChatMessages] = useState([]);
     const [chatId, setChatId] = useState(null); // Start as null, set after first message
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -188,7 +188,7 @@ export default function Login() {
         }
     };
 
-    // Anonymous chat functions
+    // Anonymous solo chat functions
     const sendAnonymousMessage = async (messageText) => {
         if (!messageText.trim()) return;
         if (messageText.length > 2000) return; // client-side guard
@@ -369,7 +369,7 @@ export default function Login() {
                 </div>
             </div>
 
-            {/* Main content area: chat or policy docs */}
+            {/* Main content area: solo chat or policy docs */}
             <div className="main-content">
                 {/* Mobile menu button */}
                 <button
@@ -381,7 +381,7 @@ export default function Login() {
                 </button>
 
                 {mainContent === 'chat' && (
-                    <Chat
+                    <SoloChat
                         messages={chatMessages}
                         onSendMessage={sendAnonymousMessage}
                         isThinking={isThinking}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase-config';
 
-export default function MainSidebar({ user, currentChatId, setCurrentChatId }) {
+export default function SoloSidebar({ user, currentChatId, setCurrentChatId }) {
     const [chats, setChats] = useState([]);
     const [loading, setLoading] = useState(true);
 

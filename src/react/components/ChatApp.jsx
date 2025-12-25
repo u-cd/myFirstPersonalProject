@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase-config';
 
 
-import Main from './Main';
+import Solo from './Solo';
 import Room from './Room';
 
 export default function ChatApp({ user }) {
@@ -38,9 +38,9 @@ export default function ChatApp({ user }) {
                     <button onClick={handleSignOut}>Log out</button>
                 </div>
             </div>
-            {/* Main or Room wrapper */}
+            {/* Solo or Room wrapper */}
             {mode === 'main' ? (
-                <Main user={user} />
+                <Solo user={user} />
             ) : (
                 <Room user={user} />
             )}
