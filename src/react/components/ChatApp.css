@@ -75,7 +75,7 @@
 .user-account-email {
     display: flex;
     align-items: center;
-    margin: 0 8px;
+    padding: 0 8px;
 }
 
 .user-account button {

@@ -9,7 +9,7 @@
 }
 
 .sidebar-fixed-top {
-    margin: 24px 0 8px 0;
+    margin: 24px 0 16px 0;
 }
 
 .sidebar-new-chat {
@@ -45,7 +45,7 @@ body[data-theme="dark"] .sidebar-new-chat-icon {
 }
 
 .sidebar-chats-header {
-    margin: 16px 0 16px 0;
+    margin: 8px 0;
     color: #444;
     padding-left: 24px;
     font-size: 1.05em;
@@ -58,21 +58,20 @@ body[data-theme="dark"] .sidebar-new-chat-icon {
     overflow-y: auto;
     scrollbar-width: thin;
     scrollbar-color: #bbb #ffffff;
+
+    padding: 8px 0;
 }
 
 .sidebar-loading {
-    /* color: #888; */
     font-size: 1em;
     padding: 6px 24px;
 }
 
 .sidebar-chat-link {
-    display: block;
     color: #222;
     text-decoration: none;
     font-size: 1em;
     padding: 6px 24px;
-    margin-top: 4px;
     background: none;
     border: none;
     width: 100%;
