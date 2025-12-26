@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase-config';
 
-export default function RoomSidebar({ user, currentRoom, setCurrentRoom }) {
+export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebarOpen, closeSidebar }) {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newRoomName, setNewRoomName] = useState('');
@@ -46,6 +46,7 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom }) {
       if (res.ok && data.room) {
         setRooms(prev => [...prev, data.room]);
         setCurrentRoom(data.room);
+        if (closeSidebar) closeSidebar();
       }
     } catch (e) {}
     setNewRoomName('');
@@ -72,6 +73,7 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom }) {
           }
         });
         setCurrentRoom(data.room);
+        if (closeSidebar) closeSidebar();
       }
     } catch (e) {}
     setJoinRoomId('');
@@ -80,10 +82,11 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom }) {
 
   const handleSelectRoom = (room) => {
     setCurrentRoom(room);
+    if (closeSidebar) closeSidebar();
   };
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar${sidebarOpen ? ' open' : ''}`}>
         <div className="sidebar-fixed-top">
             <form
                 onSubmit={e => {

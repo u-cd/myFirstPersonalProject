@@ -1,7 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase-config';
-
 
 import Solo from './Solo';
 import Room from './Room';
@@ -18,11 +16,28 @@ export default function ChatApp({ user }) {
         } catch (error) {}
     };
 
-    // Layout: topbar + mode-dependent main area
+    // Mobile menu button handler
+    const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
+    const closeSidebar = () => setSidebarOpen(false);
+
     return (
         <div className="chatapp-root">
+            {/* Sidebar overlay for mobile */}
+            <div
+                className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
+                onClick={closeSidebar}
+            />
+            
             {/* Top bar: mode switcher + user account */}
             <div className="chatapp-topbar">
+                {/* Mobile menu button */}
+                <button
+                    className="mobile-menu-btn"
+                    onClick={toggleSidebar}
+                    aria-label="Open menu"
+                >
+                    ☰
+                </button>
                 <div className="mode-switcher">
                     <button
                         onClick={() => setMode('main')}
@@ -35,7 +50,6 @@ export default function ChatApp({ user }) {
                 </div>
                 <div className="something-flexible-space">
                     <span className="rainbow-text">rainbow</span>
-
                 </div>
                 <div className="user-account">
                     <span className="user-account-email">
@@ -46,9 +60,9 @@ export default function ChatApp({ user }) {
             </div>
             {/* Solo or Room wrapper */}
             {mode === 'main' ? (
-                <Solo user={user} />
+                <Solo user={user} sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
             ) : (
-                <Room user={user} />
+                <Room user={user} sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
             )}
         </div>
     );

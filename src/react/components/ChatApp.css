@@ -8,21 +8,17 @@
     overflow: hidden;
 }
 
-
-
-
 /* Top bar */
 .chatapp-topbar {
     display: flex;
     width: 100vw;
     height: 10%;
-
     /* border-bottom: 1px dashed #000; */
+
 }
 
 .mode-switcher {
     display: flex;
-
 }
 
 .mode-switcher .active {
@@ -38,10 +34,12 @@
     cursor: pointer;
     width: 160px;
 
+    font-size: 1em;
+
     border-bottom: 2px dashed #000;
 }
 
-.sidebar-mode-switcher button:hover {
+.mode-switcher button:hover {
     background: #eee;
 }
 
@@ -50,6 +48,8 @@
     align-items: center;
     justify-content: center;
     width: 100%;
+
+    font-size: 1em;
 
     border-bottom: 2px dashed #000;
 }
@@ -65,7 +65,6 @@
 
 .user-account {
     display: flex;
-    margin-left: auto;
     /* align-items: center; */
     /* gap: 24px */
 
@@ -76,37 +75,41 @@
     display: flex;
     align-items: center;
     padding: 0 8px;
+
+    font-size: 1em;
 }
 
 .user-account button {
     background: none;
     border: none;
     cursor: pointer;
-
     width: 100px;
+
+    font-size: 1em;
 }
 
 .user-account button:hover {
     background: #eee;
 }
 
+/* Loading screen styles */
+.loading-screen {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+}
 
-
+.loading-text {
+    color: #333;
+}
 
 
 /* Mobile menu button */
 .mobile-menu-btn {
     display: none;
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    z-index: 1;
-    background: #fff;
-    border: none;
-    cursor: pointer;
 }
 
-/* Sidebar overlay for mobile */
 .sidebar-overlay {
     display: none;
     position: fixed;
@@ -117,29 +120,69 @@
     background: rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(1px);
     -webkit-backdrop-filter: blur(1px);
-    z-index: 999;
+    z-index: 1;
 }
 
 .sidebar-overlay.active {
     display: block;
 }
 
-.mobile-menu-content {
-    padding: 4px;
-    border: none;
-    outline: none;
-    background: #fff;
-}
-
 /* Mobile Responsive */
 /* and tablet, so set max 1024px, but usualy should set max 768px and create separate tablet responsive style! */
 @media screen and (max-width: 1024px) {
-    .mobile-menu-btn {
-        display: block;
+    .chatapp-topbar {
+        height: 60px;
     }
 
-    .mobile-menu-content {
-        font-size: 1.7em;
+    .mobile-menu-btn {
+        display: block;
+
+        width: 60px;
+        background: #fff;
+        font-size: 1.5em;
+        border: none;
+        border-bottom: 2px dashed #000;
+
+        flex-shrink: 0;
+    }
+
+    .mode-switcher {
+        width: 100%;
+    }
+
+    .mode-switcher button {
+        width: 100%;
+    }
+
+    .something-flexible-space {
+        display: none;
+    }
+
+    .user-account {
+        width: 60px;
+    }
+
+    .user-account-email {
+        display: none;
+    }
+
+
+
+    .sidebar {
+        display: none;
+    }
+
+    .sidebar.open {
+        z-index: 2;
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: #fff;
+        box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
+        max-width: 80%;
+        transition: transform 0.3s ease-in-out;
     }
 }
 
@@ -158,35 +201,8 @@
 
 
 
-/* Container for dark mode toggle and logout button */
-.sidebar-account-actions {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1001;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    border-top: 1px solid #eee;
-}
 
-.sidebar-darkmode-toggle,
-.sidebar-logout-btn {
-    padding: 12px 24px 18px 24px;
-    color: #444;
-    font-size: 1em;
-    border: none;
-    background: #fff;
-    min-height: 40px;
-    transition: background 0.2s, color 0.2s;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    width: 100%;
-}
+
 
 .sidebar-darkmode-toggle:hover,
 .sidebar-logout-btn:hover {
@@ -222,18 +238,6 @@ body[data-theme="dark"] .sidebar-account-actions {
 }
 
 
-/* Loading screen styles */
-.loading-screen {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: center;
-}
-
-.loading-text {
-    color: #333;
-}
-
 body[data-theme="dark"] .loading-screen {
     background: #000;
 }
@@ -242,7 +246,7 @@ body[data-theme="dark"] .loading-text {
     color: #eee;
 }
 
-/* Dark mode overrides */
+
 body[data-theme="dark"] .main-content {
     background: #000000;
     /* color: #eee; */
@@ -263,22 +267,4 @@ body[data-theme="dark"] .mobile-menu-content {
 
 body[data-theme="dark"] .thinking-emoji {
     color: #fff;
-}
-
-body[data-theme="dark"] 
-/* Thinking emoji animation */
-
-.thinking-emoji {
-    display: inline-block;
-    animation: thinking-spin 2s linear infinite;
-}
-
-@keyframes thinking-spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
 }

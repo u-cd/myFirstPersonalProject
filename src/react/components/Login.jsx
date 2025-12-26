@@ -57,6 +57,7 @@ export default function Login() {
             setTermsMarkdown(await res.text());
         }
         setMainContent('terms');
+        closeSidebar();
     };
     const showPrivacy = async (e) => {
         e.preventDefault();
@@ -65,6 +66,7 @@ export default function Login() {
             setPrivacyMarkdown(await res.text());
         }
         setMainContent('privacy');
+        closeSidebar();
     };
     const showChat = (e) => {
         if (e) e.preventDefault();
@@ -245,7 +247,15 @@ export default function Login() {
     };
 
     return (
-        <>
+        <div className="login-root">
+            {/* Login menu button */}
+            <button
+                className="login-menu-btn"
+                onClick={toggleSidebar}
+                aria-label="Open menu"
+            >
+                <div>Log in</div>
+            </button>
             {/* Sidebar overlay for mobile */}
             <div
                 className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
@@ -254,7 +264,7 @@ export default function Login() {
 
             {/* Sidebar with login */}
             <div>
-                <div className={`login-container ${sidebarOpen ? 'sidebar-open' : ''}`}>
+                <div className={`login-container${sidebarOpen ? ' open' : ''}`}>
                     <div
                         className="login-message"
                             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
@@ -369,16 +379,7 @@ export default function Login() {
             </div>
 
             {/* Main content area: solo chat or policy docs */}
-            <div style={{ flex: 1 }}>
-                {/* Mobile menu button */}
-                <button
-                    className="login-menu-btn"
-                    onClick={toggleSidebar}
-                    aria-label="Open menu"
-                >
-                    <div>Log in</div>
-                </button>
-
+            <div style={{ flex: 1, height: '100%' }}>
                 {mainContent === 'chat' && (
                     <SoloChat currentChatId={currentChatId} setCurrentChatId={setCurrentChatId} />
                 )}
@@ -407,6 +408,6 @@ export default function Login() {
                     </div>
                 )}
             </div>
-        </>
+        </div>
     );
 }

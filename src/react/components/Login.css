@@ -101,6 +101,15 @@ body[data-theme="dark"] .login-menu-btn {
 }
 
 /* Login Component Styles */
+.login-root {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
 .login-container {
     width: 321px;
     height: 100%;
@@ -237,6 +246,9 @@ body[data-theme="dark"] .login-menu-btn {
     overflow-wrap: normal;
 }
 
+
+
+
 .login-menu-btn {
     display: none;
     position: fixed;
@@ -250,7 +262,6 @@ body[data-theme="dark"] .login-menu-btn {
     font-size: 1.3em;
 }
 
-
 /* Mobile Responsive */
 @media screen and (max-width: 1024px) {
     .login-menu-btn {
@@ -258,14 +269,21 @@ body[data-theme="dark"] .login-menu-btn {
     }
 
     .login-container {
-        background: #fff;
-        width: 100%;
-        min-width: unset;
-        max-width: 400px;
-        margin: 0 auto;
-        border-right: none;
+        display: none;
+    }
+
+    .login-container.open {
+        z-index: 2;
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
         height: 100%;
-        justify-content: center;
+        background: #fff;
+        box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
+        max-width: 80%;
+        transition: transform 0.3s ease-in-out;
+        border: none;
     }
 
     .google-login {
@@ -296,4 +314,6 @@ body[data-theme="dark"] .login-menu-btn {
     .doc-scroll {
         padding: 12px;
     }
+
+    
 }

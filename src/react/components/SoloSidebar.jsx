@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase-config';
 
-export default function SoloSidebar({ user, currentChatId, setCurrentChatId }) {
+export default function SoloSidebar({ user, currentChatId, setCurrentChatId, sidebarOpen, closeSidebar }) {
     const [chats, setChats] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -27,14 +27,16 @@ export default function SoloSidebar({ user, currentChatId, setCurrentChatId }) {
 
     const handleNewChat = () => {
         setCurrentChatId(null);
+        if (closeSidebar) closeSidebar();
     };
 
     const handleChatSelect = (chatId) => {
         setCurrentChatId(chatId);
+        if (closeSidebar) closeSidebar();
     };
 
     return (
-        <div className="sidebar">
+        <div className={`sidebar${sidebarOpen ? ' open' : ''}`}>
             <div className="sidebar-fixed-top">
                 <button className="sidebar-new-chat" onClick={handleNewChat}>
                     <span className="sidebar-new-chat-icon" aria-hidden="true">

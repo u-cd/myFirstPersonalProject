@@ -85,23 +85,7 @@ body[data-theme="dark"] .sidebar-new-chat-icon {
 }
 
 
-/* Mobile Responsive */
-@media screen and (max-width: 1024px) {
-    .sidebar-content-wrapper {
-        position: fixed;
-        top: 0;
-        left: -600px;
-        background: #fff;
-        height: 100%;
-        z-index: 1000;
-        transition: left 0.3s ease;
-        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
-    }
 
-    .sidebar-content-wrapper.sidebar-open {
-        left: 0;
-    }
-}
 
 
 /* Dark mode overrides */
