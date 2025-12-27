@@ -12,8 +12,9 @@ function useDebouncedEffect(effect, deps, delay) {
 }
 
 export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
-    const [messages, setMessages] = useState([]);
+    const [loading, setLoading] = useState(true);
 
+    const [messages, setMessages] = useState([]);
     const [welcomeMessage, setWelcomeMessage] = useState('');
     // Load welcome message markdown from public folder
     useEffect(() => {
@@ -25,9 +26,9 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
         }
     }, [messages.length]);
 
-    const [loading, setLoading] = useState(true);
-    const [isThinking, setIsThinking] = useState(false);
     const [input, setInput] = useState('');
+    const [isThinking, setIsThinking] = useState(false);
+
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
@@ -36,6 +37,7 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
         const saved = localStorage.getItem('writingSuggestionsEnabled');
         return saved === null ? true : saved === 'true';
     });
+
     const inputRef = useRef(null);
     const chatRef = useRef(null);
 
@@ -142,8 +144,8 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 15000);
             const body = user
-                ? { message: messageText, currentChatId, userId: user.id }
-                : { message: messageText, currentChatId };
+                ? { message: messageText, chatId: currentChatId, userId: user.id }
+                : { message: messageText, chatId: currentChatId };
             const res = await fetch('/', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -213,8 +215,8 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
     };
 
     return (
-        <div className="chat" ref={chatRef}>
-            <div className="chat-messages">
+        <div className="chat">
+            <div className="chat-messages" ref={chatRef}>
                 {messages.length === 0 ? (
                     <div className="welcome-message">
                         {welcomeMessage && (

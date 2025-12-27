@@ -123,7 +123,6 @@ app.get('/chats-with-title', authenticate, async (req, res) => {
     }
 });
 
-// POST / for chatbot
 // AI-powered input prediction endpoint
 app.post('/writing-suggestions', async (req, res) => {
     const { context, input } = req.body;
@@ -159,6 +158,7 @@ app.post('/writing-suggestions', async (req, res) => {
     }
 });
 
+// don't use authenticate here - allow anonymous users
 app.post('/', async (req, res) => {
     const userMessage = req.body.message;
     let chatId = req.body.chatId; // This should be the Chat _id or null
