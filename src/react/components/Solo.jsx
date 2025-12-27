@@ -9,7 +9,7 @@ export default function Solo({ user, sidebarOpen, closeSidebar }) {
             <aside>
                 <SoloSidebar user={user} currentChatId={currentChatId} setCurrentChatId={setCurrentChatId} sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
             </aside>
-            <main style={{ flex: 1 }}>
+            <main className="flex-1">
                 <SoloChat user={user} currentChatId={currentChatId} setCurrentChatId={setCurrentChatId} />
             </main>
         </div>

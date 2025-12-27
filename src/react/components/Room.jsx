@@ -9,7 +9,7 @@ export default function Room({ user, sidebarOpen, closeSidebar }) {
             <aside>
                 <RoomSidebar user={user} currentRoom={currentRoom} setCurrentRoom={setCurrentRoom} sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
             </aside>
-            <main style={{ flex: 1 }}>
+            <main className="flex-1">
                 <RoomChat user={user} currentRoom={currentRoom} />
             </main>
         </div>

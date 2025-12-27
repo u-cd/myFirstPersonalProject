@@ -13,6 +13,18 @@ function useDebouncedEffect(effect, deps, delay) {
 
 export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
     const [messages, setMessages] = useState([]);
+
+    const [welcomeMessage, setWelcomeMessage] = useState('');
+    // Load welcome message markdown from public folder
+    useEffect(() => {
+        if (messages.length === 0) {
+            fetch('/welcom-message.md')
+                .then(res => res.ok ? res.text() : '')
+                .then(md => setWelcomeMessage(md))
+                .catch(() => setWelcomeMessage(''));
+        }
+    }, [messages.length]);
+
     const [loading, setLoading] = useState(true);
     const [isThinking, setIsThinking] = useState(false);
     const [input, setInput] = useState('');
@@ -204,7 +216,11 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
         <div className="chat" ref={chatRef}>
             <div className="chat-messages">
                 {messages.length === 0 ? (
-                    <div style={{ color: '#888' }}>No messages yet</div>
+                    <div className="welcome-message">
+                        {welcomeMessage && (
+                            <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(marked.parse(welcomeMessage)) }} />
+                        )}
+                    </div>
                 ) : (
                     messages.map((message, index) => {
                         if (message.role === 'user') {

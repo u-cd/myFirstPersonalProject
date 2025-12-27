@@ -26,29 +26,6 @@ export default function Login() {
 
     // Dynamic max height for markdown panels based on actual layout
     const docScrollRef = useRef(null);
-    const [docMaxHeight, setDocMaxHeight] = useState(undefined);
-
-    useEffect(() => {
-        const updateMaxHeight = () => {
-            if (!docScrollRef.current) return;
-            const rect = docScrollRef.current.getBoundingClientRect();
-            // Leave a small bottom gap to avoid touching screen edges
-            const bottomGap = 12;
-            const available = Math.max(0, window.innerHeight - rect.top - bottomGap);
-            setDocMaxHeight(available);
-        };
-
-        // Run on mount and when content/view changes
-        const raf = requestAnimationFrame(updateMaxHeight);
-        window.addEventListener('resize', updateMaxHeight);
-        window.addEventListener('orientationchange', updateMaxHeight);
-
-        return () => {
-            cancelAnimationFrame(raf);
-            window.removeEventListener('resize', updateMaxHeight);
-            window.removeEventListener('orientationchange', updateMaxHeight);
-        };
-    }, [mainContent, termsMarkdown, privacyMarkdown]);
 
     const showTerms = async (e) => {
         e.preventDefault();
@@ -247,166 +224,169 @@ export default function Login() {
     };
 
     return (
-        <div className="login-root">
-            {/* Login menu button */}
-            <button
-                className="login-menu-btn"
-                onClick={toggleSidebar}
-                aria-label="Open menu"
-            >
-                <div>Log in</div>
-            </button>
+        <div className="chatapp-root">
             {/* Sidebar overlay for mobile */}
             <div
                 className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
                 onClick={closeSidebar}
             />
+            <div className="login-topbar">
+                <div className="you-can-log-in-here">🤗 You can log in here →</div>
+                {/* Login menu button */}
+                <button
+                    className="login-menu-btn"
+                    onClick={toggleSidebar}
+                    aria-label="Open menu"
+                >
+                    <div>Log in</div>
+                </button>
+            </div>
 
-            {/* Sidebar with login */}
-            <div>
-                <div className={`login-container${sidebarOpen ? ' open' : ''}`}>
-                    <div
-                        className="login-message"
-                            dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
-                    />
-
-                    <h2>{isSignUp ? 'Sign up' : 'Log in'}</h2>
-
-                    <button
-                        className="google-login"
-                        onClick={signInWithGoogle}
-                        disabled={loading}
-                    >
-                        <img
-                            src="/google-color-svgrepo-com.svg"
-                            alt="Google"
-                            style={{ width: '20px', verticalAlign: 'middle', marginRight: '8px' }}
+            <div className="chatapp-mainarea">
+                {/* Sidebar with login */}
+                <div>
+                    <div className={`login-container${sidebarOpen ? ' open' : ''}`}>
+                        <div
+                            className="login-message"
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
                         />
-                        {loading ? 'Logging in...' : 'Continue with Google'}
-                    </button>
 
-                    <div className="login-or">or</div>
+                        <h2>{isSignUp ? 'Sign up' : 'Log in'}</h2>
 
-                    {!showMagicForm ? (
-                        <form className="login-form" onSubmit={signInOrSignUpWithEmail}>
-                            <input
-                                type="email"
-                                placeholder="Enter your email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                disabled={loading}
-                                required
+                        <button
+                            className="google-login"
+                            onClick={signInWithGoogle}
+                            disabled={loading}
+                        >
+                            <img
+                                src="/google-color-svgrepo-com.svg"
+                                alt="Google"
+                                style={{ width: '20px', verticalAlign: 'middle', marginRight: '8px' }}
                             />
-                            <input
-                                type="password"
-                                placeholder="Enter your password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                disabled={loading}
-                                required
-                            />
-                            <button type="submit" disabled={loading || !email || !password}>
-                                {loading ? (isSignUp ? 'Signing up...' : 'Logging in...') : (isSignUp ? 'Sign up' : 'Continue')}
-                            </button>
-                        </form>
-                    ) : (
-                        <>
-                            <form className="login-form" onSubmit={handleSendMagicLink}>
+                            {loading ? 'Logging in...' : 'Continue with Google'}
+                        </button>
+
+                        <div className="login-or">or</div>
+
+                        {!showMagicForm ? (
+                            <form className="login-form" onSubmit={signInOrSignUpWithEmail}>
                                 <input
                                     type="email"
                                     placeholder="Enter your email"
                                     value={email}
-                                    onChange={e => setEmail(e.target.value)}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    disabled={loading}
                                     required
                                 />
-                                <button type="submit">Send magic link</button>
-                            </form>
-                            <button type="button" className="toggle-auth-mode" onClick={() => { setShowMagicForm(false); setMessage('') }}>Back to login</button>
-                        </>
-                    )}
-
-                    {isSignUp && (
-                        <div style={{ margin: '12px 0 8px 0', fontSize: '0.95em' }}>
-                            <input
-                                type="checkbox"
-                                id="agreePolicies"
-                                checked={agreed}
-                                onChange={e => setAgreed(e.target.checked)}
-                                required
-                                style={{ marginRight: '6px' }}
-                            />
-                            <label htmlFor="agreePolicies">
-                                I agree to the
-                                <a href="#terms" onClick={showTerms} className="login-link">Terms of Use</a>
-                                and
-                                <a href="#privacy" onClick={showPrivacy} className="login-link">Privacy Policy</a>
-                                .<br />
-                                <span className="agreement-note">
-                                    （利用規約およびプライバシーポリシーに同意します）
-                                </span>
-                            </label>
-                        </div>
-                    )}
-
-                    <div className="toggle-auth-container">
-                        {isSignUp ? (
-                            <>
-                                Already have an account?（すでにアカウントをお持ちですか？）{' '}
-                                <button
-                                    type="button"
-                                    className="toggle-auth-mode login-link"
-                                    onClick={() => { setIsSignUp(false); setShowMagicForm(false); setMessage(''); }}
+                                <input
+                                    type="password"
+                                    placeholder="Enter your password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
                                     disabled={loading}
-                                >
-                                    Log in
+                                    required
+                                />
+                                <button type="submit" disabled={loading || !email || !password}>
+                                    {loading ? (isSignUp ? 'Signing up...' : 'Logging in...') : (isSignUp ? 'Sign up' : 'Continue')}
                                 </button>
-                            </>
+                            </form>
                         ) : (
                             <>
-                                Don&apos;t have an account?（アカウントをお持ちでないですか？）{' '}
-                                <button
-                                    type="button"
-                                    className="toggle-auth-mode login-link"
-                                    onClick={() => { setIsSignUp(true); setShowMagicForm(false); setMessage(''); }}
-                                    disabled={loading}
-                                >
-                                    Sign up（新規登録）
-                                </button>
+                                <form className="login-form" onSubmit={handleSendMagicLink}>
+                                    <input
+                                        type="email"
+                                        placeholder="Enter your email"
+                                        value={email}
+                                        onChange={e => setEmail(e.target.value)}
+                                        required
+                                    />
+                                    <button type="submit">Send magic link</button>
+                                </form>
+                                <button type="button" className="toggle-auth-mode" onClick={() => { setShowMagicForm(false); setMessage('') }}>Back to login</button>
                             </>
                         )}
+
+                        {isSignUp && (
+                            <div style={{ margin: '12px 0 8px 0', fontSize: '0.95em' }}>
+                                <input
+                                    type="checkbox"
+                                    id="agreePolicies"
+                                    checked={agreed}
+                                    onChange={e => setAgreed(e.target.checked)}
+                                    required
+                                    style={{ marginRight: '6px' }}
+                                />
+                                <label htmlFor="agreePolicies">
+                                    I agree to the
+                                    <a href="#terms" onClick={showTerms} className="login-link">Terms of Use</a>
+                                    and
+                                    <a href="#privacy" onClick={showPrivacy} className="login-link">Privacy Policy</a>
+                                    .<br />
+                                    <span className="agreement-note">
+                                        （利用規約およびプライバシーポリシーに同意します）
+                                    </span>
+                                </label>
+                            </div>
+                        )}
+
+                        <div className="toggle-auth-container">
+                            {isSignUp ? (
+                                <>
+                                    Already have an account?（すでにアカウントをお持ちですか？）{' '}
+                                    <button
+                                        type="button"
+                                        className="toggle-auth-mode login-link"
+                                        onClick={() => { setIsSignUp(false); setShowMagicForm(false); setMessage(''); }}
+                                        disabled={loading}
+                                    >
+                                        Log in
+                                    </button>
+                                </>
+                            ) : (
+                                <>
+                                    Don&apos;t have an account?（アカウントをお持ちでないですか？）{' '}
+                                    <button
+                                        type="button"
+                                        className="toggle-auth-mode login-link"
+                                        onClick={() => { setIsSignUp(true); setShowMagicForm(false); setMessage(''); }}
+                                        disabled={loading}
+                                    >
+                                        Sign up（新規登録）
+                                    </button>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Main content area: solo chat or policy docs */}
-            <div style={{ flex: 1, height: '100%' }}>
-                {mainContent === 'chat' && (
-                    <SoloChat currentChatId={currentChatId} setCurrentChatId={setCurrentChatId} />
-                )}
-                {mainContent === 'terms' && (
-                    <div className="doc-container">
-                        <button onClick={showChat} className="doc-close">Close</button>
-                        <div
-                            style={{ maxHeight: docMaxHeight ? `${docMaxHeight}px` : undefined }}
-                            className="doc-scroll"
-                            ref={docScrollRef}
-                        >
-                            <ReactMarkdown>{termsMarkdown}</ReactMarkdown>
+                {/* Main content area: solo chat or policy docs */}
+                <div className="flex-1">
+                    {mainContent === 'chat' && (
+                        <SoloChat currentChatId={currentChatId} setCurrentChatId={setCurrentChatId} />
+                    )}
+                    {mainContent === 'terms' && (
+                        <div className="doc-container">
+                            <button onClick={showChat} className="doc-close">Close</button>
+                            <div
+                                className="doc-scroll"
+                                ref={docScrollRef}
+                            >
+                                <ReactMarkdown>{termsMarkdown}</ReactMarkdown>
+                            </div>
                         </div>
-                    </div>
-                )}
-                {mainContent === 'privacy' && (
-                    <div className="doc-container">
-                        <button onClick={showChat} className="doc-close">Close</button>
-                        <div
-                            style={{ maxHeight: docMaxHeight ? `${docMaxHeight}px` : undefined }}
-                            className="doc-scroll"
-                            ref={docScrollRef}
-                        >
-                            <ReactMarkdown>{privacyMarkdown}</ReactMarkdown>
+                    )}
+                    {mainContent === 'privacy' && (
+                        <div className="doc-container">
+                            <button onClick={showChat} className="doc-close">Close</button>
+                            <div
+                                className="doc-scroll"
+                                ref={docScrollRef}
+                            >
+                                <ReactMarkdown>{privacyMarkdown}</ReactMarkdown>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
         </div>
     );

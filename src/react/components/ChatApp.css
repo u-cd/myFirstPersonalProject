@@ -130,6 +130,9 @@
 /* Mobile Responsive */
 /* and tablet, so set max 1024px, but usualy should set max 768px and create separate tablet responsive style! */
 @media screen and (max-width: 1024px) {
+    .chatapp-root {
+        flex-direction: column;
+    }
     .chatapp-topbar {
         height: 60px;
     }
