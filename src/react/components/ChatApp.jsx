@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { supabase } from '../supabase-config';
 
 import Solo from './Solo';
@@ -6,8 +6,11 @@ import Room from './Room';
 
 export default function ChatApp({ user }) {
     const [mode, setMode] = useState('main'); // 'main' or 'rooms'
-    // Sidebar open/close for mobile
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+    // Store last selected chat and room
+    const [currentChatId, setCurrentChatId] = useState(null);
+    const [currentRoom, setCurrentRoom] = useState(null);
 
     // User account block (can be expanded later)
     const handleSignOut = async () => {
@@ -49,7 +52,7 @@ export default function ChatApp({ user }) {
                     >Rooms</button>
                 </div>
                 <div className="something-flexible-space">
-                    <span className="rainbow-text">rainbow</span>
+                    <span className="rainbow-text">konbanwa</span>
                 </div>
                 <div className="user-account">
                     <span className="user-account-email">
@@ -60,11 +63,22 @@ export default function ChatApp({ user }) {
             </div>
             {/* Solo or Room wrapper */}
             {mode === 'main' ? (
-                <Solo user={user} sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
+                <Solo
+                    user={user}
+                    sidebarOpen={sidebarOpen}
+                    closeSidebar={closeSidebar}
+                    currentChatId={currentChatId}
+                    setCurrentChatId={setCurrentChatId}
+                />
             ) : (
-                <Room user={user} sidebarOpen={sidebarOpen} closeSidebar={closeSidebar} />
+                <Room
+                    user={user}
+                    sidebarOpen={sidebarOpen}
+                    closeSidebar={closeSidebar}
+                    currentRoom={currentRoom}
+                    setCurrentRoom={setCurrentRoom}
+                />
             )}
         </div>
     );
 }
-

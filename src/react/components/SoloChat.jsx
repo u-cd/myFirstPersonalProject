@@ -12,8 +12,6 @@ function useDebouncedEffect(effect, deps, delay) {
 }
 
 export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
-    const [loading, setLoading] = useState(true);
-
     const [messages, setMessages] = useState([]);
     const [welcomeMessage, setWelcomeMessage] = useState('');
     // Load welcome message markdown from public folder
@@ -58,7 +56,6 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
 
     const fetchMessages = async (chatId) => {
         if (!user) return;
-        setLoading(true);
         try {
             const { data: sessionData } = await supabase.auth.getSession();
             const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
@@ -71,7 +68,6 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
         } catch (e) {
             setMessages([]);
         }
-        setLoading(false);
     };
 
     useDebouncedEffect(() => {
@@ -106,7 +102,7 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
         setIsLoadingSuggestions(true);
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 8000);
-        fetch('/writing-suggestions', {
+        fetch('/writing-suggestions',{
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -131,6 +127,11 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
             });
         return () => { ignore = true; clearTimeout(timeoutId); controller.abort(); };
     }, [input, messages, suggestionsEnabled], 1500);
+
+    useEffect(() => {
+    console.log('suggestions updated:', suggestions);
+    console.log('showSuggestions updated:', showSuggestions);
+    }, [suggestions, showSuggestions]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

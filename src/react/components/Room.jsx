@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import RoomSidebar from './RoomSidebar';
 import RoomChat from './RoomChat';
 
-export default function Room({ user, sidebarOpen, closeSidebar }) {
-    const [currentRoom, setCurrentRoom] = useState(null);
+export default function Room({ user, sidebarOpen, closeSidebar, currentRoom, setCurrentRoom }) {
     return (
         <div className="chatapp-mainarea">
             <aside>

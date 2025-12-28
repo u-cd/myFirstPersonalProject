@@ -74,6 +74,8 @@
 
     border: 1px solid #ddd;
     transition: border 0.2s;
+
+    position: relative;
 }
 
 .chat-form:focus-within {
@@ -198,12 +200,11 @@
     right: 0;
     bottom: 100%;
     top: auto;
-    z-index: 10;
+    z-index: 1;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    margin-top: 2px;
     padding: 0;
     list-style: none;
     max-height: 180px;
@@ -348,5 +349,9 @@ body[data-theme="dark"] .disclaimer {
 
     .chat-input {
         padding: 12px 14px;
+    }
+
+    .chat-suggestions {
+        right: 8px;
     }
 }

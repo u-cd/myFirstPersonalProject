@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase-config';
+import js from '@eslint/js';
 
 export default function RoomChat({ user, currentRoom }) {
   const [messages, setMessages] = useState([]);
-  const [loadingMessages, setLoadingMessages] = useState(false);
   const [input, setInput] = useState('');
   const chatRef = useRef(null);
   const inputRef = useRef(null);
@@ -26,7 +26,6 @@ export default function RoomChat({ user, currentRoom }) {
   }, [messages]);
 
   const fetchMessages = async (roomId) => {
-    setLoadingMessages(true);
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
@@ -39,7 +38,6 @@ export default function RoomChat({ user, currentRoom }) {
     } catch (e) {
       setMessages([]);
     }
-    setLoadingMessages(false);
   };
 
   const handleSend = async (e) => {
@@ -102,14 +100,11 @@ const handleKeyDown = (e) => {
             Participants: {currentRoom.participants?.join(', ')}
           </div>
           <div className="chat-messages" ref={chatRef}>
-            {loadingMessages ? (
-              <div>Loading messages...</div>
-            ) : messages.length === 0 ? (
+            {messages.length === 0 ? (
               <div>No messages yet</div>
             ) : (
               messages.map(msg => (
                 <div key={msg._id || msg.id} className={msg.userId === user?.id ? 'my-message' : 'other-message'}>
-                  {/* <strong>{msg.userId}:</strong> {msg.content} */}
                   {msg.content}
                 </div>
               ))

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import SoloSidebar from './SoloSidebar';
 import SoloChat from './SoloChat';
 
-export default function Solo({ user, sidebarOpen, closeSidebar }) {
-    const [currentChatId, setCurrentChatId] = useState(null);
+export default function Solo({ user, sidebarOpen, closeSidebar, currentChatId, setCurrentChatId }) {
     return (
         <div className="chatapp-mainarea">
             <aside>
