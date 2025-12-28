@@ -21,7 +21,7 @@ function App() {
                         (!prevUser && !newUser) ||
                         (prevUser && newUser && prevUser.id === newUser.id)
                     ) {
-                        console.log('almond'); //check skipe re-render in console, delete this
+                        console.log('^._.^'); //check skipe re-render in console, delete this
                         return prevUser; // No change, skip re-render
                     }
                     return newUser;

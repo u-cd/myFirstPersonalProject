@@ -128,11 +128,6 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
         return () => { ignore = true; clearTimeout(timeoutId); controller.abort(); };
     }, [input, messages, suggestionsEnabled], 1500);
 
-    useEffect(() => {
-    console.log('suggestions updated:', suggestions);
-    console.log('showSuggestions updated:', showSuggestions);
-    }, [suggestions, showSuggestions]);
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         const messageText = input.trim();

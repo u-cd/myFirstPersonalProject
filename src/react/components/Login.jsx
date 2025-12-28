@@ -3,7 +3,6 @@ import DOMPurify from 'dompurify';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '../supabase-config';
 import SoloChat from './SoloChat';
-import './Login.css';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -13,19 +12,12 @@ export default function Login() {
     const [agreed, setAgreed] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false); // Toggle between login and sign-up
 
-    // Anonymous solo chat state
-    const [chatMessages, setChatMessages] = useState([]);
-
     const [currentChatId, setCurrentChatId] = useState(null); // For SoloChat
 
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [mainContent, setMainContent] = useState('chat'); // 'chat' | 'terms' | 'privacy'
     const [termsMarkdown, setTermsMarkdown] = useState('');
     const [privacyMarkdown, setPrivacyMarkdown] = useState('');
-    const [isThinking, setIsThinking] = useState(false);
-
-    // Dynamic max height for markdown panels based on actual layout
-    const docScrollRef = useRef(null);
 
     const showTerms = async (e) => {
         e.preventDefault();
@@ -169,52 +161,6 @@ export default function Login() {
         }
     };
 
-    // Anonymous solo chat functions
-    const sendAnonymousMessage = async (messageText) => {
-        if (!messageText.trim()) return;
-        if (messageText.length > 2000) return; // client-side guard
-
-        // Add user message to state immediately
-        const userMessage = { role: 'user', content: messageText };
-        setChatMessages(prev => [...prev, userMessage]);
-        setIsThinking(true);
-
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000);
-            const res = await fetch('/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: messageText,
-                    chatId: chatId // null for first message, then set
-                    // No userId for anonymous users
-                }),
-                signal: controller.signal
-            });
-
-            const data = await res.json();
-
-            // If this was the first message, set the new chatId from backend
-            if (!chatId && data.chatId) {
-                setChatId(data.chatId);
-            }
-
-            // Add AI response to state (avoid rendering backend error text)
-            const aiMessage = {
-                role: 'assistant',
-                content: typeof data.reply === 'string' ? data.reply : ''
-            };
-            setChatMessages(prev => [...prev, aiMessage]);
-            clearTimeout(timeoutId);
-            setIsThinking(false);
-        } catch (error) {
-            const errorMessage = { role: 'assistant', content: 'Error: Failed to send message. メッセージが送信できませんでした🤦‍♂️' };
-            setChatMessages(prev => [...prev, errorMessage]);
-            setIsThinking(false);
-        }
-    };
-
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
@@ -229,10 +175,11 @@ export default function Login() {
             <div
                 className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
                 onClick={closeSidebar}
-            />
+            >
+                ₍ᐢ._. ᐢ₎
+            </div>
             <div className="login-topbar">
                 <div className="you-can-log-in-here">🤗 You can log in here →</div>
-                {/* Login menu button */}
                 <button
                     className="login-menu-btn"
                     onClick={toggleSidebar}
@@ -243,7 +190,6 @@ export default function Login() {
             </div>
 
             <div className="chatapp-mainarea">
-                {/* Sidebar with login */}
                 <div>
                     <div className={`login-container${sidebarOpen ? ' open' : ''}`}>
                         <div
@@ -369,7 +315,6 @@ export default function Login() {
                             <button onClick={showChat} className="doc-close">Close</button>
                             <div
                                 className="doc-scroll"
-                                ref={docScrollRef}
                             >
                                 <ReactMarkdown>{termsMarkdown}</ReactMarkdown>
                             </div>
@@ -380,7 +325,6 @@ export default function Login() {
                             <button onClick={showChat} className="doc-close">Close</button>
                             <div
                                 className="doc-scroll"
-                                ref={docScrollRef}
                             >
                                 <ReactMarkdown>{privacyMarkdown}</ReactMarkdown>
                             </div>
