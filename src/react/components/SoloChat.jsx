@@ -43,9 +43,11 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
     useEffect(() => {
         if (user && currentChatId) {
             fetchMessages(currentChatId);
-        } else {
+        } else if (user && !currentChatId) {
+            // If logged in but no chat selected, clear messages
             setMessages([]);
         }
+        // If user is undefined (anonymous), do nothing—keep messages as is
     }, [user, currentChatId]);
 
     useEffect(() => {
@@ -164,6 +166,12 @@ export default function SoloChat({ user, currentChatId, setCurrentChatId }) {
             setIsThinking(false);
         }
     };
+
+    useEffect(() => {
+    }, [messages]);
+
+    useEffect(() => {
+    }, [currentChatId]);
 
     const handleKeyDown = (e) => {
         if (showSuggestions && suggestions.length > 0) {
