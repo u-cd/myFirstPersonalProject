@@ -249,16 +249,25 @@ app.post('/rooms/:roomId/messages', authenticate, async (req, res) => {
         return res.status(400).json({ error: '' });
     }
     try {
-        // Only allow if user is a participant
         const room = await Room.findById(roomId);
-        if (!room || !room.participants.includes(userId)) {
+        if (!room) {
             return res.status(400).json({ error: '' });
+        }
+
+        // Allow if public, or if user is a participant
+        if (!room.public && !room.participants.includes(userId)) {
+            return res.status(400).json({ error: '' });
+        }
+
+        // Optionally: auto-add user to participants if public and not already in
+        if (room.public && !room.participants.includes(userId)) {
+            room.participants.push(userId);
+            room.updatedAt = new Date();
+            await room.save();
         }
 
         // Fetch last 10 messages for context (room only)
         const prevMessages = await ChatMessage.find({ roomId }).sort({ timestamp: 1 }).lean();
-        // Separate context and current message for the LLM
-        // Only provide previous messages as context, and clearly mark the current message to be translated
         const contextHistory = prevMessages.slice(-9).map(msg => ({ role: msg.role, content: msg.content }));
         const inputHistory = [
             roomSystemPrompt,
@@ -296,9 +305,10 @@ app.get('/rooms/:roomId/messages', authenticate, async (req, res) => {
     const userId = req.authUser.id;
     if (!roomId || !userId) return res.status(400).json({ error: '' });
     try {
-        // Only allow if user is a participant
         const room = await Room.findById(roomId);
-        if (!room || !room.participants.includes(userId)) {
+        if (!room) return res.status(400).json({ error: '' });
+        // Allow if public, or if user is a participant
+        if (!room.public && !room.participants.includes(userId)) {
             return res.status(400).json({ error: '' });
         }
         const messages = await ChatMessage.find({ roomId }).sort({ timestamp: 1 }).lean();
@@ -321,7 +331,7 @@ app.get('/rooms', authenticate, async (req, res) => {
     }
 });
 
-// Join an existing room
+// Join an existing room (open access for public rooms)
 app.post('/rooms/:roomId/join', authenticate, async (req, res) => {
     const roomId = req.params.roomId;
     const userId = req.authUser.id;
@@ -329,20 +339,25 @@ app.post('/rooms/:roomId/join', authenticate, async (req, res) => {
     try {
         const room = await Room.findById(roomId);
         if (!room) return res.status(404).json({ error: '' });
-        if (!room.participants.includes(userId)) {
-            room.participants.push(userId);
-            room.updatedAt = new Date();
-            await room.save();
+        // Allow join if public, or already a participant
+        if (room.public || room.participants.includes(userId)) {
+            if (!room.participants.includes(userId)) {
+                room.participants.push(userId);
+                room.updatedAt = new Date();
+                await room.save();
+            }
+            return res.status(200).json({ room });
         }
-        res.status(200).json({ room });
+        // Not public and not a participant
+        return res.status(400).json({ error: '' });
     } catch (err) {
         res.status(500).json({ error: '' });
     }
 });
 
-// Create a new room
+// Create a new room (support public)
 app.post('/rooms', authenticate, async (req, res) => {
-    const { name, settings } = req.body;
+    const { name, settings, public: isPublic } = req.body;
     const ownerId = req.authUser.id;
     if (!ownerId) return res.status(400).json({ error: '' });
     try {
@@ -352,8 +367,19 @@ app.post('/rooms', authenticate, async (req, res) => {
             participants: [ownerId],
             ownerId,
             settings: settings || {},
+            public: !!isPublic,
         });
         res.status(201).json({ room });
+    } catch (err) {
+        res.status(500).json({ error: '' });
+    }
+});
+
+// List all public rooms (open access)
+app.get('/public-rooms', authenticate, async (req, res) => {
+    try {
+        const rooms = await Room.find({ public: true }).sort({ updatedAt: -1, createdAt: -1 }).lean();
+        res.status(200).json({ rooms });
     } catch (err) {
         res.status(500).json({ error: '' });
     }

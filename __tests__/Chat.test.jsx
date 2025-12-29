@@ -3,6 +3,7 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import Chat from '../src/react/components/Chat';
 
+// ↓ this is not a comment, just to set the environment
 // @vitest-environment jsdom
 
 describe('Chat component', () => {

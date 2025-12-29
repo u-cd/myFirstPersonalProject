@@ -7,6 +7,7 @@ const roomSchema = new mongoose.Schema({
     updatedAt: { type: Date },
     ownerId: { type: String, required: true }, // Supabase userId
     settings: { type: Object, required: false }, // For future AI/room config
+    public: { type: Boolean, default: false }, // Public room flag
 });
 
 // Index for fast lookup by participant

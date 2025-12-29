@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase-config';
-import js from '@eslint/js';
 
-export default function RoomChat({ user, currentRoom }) {
+export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [publicRooms, setPublicRooms] = useState([]);
   const chatRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -15,6 +15,13 @@ export default function RoomChat({ user, currentRoom }) {
       fetchMessages(currentRoom._id);
     } else {
       setMessages([]);
+    }
+  }, [currentRoom]);
+
+  // Fetch public rooms when currentRoom is null
+  useEffect(() => {
+    if (!currentRoom) {
+      fetchPublicRooms();
     }
   }, [currentRoom]);
 
@@ -37,6 +44,20 @@ export default function RoomChat({ user, currentRoom }) {
       else setMessages([]);
     } catch (e) {
       setMessages([]);
+    }
+  };
+
+  const fetchPublicRooms = async () => {
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
+      const res = await fetch('/public-rooms', {
+        headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
+      });
+      const data = await res.json();
+      setPublicRooms(data.rooms || []);
+    } catch (e) {
+      setPublicRooms([]);
     }
   };
 
@@ -92,13 +113,30 @@ const handleKeyDown = (e) => {
   return (
     <div className="chat">
       {!currentRoom ? (
-        <div>Select a room to start chatting.</div>
+        <div>
+          <h2>Public Rooms</h2>
+          {publicRooms.length === 0 ? (
+            <div>No public rooms found</div>
+          ) : (
+            <ul>
+              {publicRooms.map(room => (
+                <li key={room._id || room.id}>
+                  <span>
+                    {room.name || 'Untitled'} ({room.participants?.length || 0} users)
+                  </span>
+                  <button
+                    onClick={() => {
+                      if (typeof setCurrentRoom === 'function') setCurrentRoom(room);
+                    }}
+                  >Open</button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       ) : (
         <>
-          <h2>{currentRoom.name}</h2>
-          <div className="participants">
-            Participants: {currentRoom.participants?.join(', ')}
-          </div>
+          {/* <div className="room-title">{currentRoom.name}</div> */}
           <div className="chat-messages" ref={chatRef}>
             {messages.length === 0 ? (
               <div>No messages yet</div>
