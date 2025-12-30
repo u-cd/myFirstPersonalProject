@@ -37,7 +37,7 @@ export default function SoloSidebar({ user, currentChatId, setCurrentChatId, sid
 
     return (
         <div className={`sidebar${sidebarOpen ? ' open' : ''}`}>
-            <div className="sidebar-fixed-top">
+            <div>
                 <button className="sidebar-new-chat" onClick={handleNewChat}>
                     <span className="sidebar-new-chat-icon" aria-hidden="true">
                         <svg width="18" height="18" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ verticalAlign: 'middle', marginRight: '8px' }}>

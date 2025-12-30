@@ -8,24 +8,16 @@
     height: 100%;
 }
 
-.sidebar-fixed-top {
-    margin: 24px 0 16px 0;
-}
-
 .sidebar-new-chat {
     display: flex;
-    align-items: center;
     color: #222;
-    text-decoration: none;
     font-size: 1.1em;
-    padding-left: 24px;
-    margin: 0 0 0 0;
-    transition: background 0.2s;
-    gap: 8px;
+    padding: 6px 24px;
     cursor: pointer;
     background: none;
     border: none;
     width: 100%;
+    margin: 10px 0;
 }
 
 .sidebar-new-chat-icon {
@@ -77,6 +69,7 @@ body[data-theme="dark"] .sidebar-new-chat-icon {
     width: 100%;
     text-align: left;
     cursor: pointer;
+    overflow-wrap: anywhere;
 }
 
 .sidebar-chat-link:hover {

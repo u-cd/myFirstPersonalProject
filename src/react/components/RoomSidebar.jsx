@@ -72,45 +72,14 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebar
 
   return (
     <div className={`sidebar${sidebarOpen ? ' open' : ''}`}>
-      <div className="sidebar-fixed-top">
-        <div>
+      <div>
           <button
             type="button"
+            className="sidebar-new-chat"
             onClick={() => setCurrentRoom(null)}
           >
             Show Public Rooms
           </button>
-        </div>
-        <form
-          onSubmit={e => {
-            e.preventDefault();
-            handleCreateRoom(newRoomName, createPrivate, newRoomDescription);
-          }}
-        >
-          <input
-            type="text"
-            placeholder="New room name"
-            value={newRoomName}
-            onChange={e => setNewRoomName(e.target.value)}
-          />
-          <textarea
-            placeholder="Room description (optional)"
-            value={newRoomDescription}
-            onChange={e => setNewRoomDescription(e.target.value)}
-          />
-          {/* Temporarily uncomment the private checkbox */}
-          {/* <label style={{ marginLeft: 8, fontSize: '0.95em' }}>
-            <input
-              type="checkbox"
-              checked={createPrivate}
-              onChange={e => setCreatePrivate(e.target.checked)}
-              style={{ marginRight: 4 }}
-            />
-            Private
-          </label> */}
-          <button type="submit">Create Room</button>
-        </form>
-
       </div>
       
         <div className="sidebar-chats-header">Rooms</div>

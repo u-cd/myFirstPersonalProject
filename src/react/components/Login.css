@@ -42,7 +42,7 @@
 
 .google-login:hover {
     transform: scale(1.01);
-    box-shadow: 0 2px 12px 0 #bbb8;
+    box-shadow: 0 2px 12px 0 #bbb;
 }
 
 /* Login Form Styles */

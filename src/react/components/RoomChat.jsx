@@ -23,10 +23,25 @@ export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
   const [input, setInput] = useState('');
   const [publicRooms, setPublicRooms] = useState([]);
   const [roomMessageCounts, setRoomMessageCounts] = useState({});
+  const [isThinking, setIsThinking] = useState(false);
   const chatRef = useRef(null);
   const inputRef = useRef(null);
   // Store a color for each userId in a ref (so it persists during the session)
   const userColorsRef = useRef({});
+
+  const [thinkingDots, setThinkingDots] = useState('');
+  useEffect(() => {
+    if (!isThinking) {
+      setThinkingDots('');
+      return;
+    }
+    let i = 0;
+    const interval = setInterval(() => {
+      setThinkingDots('.'.repeat((i % 3) + 1));
+      i++;
+    }, 400);
+    return () => clearInterval(interval);
+  }, [isThinking]);
 
   function getUserColor(userId) {
     if (!userColorsRef.current[userId]) {
@@ -111,15 +126,8 @@ export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
     if (!input.trim() || !currentRoom || !currentRoom._id || !user) return;
     const messageText = input.trim();
     setInput('');
-    setMessages(prev => [
-      ...prev,
-      {
-        _id: 'temp-' + Date.now(),
-        userId: user.id,
-        content: messageText,
-        role: 'user',
-      }
-    ]);
+    setIsThinking(true);
+    // Do not add a temporary user message; only show the fetched response
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
@@ -138,6 +146,7 @@ export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
         }
       }
     } catch (e) {}
+    setIsThinking(false);
   };
 
   const handleInputChange = (e) => {
@@ -155,58 +164,124 @@ const handleKeyDown = (e) => {
     }
 };
 
+const [newRoomName, setNewRoomName] = useState('');
+const [newRoomDescription, setNewRoomDescription] = useState('');
+
+const handleCreateRoom = async (roomName, isPrivate = false, description = '') => {
+  if (!roomName.trim()) return;
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
+    const res = await fetch('/rooms', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+      },
+      body: JSON.stringify({ name: roomName, public: !isPrivate, description })
+    });
+    const data = await res.json();
+    if (res.ok && data.room) {
+      setPublicRooms(prev => [data.room, ...prev]);
+      setNewRoomName('');
+      setNewRoomDescription('');
+    }
+  } catch (e) {}
+};
+
   return (
     <div className="chat">
       {!currentRoom ? (
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: 32, overflowY: 'auto' }}>
-            <div style={{ flex: 2 }}>
+          <div className="public-room-welcome-flex">
+            <div className="public-room-list-col">
               <h2>Public Rooms</h2>
+              <div>
+                <form
+                  className="sidebar-create-room-form"
+                  onSubmit={e => {
+                    e.preventDefault();
+                    handleCreateRoom(newRoomName, false, newRoomDescription);
+                  }}
+                >
+                  <input
+                    type="text"
+                    className="sidebar-create-room-input"
+                    placeholder="New room name"
+                    value={newRoomName}
+                    onChange={e => setNewRoomName(e.target.value)}
+                  />
+                  <textarea
+                    className="sidebar-create-room-textarea"
+                    placeholder="Room description (optional)"
+                    value={newRoomDescription}
+                    onChange={e => setNewRoomDescription(e.target.value)}
+                  />
+                  {/* Temporarily uncomment the private checkbox */}
+                  {/* <label style={{ marginLeft: 8, fontSize: '0.95em' }}>
+                    <input
+                      type="checkbox"
+                      checked={createPrivate}
+                      onChange={e => setCreatePrivate(e.target.checked)}
+                      style={{ marginRight: 4 }}
+                    />
+                    Private
+                  </label> */}
+                  <button type="submit" className="sidebar-create-room-submit">Create Room</button>
+                </form>
+              </div>
               {publicRooms.length === 0 ? (
                 <div>No public rooms found</div>
               ) : (
-                <ul>
+                <div>
                   {publicRooms.map(room => (
-                    <li key={room._id || room.id}>
-                      <div>
+                    <div
+                      key={room._id || room.id}
+                      className="public-room-entry"
+                      onClick={() => {
+                        if (typeof setCurrentRoom === 'function') setCurrentRoom(room);
+                      }}
+                    >
+                      <div className="room-created-by">
+                        <span>Created by: {room.ownerId ? room.ownerId.slice(0, 6) + '...' : 'unknown'}</span>
+                      </div>
+                      <div className="room-title-wrap">
                         <strong>{room.name || 'Untitled'}</strong>
                       </div>
                       {room.description && (
-                        <div>
+                        <div className="room-description-wrap">
                           {room.description}
                         </div>
                       )}
-                      <div>
-                        Created by: {room.ownerId ? room.ownerId.slice(0, 6) + '...' : 'unknown'}
+                      <div className="room-meta-row">
+                        <span>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                            style={{ verticalAlign: 'middle', marginRight: '3px' }}
+                          >
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                          </svg>
+                          {roomMessageCounts[room._id || room.id] ?? '...'}
+                        </span>
+                        <span>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="18" height="18" viewBox="0 0 24 24" fill="none"
+                            style={{ verticalAlign: 'middle', marginRight: '3px' }}
+                          >
+                            <path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05C17.16 14.1 19 15.03 19 16.5V19h5v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#555"/>
+                          </svg>
+                          {room.participants?.length ?? 0}
+                        </span>
+                        <span>{room.updatedAt ? timeAgo(room.updatedAt) : 'unknown'}</span>
                       </div>
-                      <div>
-                        Last updated: {room.updatedAt ? timeAgo(room.updatedAt) : 'unknown'}
-                      </div>
-                      <div>
-                        Participants: {room.participants?.length ?? 0}
-                      </div>
-                      <div>
-                        Messages: {roomMessageCounts[room._id || room.id] ?? '...'}
-                      </div>
-                      <button
-                        onClick={() => {
-                          if (typeof setCurrentRoom === 'function') setCurrentRoom(room);
-                        }}
-                      >Open</button>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
               )}
             </div>
-            <div className="room-welcome"
-              style={{
-                padding: '12px',
-                background: '#f8f8fa',
-                color: '#444',
-                maxWidth: 340,
-                position: 'sticky',
-                top: 0, // or whatever offset you want from the top
-                zIndex: 1
-              }}>
+            <div className="room-welcome">
               <strong>Welcome to Group Chat Rooms!</strong>
               <ul style={{ margin: '8px 0 0 18px', padding: 0, fontSize: '1em' }}>
                 <li>Anyone can join and send messages in public rooms.</li>
@@ -284,6 +359,15 @@ const handleKeyDown = (e) => {
                   )}
                 </div>
               ))
+            )}
+            {isThinking && (
+              <div className="my-message">
+                <span className="thinking-dots" style={{ color: '#000', fontSize: '1.2em', letterSpacing: 2 }}>
+                  <br />
+                  {thinkingDots}
+                  <br />
+                </span>
+              </div>
             )}
           </div>
           <form className="chat-form" onSubmit={handleSend}>

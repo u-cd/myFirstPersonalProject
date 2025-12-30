@@ -1,37 +1,97 @@
 /* Layout for RoomChatApp */
 /* Try to use the solo mode style as much as possible */
-.public-room-welcome {
+
+
+/* RoomChat elements */
+
+
+/* Flex container for public room list and welcome */
+.public-room-welcome-flex {
 	display: flex;
-	flex-direction: column;
-	overflow-y: auto;
+}
+
+/* Public room list column flex grow */
+.public-room-list-col {
+	flex: 2;
+	margin: 0 30px;
+}
+
+.public-room-entry {
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.public-room-entry:hover {
+  background: #f0f4fa;
+}
+
+.room-created-by {
+    font-size: 0.97em;
+    color: #555;
+}
+
+/* Room name and description wrap for public room list */
+.room-title-wrap {
+    overflow-wrap: anywhere;
+    font-size: 1.3em;
+    line-height: 1.5em;
+}
+.room-description-wrap {
+    overflow-wrap: anywhere;
+    margin: 8px 0;
+    font-size: 1em;
+    color: #444;
+}
+
+.room-meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 0.97em;
+    color: #555;
+}
+.room-meta-row span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 160px;
+}
+
+/* Sticky welcome/info box for public rooms */
+.room-welcome {
+	padding: 12px;
+	background: #f8f8fa;
+	color: #444;
+	max-width: 340px;
+	position: sticky;
+	top: 0;
+	z-index: 1;
 }
 
 .room-header {
     width: 50vw;
     max-width: 800px;
 	margin: 0 auto;
+	margin-top: 8px;
 }
 
 .room-title {
-	font-size: 1.25em;
-	font-weight: bold;
+	font-size: 1.5em;
+	font-weight: 600;
+	line-height: 1.75em;
+	overflow-wrap: anywhere;
 }
 
 .room-description {
 	font-size: 0.97em;
 	color: #666;
+	padding: 10px;
+	overflow-wrap: anywhere;
 }
 
 .my-message {
-	/* background-color: #bdd; */
 	align-self: flex-end;
-	/* border-radius: 12px 12px 0 12px; */
-	/* padding: 8px 12px; */
-	/* margin: 4px 0; */
-	/* max-width: 70%; */
-
-	/* word-break: break-word; */
-    /* white-space: pre-wrap; */
+	margin-top: 12px;
 }
 
 .delete-message-btn {
@@ -40,16 +100,72 @@
 	border: none;
 	cursor: pointer;
 	float: right;
+	margin-top: 2px;
 }
 
-/* .other-message {
-	background-color: #f0f0f0;
-	align-self: flex-start;
-	border-radius: 12px 12px 12px 0;
-	padding: 8px 12px;
-	margin: 4px 0;
-	max-width: 70%;
+.other-message {
+	margin-top: 18px;
+}
 
-	word-break: break-word;
-    white-space: pre-wrap;
-} */
+
+/* RoomSidebar elements */
+
+.sidebar-public-rooms-btn-wrap {
+  margin-bottom: 8px;
+}
+
+.sidebar-public-rooms-btn {
+  background: none;
+  color: #222;
+  border: none;
+  padding: 7px 16px;
+  font-size: 1.1em;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+.sidebar-public-rooms-btn:hover {
+  background: #eee;
+  color: #1565c0;
+}
+
+.sidebar-create-room-form {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 8px 0;
+  padding: 0 12px;
+}
+
+.sidebar-create-room-input,
+.sidebar-create-room-textarea {
+  border: 1px solid #d0d7de;
+  padding: 7px 10px;
+  font-size: 1em;
+  color: #222;
+  border-radius: 8px;
+}
+.sidebar-create-room-input:focus,
+.sidebar-create-room-textarea:focus {
+  border-color: #666;
+  outline: none;
+}
+
+.sidebar-create-room-textarea {
+  min-height: 36px;
+  max-height: 80px;
+  resize: vertical;
+}
+
+.sidebar-create-room-submit {
+	background: #000;
+	color: #fff;
+	border: none;
+	padding: 7px 0;
+	font-size: 1em;
+	cursor: pointer;
+	border-radius: 8px;
+}
+.sidebar-create-room-submit:hover {
+	transform: scale(1.02);
+}

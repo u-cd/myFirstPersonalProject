@@ -52,7 +52,7 @@ export default function ChatApp({ user }) {
                     >Rooms</button>
                 </div>
                 <div className="something-flexible-space">
-                    <span className="rainbow-text">konbanwa</span>
+                    {/* write something here */}
                 </div>
                 <div className="user-account">
                     <span className="user-account-email">
