@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 
 const roomSchema = new mongoose.Schema({
-    name: { type: String, required: false, maxlength: 100 },
+    name: { type: String, required: true, maxlength: 100 },
+    description: { type: String, required: false, maxlength: 500 },
     participants: [{ type: String, required: true }], // Supabase userIds
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date },

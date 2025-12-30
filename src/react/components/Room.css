@@ -1,17 +1,48 @@
 /* Layout for RoomChatApp */
 /* Try to use the solo mode style as much as possible */
-.my-message {
-	background-color: #bdd;
-	align-self: flex-end;
-	border-radius: 12px 12px 0 12px;
-	padding: 8px 12px;
-	margin: 4px 0;
-	max-width: 70%;
-
-	word-break: break-word;
-    white-space: pre-wrap;
+.public-room-welcome {
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
 }
-.other-message {
+
+.room-header {
+    width: 50vw;
+    max-width: 800px;
+	margin: 0 auto;
+}
+
+.room-title {
+	font-size: 1.25em;
+	font-weight: bold;
+}
+
+.room-description {
+	font-size: 0.97em;
+	color: #666;
+}
+
+.my-message {
+	/* background-color: #bdd; */
+	align-self: flex-end;
+	/* border-radius: 12px 12px 0 12px; */
+	/* padding: 8px 12px; */
+	/* margin: 4px 0; */
+	/* max-width: 70%; */
+
+	/* word-break: break-word; */
+    /* white-space: pre-wrap; */
+}
+
+.delete-message-btn {
+	color: #888;
+	background: none;
+	border: none;
+	cursor: pointer;
+	float: right;
+}
+
+/* .other-message {
 	background-color: #f0f0f0;
 	align-self: flex-start;
 	border-radius: 12px 12px 12px 0;
@@ -21,4 +52,4 @@
 
 	word-break: break-word;
     white-space: pre-wrap;
-}
+} */

@@ -357,13 +357,14 @@ app.post('/rooms/:roomId/join', authenticate, async (req, res) => {
 
 // Create a new room (support public)
 app.post('/rooms', authenticate, async (req, res) => {
-    const { name, settings, public: isPublic } = req.body;
+    const { name, description, settings, public: isPublic } = req.body;
     const ownerId = req.authUser.id;
     if (!ownerId) return res.status(400).json({ error: '' });
     try {
         // Create room with owner as first participant
         const room = await Room.create({
             name: name || '',
+            description: description || '',
             participants: [ownerId],
             ownerId,
             settings: settings || {},
@@ -383,6 +384,21 @@ app.get('/public-rooms', authenticate, async (req, res) => {
     } catch (err) {
         res.status(500).json({ error: '' });
     }
+});
+
+app.delete('/messages/:messageId', authenticate, async (req, res) => {
+  const messageId = req.params.messageId;
+  const userId = req.authUser.id;
+  if (!messageId || !userId) return res.status(400).json({ error: '' });
+  try {
+    const msg = await ChatMessage.findById(messageId);
+    if (!msg) return res.status(404).json({ error: '' });
+    if (String(msg.userId) !== String(userId)) return res.status(403).json({ error: '' });
+    await ChatMessage.deleteOne({ _id: messageId });
+    res.status(200).json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: '' });
+  }
 });
 
 

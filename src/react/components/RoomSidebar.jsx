@@ -1,11 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabase-config';
 
+function timeAgo(date) {
+  if (!date) return '';
+  const now = new Date();
+  const then = new Date(date);
+  const diff = Math.floor((now - then) / 1000);
+  if (diff < 60) return `${diff} seconds ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
+  return `${Math.floor(diff / 86400)} days ago`;
+}
+
 export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebarOpen, closeSidebar }) {
   const [rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newRoomName, setNewRoomName] = useState('');
   const [createPrivate, setCreatePrivate] = useState(false);
+  const [newRoomDescription, setNewRoomDescription] = useState('');
 
   useEffect(() => {
     fetchRooms();
@@ -28,7 +40,7 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebar
     setLoading(false);
   };
 
-  const handleCreateRoom = async (roomName, isPrivate = false) => {
+  const handleCreateRoom = async (roomName, isPrivate = false, description = '') => {
     if (!roomName.trim()) return;
     try {
       const { data: sessionData } = await supabase.auth.getSession();
@@ -39,7 +51,7 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebar
           'Content-Type': 'application/json',
           ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
         },
-        body: JSON.stringify({ name: roomName, public: !isPrivate })
+        body: JSON.stringify({ name: roomName, public: !isPrivate, description })
       });
       const data = await res.json();
       if (res.ok && data.room) {
@@ -49,6 +61,7 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebar
       }
     } catch (e) {}
     setNewRoomName('');
+    setNewRoomDescription('');
     fetchRooms();
   };
 
@@ -71,7 +84,7 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebar
         <form
           onSubmit={e => {
             e.preventDefault();
-            handleCreateRoom(newRoomName, createPrivate);
+            handleCreateRoom(newRoomName, createPrivate, newRoomDescription);
           }}
         >
           <input
@@ -80,6 +93,12 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebar
             value={newRoomName}
             onChange={e => setNewRoomName(e.target.value)}
           />
+          <textarea
+            placeholder="Room description (optional)"
+            value={newRoomDescription}
+            onChange={e => setNewRoomDescription(e.target.value)}
+          />
+          {/* Temporarily uncomment the private checkbox */}
           {/* <label style={{ marginLeft: 8, fontSize: '0.95em' }}>
             <input
               type="checkbox"
@@ -108,7 +127,12 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebar
                   className="sidebar-chat-link"
                   onClick={() => handleSelectRoom(room)}
                 >
-                  {room.name || 'Untitled'} ({room.participants?.length || 0} users)
+                  {room.name || 'Untitled'}
+                  {room.updatedAt && (
+                    <span style={{ marginLeft: 6, fontSize: '0.92em', color: '#888' }}>
+                      {timeAgo(room.updatedAt)}
+                    </span>
+                  )}
                   {!room.public ? <span style={{marginLeft: 6, fontSize: '0.9em'}}>🗝️</span> : null}
                 </button>
               ))
