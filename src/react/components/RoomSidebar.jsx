@@ -77,7 +77,13 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebar
             type="button"
             className="sidebar-new-chat"
             onClick={() => setCurrentRoom(null)}
+            style={{ display: 'flex', alignItems: 'center', gap: '7px' }}
           >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ marginRight: '2px' }} xmlns="http://www.w3.org/2000/svg">
+              <path d="M4 10V20h16V10" stroke="#222" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+              <path d="M2 12L12 3l10 9" stroke="#222" strokeWidth="1.5" fill="none" strokeLinejoin="round"/>
+              <rect x="9" y="14" width="6" height="6" rx="1" fill="#222"/>
+            </svg>
             Show Public Rooms
           </button>
       </div>

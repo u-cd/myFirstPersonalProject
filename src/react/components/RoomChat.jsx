@@ -19,6 +19,7 @@ function timeAgo(date) {
 }
 
 export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
+    const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [publicRooms, setPublicRooms] = useState([]);
@@ -194,41 +195,68 @@ const handleCreateRoom = async (roomName, isPrivate = false, description = '') =
       {!currentRoom ? (
           <div className="public-room-welcome-flex">
             <div className="public-room-list-col">
-              <h2>Public Rooms</h2>
-              <div>
-                <form
-                  className="sidebar-create-room-form"
-                  onSubmit={e => {
-                    e.preventDefault();
-                    handleCreateRoom(newRoomName, false, newRoomDescription);
-                  }}
+
+              <div className="public-room-list-header-row">
+                <h2>Public Rooms</h2>
+                <button
+                  className="fab-create-room-inside"
+                  onClick={() => setShowCreateRoomModal(true)}
+                  aria-label="Create Room"
                 >
-                  <input
-                    type="text"
-                    className="sidebar-create-room-input"
-                    placeholder="New room name"
-                    value={newRoomName}
-                    onChange={e => setNewRoomName(e.target.value)}
-                  />
-                  <textarea
-                    className="sidebar-create-room-textarea"
-                    placeholder="Room description (optional)"
-                    value={newRoomDescription}
-                    onChange={e => setNewRoomDescription(e.target.value)}
-                  />
-                  {/* Temporarily uncomment the private checkbox */}
-                  {/* <label style={{ marginLeft: 8, fontSize: '0.95em' }}>
-                    <input
-                      type="checkbox"
-                      checked={createPrivate}
-                      onChange={e => setCreatePrivate(e.target.checked)}
-                      style={{ marginRight: 4 }}
-                    />
-                    Private
-                  </label> */}
-                  <button type="submit" className="sidebar-create-room-submit">Create Room</button>
-                </form>
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="14" cy="14" r="14" fill="#222"/>
+                    <rect x="7" y="13" width="14" height="2" rx="1" fill="#fff"/>
+                    <rect x="13" y="7" width="2" height="14" rx="1" fill="#fff"/>
+                  </svg>
+                  <span className="fab-create-room-label">Create Room</span>
+                </button>
               </div>
+
+              {/* Modal for Create Room */}
+              {showCreateRoomModal && (
+                <div className="modal-create-room-overlay" onClick={() => setShowCreateRoomModal(false)}>
+                  <div className="modal-create-room" onClick={e => e.stopPropagation()}>
+                    <div className="modal-create-room-header">
+                      <span>Create Room</span>
+                      <button className="modal-create-room-close" onClick={() => setShowCreateRoomModal(false)} aria-label="Close">×</button>
+                    </div>
+                    <form
+                      className="sidebar-create-room-form"
+                      onSubmit={e => {
+                        e.preventDefault();
+                        handleCreateRoom(newRoomName, false, newRoomDescription);
+                        setShowCreateRoomModal(false);
+                      }}
+                    >
+                      <input
+                        type="text"
+                        className="sidebar-create-room-input"
+                        placeholder="New room name"
+                        value={newRoomName}
+                        onChange={e => setNewRoomName(e.target.value)}
+                        autoFocus
+                      />
+                      <textarea
+                        className="sidebar-create-room-textarea"
+                        placeholder="Room description (optional)"
+                        value={newRoomDescription}
+                        onChange={e => setNewRoomDescription(e.target.value)}
+                      />
+                      {/* Temporarily uncomment the private checkbox */}
+                      {/* <label style={{ marginLeft: 8, fontSize: '0.95em' }}>
+                        <input
+                          type="checkbox"
+                          checked={createPrivate}
+                          onChange={e => setCreatePrivate(e.target.checked)}
+                          style={{ marginRight: 4 }}
+                        />
+                        Private
+                      </label> */}
+                      <button type="submit" className="sidebar-create-room-submit">Create Room</button>
+                    </form>
+                  </div>
+                </div>
+              )}
               {publicRooms.length === 0 ? (
                 <div>No public rooms found</div>
               ) : (

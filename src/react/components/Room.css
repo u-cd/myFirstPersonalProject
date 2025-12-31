@@ -16,6 +16,116 @@
 	margin: 0 30px;
 }
 
+/* Floating Action Button (FAB) for Create Room */
+.public-room-list-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.fab-create-room-inside {
+  background: none;
+
+  gap: 8px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 24px;
+  padding: 6px 16px 6px 8px;
+  cursor: pointer;
+  display: flex;
+  font-size: 0.97em;
+}
+.fab-create-room-inside:hover {
+	transform: scale(1.01);
+}
+
+.fab-create-room-label {
+  display: flex;
+  align-items: center;
+}
+
+/* Modal overlay and modal for Create Room */
+.modal-create-room-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.25);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-create-room {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  padding: 28px 24px 20px 24px;
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.modal-create-room-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 1.2em;
+  font-weight: 600;
+}
+.modal-create-room-close {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  color: #888;
+  cursor: pointer;
+}
+
+.sidebar-create-room-form {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  margin: 8px 0;
+  padding: 0 12px;
+}
+
+.sidebar-create-room-input,
+.sidebar-create-room-textarea {
+  border: 1px solid #d0d7de;
+  padding: 7px 10px;
+  font-size: 1em;
+  color: #222;
+  border-radius: 8px;
+}
+.sidebar-create-room-input:focus,
+.sidebar-create-room-textarea:focus {
+  border-color: #666;
+  outline: none;
+}
+
+.sidebar-create-room-textarea {
+	height: 100px;
+	min-height: 36px;
+	max-height: 300px;
+	resize: vertical;
+}
+
+.sidebar-create-room-submit {
+	background: #000;
+	color: #fff;
+	border: none;
+	padding: 7px 0;
+	font-size: 1em;
+	cursor: pointer;
+	border-radius: 8px;
+}
+.sidebar-create-room-submit:hover {
+	transform: scale(1.01);
+}
+
+
 .public-room-entry {
   cursor: pointer;
   margin-bottom: 20px;
@@ -63,9 +173,6 @@
 	background: #f8f8fa;
 	color: #444;
 	max-width: 340px;
-	position: sticky;
-	top: 0;
-	z-index: 1;
 }
 
 .room-header {
@@ -127,45 +234,4 @@
 .sidebar-public-rooms-btn:hover {
   background: #eee;
   color: #1565c0;
-}
-
-.sidebar-create-room-form {
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  margin: 8px 0;
-  padding: 0 12px;
-}
-
-.sidebar-create-room-input,
-.sidebar-create-room-textarea {
-  border: 1px solid #d0d7de;
-  padding: 7px 10px;
-  font-size: 1em;
-  color: #222;
-  border-radius: 8px;
-}
-.sidebar-create-room-input:focus,
-.sidebar-create-room-textarea:focus {
-  border-color: #666;
-  outline: none;
-}
-
-.sidebar-create-room-textarea {
-  min-height: 36px;
-  max-height: 80px;
-  resize: vertical;
-}
-
-.sidebar-create-room-submit {
-	background: #000;
-	color: #fff;
-	border: none;
-	padding: 7px 0;
-	font-size: 1em;
-	cursor: pointer;
-	border-radius: 8px;
-}
-.sidebar-create-room-submit:hover {
-	transform: scale(1.02);
 }
