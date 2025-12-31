@@ -8,12 +8,16 @@
 /* Flex container for public room list and welcome */
 .public-room-welcome-flex {
 	display: flex;
+	height: 100%;
 }
 
 /* Public room list column flex grow */
 .public-room-list-col {
 	flex: 2;
-	margin: 0 30px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	max-width: 50vw
 }
 
 /* Floating Action Button (FAB) for Create Room */
@@ -125,6 +129,13 @@
 	transform: scale(1.01);
 }
 
+/* Scrollable public room list */
+.public-room-list-scrollable {
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: #bbb #ffffff;
+}
 
 .public-room-entry {
   cursor: pointer;
@@ -172,7 +183,8 @@
 	padding: 12px;
 	background: #f8f8fa;
 	color: #444;
-	max-width: 340px;
+	max-width: 321px;
+	box-sizing: border-box;
 }
 
 .room-header {
@@ -212,6 +224,11 @@
 
 .other-message {
 	margin-top: 18px;
+}
+
+/* Ensure long words/messages in chat wrap properly */
+.room-message-content {
+  overflow-wrap: anywhere;
 }
 
 

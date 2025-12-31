@@ -258,9 +258,9 @@ const handleCreateRoom = async (roomName, isPrivate = false, description = '') =
                 </div>
               )}
               {publicRooms.length === 0 ? (
-                <div>No public rooms found</div>
+                <div></div>
               ) : (
-                <div>
+                <div className="public-room-list-scrollable">
                   {publicRooms.map(room => (
                     <div
                       key={room._id || room.id}
@@ -321,7 +321,6 @@ const handleCreateRoom = async (roomName, isPrivate = false, description = '') =
                 </li>
                 <li><span style={{ color: '#d32f2f' }}>Do not share personal or sensitive information.</span></li>
                 <li>Be respectful and follow good manners.</li>
-                <li>To create a new room, use the sidebar form.</li>
               </ul>
             </div>
           </div>
@@ -353,7 +352,7 @@ const handleCreateRoom = async (roomName, isPrivate = false, description = '') =
                         {msg.timestamp ? timeAgo(msg.timestamp) : ''}
                       </span>
                       <br />
-                      {msg.content}
+                      <span className="room-message-content">{msg.content}</span>
                     </>
                   ) : (
                     <>
@@ -361,7 +360,7 @@ const handleCreateRoom = async (roomName, isPrivate = false, description = '') =
                         {msg.timestamp ? timeAgo(msg.timestamp) : ''}
                       </span>
                       <br />
-                      {msg.content}
+                      <span className="room-message-content">{msg.content}</span>
                       <br />
                       <button
                         className="delete-message-btn"
