@@ -275,55 +275,63 @@ useEffect(() => {
                   </div>
                 </div>
               )}
+              
               {publicRooms.length === 0 ? (
                 <div></div>
               ) : (
                 <div className="public-room-list-scrollable">
-                  {publicRooms.map(room => (
-                    <div
-                      key={room._id || room.id}
-                      className="public-room-entry"
-                      onClick={() => {
-                        if (typeof setCurrentRoom === 'function') setCurrentRoom(room);
-                      }}
-                    >
-                      <div className="room-created-by">
-                        <span>Created by: {room.ownerId ? room.ownerId.slice(0, 6) + '...' : 'unknown'}</span>
-                      </div>
-                      <div className="room-title-wrap">
-                        <strong>{room.name || 'Untitled'}</strong>
-                      </div>
-                      {room.description && (
-                        <div className="room-description-wrap">
-                          {room.description}
+                  {[...publicRooms]
+                    .sort((a, b) => {
+                      const PINNED_ID = "69535eedd90e2cc65d019270";
+                      if ((a._id || a.id) === PINNED_ID) return -1;
+                      if ((b._id || b.id) === PINNED_ID) return 1;
+                      return 0;
+                    })
+                    .map(room => (
+                      <div
+                        key={room._id || room.id}
+                        className="public-room-entry"
+                        onClick={() => {
+                          if (typeof setCurrentRoom === 'function') setCurrentRoom(room);
+                        }}
+                      >
+                        <div className="room-created-by">
+                          <span>Created by: {room.ownerId ? room.ownerId.slice(0, 6) + '...' : 'unknown'}</span>
                         </div>
-                      )}
-                      <div className="room-meta-row">
-                        <span>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-                            style={{ verticalAlign: 'middle', marginRight: '3px' }}
-                          >
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
-                          </svg>
-                          {roomMessageCounts[room._id || room.id] ?? '...'}
-                        </span>
-                        <span>
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="18" height="18" viewBox="0 0 24 24" fill="none"
-                            style={{ verticalAlign: 'middle', marginRight: '3px' }}
-                          >
-                            <path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05C17.16 14.1 19 15.03 19 16.5V19h5v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#555"/>
-                          </svg>
-                          {room.participants?.length ?? 0}
-                        </span>
-                        <span>{room.updatedAt ? timeAgo(room.updatedAt) : 'unknown'}</span>
+                        <div className="room-title-wrap">
+                          <strong>{room.name || 'Untitled'}</strong>
+                        </div>
+                        {room.description && (
+                          <div className="room-description-wrap">
+                            {room.description}
+                          </div>
+                        )}
+                        <div className="room-meta-row">
+                          <span>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18" height="18" viewBox="0 0 24 24" fill="none"
+                              stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                              style={{ verticalAlign: 'middle', marginRight: '3px' }}
+                            >
+                              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                            </svg>
+                            {roomMessageCounts[room._id || room.id] ?? '...'}
+                          </span>
+                          <span>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              width="18" height="18" viewBox="0 0 24 24" fill="none"
+                              style={{ verticalAlign: 'middle', marginRight: '3px' }}
+                            >
+                              <path d="M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5C15 14.17 10.33 13 8 13zm8 0c-.29 0-.62.02-.97.05C17.16 14.1 19 15.03 19 16.5V19h5v-2.5c0-2.33-4.67-3.5-7-3.5z" fill="#555"/>
+                            </svg>
+                            {room.participants?.length ?? 0}
+                          </span>
+                          <span>{room.updatedAt ? timeAgo(room.updatedAt) : 'unknown'}</span>
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               )}
             </div>

@@ -5,8 +5,26 @@ import Solo from './Solo';
 import Room from './Room';
 
 export default function ChatApp({ user }) {
-    const [mode, setMode] = useState('main'); // 'main' or 'rooms'
+    // Persist mode per user in localStorage
+    const getInitialMode = () => {
+        try {
+            const userId = user?.id || 'guest';
+            const saved = localStorage.getItem('chatAppMode_' + userId);
+            if (saved === 'main' || saved === 'rooms') return saved;
+            return 'main';
+        } catch {
+            return 'main';
+        }
+    };
+    const [mode, setMode] = useState(getInitialMode);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+
+
+    // Save mode to localStorage when it changes
+    React.useEffect(() => {
+        const userId = user?.id || 'guest';
+        localStorage.setItem('chatAppMode_' + userId, mode);
+    }, [mode, user]);
 
     // Store last selected chat and room
     const [currentChatId, setCurrentChatId] = useState(null);

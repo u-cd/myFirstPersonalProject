@@ -76,7 +76,10 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebar
           <button
             type="button"
             className="sidebar-new-chat"
-            onClick={() => setCurrentRoom(null)}
+            onClick={() => {
+              setCurrentRoom(null);
+              if (closeSidebar) closeSidebar();
+            }}
             style={{ display: 'flex', alignItems: 'center', gap: '7px' }}
           >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style={{ marginRight: '2px' }} xmlns="http://www.w3.org/2000/svg">

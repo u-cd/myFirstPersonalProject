@@ -22,7 +22,7 @@
 	margin: 0 auto;
 	display: flex;
 	flex-direction: column;
-	max-width: 50vw
+  width: 50vw;
 }
 
 /* Floating Action Button (FAB) for Create Room */
@@ -232,18 +232,23 @@
 /* room welcome message */
 .room-welcome {
   padding: 6px 12px;
-  width: 321px;
+  max-width: 321px;
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   border-left: 2px dashed #000;
+
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #bbb #ffffff;
 }
 
 .room-welcome-toggle-btn {
   background: none;
   border: none;
   cursor: pointer;
-  margin: auto 2px auto 0;
+  margin: auto 4px auto 0;
+  padding: 0;
 }
 .room-welcome-toggle-btn:hover {
   background: #eee;
@@ -304,4 +309,47 @@
 .sidebar-public-rooms-btn:hover {
   background: #eee;
   color: #1565c0;
+}
+
+
+
+
+.room-welcome-toggle-btn-top {
+  display: none;
+}
+
+@media screen and (max-width: 1024px) {
+  .public-room-list-col {
+    width: 100%;
+    overflow-y: auto;
+  }
+
+  .room-welcome-toggle-btn {
+    display: none;
+  }
+
+  .public-room-list-header-row {
+    padding: 0 12px;
+    margin: 0px;
+  }
+
+  .public-room-list-scrollable {
+    padding: 0 8px;
+  }
+
+  .modal-create-room {
+    margin: 16px;
+  }
+
+  .room-header {
+    max-height: 120px;
+    display: flex;
+    overflow-y: auto;
+    flex-direction: column;
+    padding: 10px;
+
+    width: auto;
+    margin: 0;
+    border-bottom: 1px solid aliceblue;
+  }
 }

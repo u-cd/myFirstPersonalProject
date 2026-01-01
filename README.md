@@ -111,8 +111,3 @@ Figma：https://www.figma.com/board/P2QWX1Z0kuKyk7pWxFjvGb/Screen-transition-dia
 - content: メッセージの本文
 - timestamp: メッセージ送信日時
 
-## Licensing
-
-- Icon assets in `public/` were created from Noto Emoji glyphs and are used under the SIL Open Font License 1.1 (OFL). The full license text is included in `licenses/Noto-Emoji-OFL.txt`.
-- If you redistribute the Noto Emoji font files (TTF/WOFF/etc.), include the OFL license text and follow the OFL requirements.
-- Placeholder icons are original SVGs created for this repo; if you swap them with other third-party assets, include their licenses and attribution as required.
