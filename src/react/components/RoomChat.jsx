@@ -190,12 +190,30 @@ const handleCreateRoom = async (roomName, isPrivate = false, description = '') =
   } catch (e) {}
 };
 
-  return (
-    <div className="chat">
-      {!currentRoom ? (
-          <div className="public-room-welcome-flex">
-            <div className="public-room-list-col">
+// Persist welcomeOpen state per user in localStorage
+const getWelcomeOpenInitial = () => {
+  try {
+    const userId = user?.id || 'guest';
+    const saved = localStorage.getItem('roomWelcomeOpen_' + userId);
+    if (saved === 'false') return false;
+    if (saved === 'true') return true;
+    return true; // default open
+  } catch {
+    return true;
+  }
+};
+const [welcomeOpen, setWelcomeOpen] = useState(getWelcomeOpenInitial);
 
+// Update localStorage when user or welcomeOpen changes
+useEffect(() => {
+  const userId = user?.id || 'guest';
+  localStorage.setItem('roomWelcomeOpen_' + userId, String(welcomeOpen));
+}, [user, welcomeOpen]);
+
+  return (
+    <div className="room-chat-wrapper">
+      {!currentRoom ? (
+            <div className="public-room-list-col">
               <div className="public-room-list-header-row">
                 <h2>Public Rooms</h2>
                 <button
@@ -309,23 +327,8 @@ const handleCreateRoom = async (roomName, isPrivate = false, description = '') =
                 </div>
               )}
             </div>
-            <div className="room-welcome">
-              <strong>Welcome to Group Chat Rooms!</strong>
-              <ul style={{ margin: '8px 0 0 18px', padding: 0, fontSize: '1em' }}>
-                <li>Anyone can join and send messages in public rooms.</li>
-                <li>Messages are visible to all participants in the room.</li>
-                <li>
-                  <span style={{ color: '#1976d2' }}>
-                    ✨ All messages you send will be automatically translated to natural English by AI.
-                  </span>
-                </li>
-                <li><span style={{ color: '#d32f2f' }}>Do not share personal or sensitive information.</span></li>
-                <li>Be respectful and follow good manners.</li>
-              </ul>
-            </div>
-          </div>
       ) : (
-        <>
+        <div className="room-chat">
           <div className="room-header">
             <div className="room-title">{currentRoom.name}</div>
             {currentRoom.description && (
@@ -424,8 +427,59 @@ const handleCreateRoom = async (roomName, isPrivate = false, description = '') =
                 </svg>
             </button>
           </form>
-        </>
+        </div>
       )}
+
+      {/* Always show the welcome message */}
+        <button
+          className="room-welcome-toggle-btn"
+          onClick={() => setWelcomeOpen(open => !open)}
+          aria-expanded={welcomeOpen}
+          aria-label={welcomeOpen ? "Hide welcome/info" : "Show welcome/info"}
+        >
+          {welcomeOpen ? (
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" style={{ display: 'inline', verticalAlign: 'middle' }}>
+              <line x1="6" y1="11" x2="16" y2="11" stroke="#222" strokeWidth="2" strokeLinecap="round"/>
+              <polyline points="12,7 16,11 12,15" fill="none" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          ) : (
+            <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true" style={{ display: 'inline', verticalAlign: 'middle' }}>
+              <line x1="16" y1="11" x2="6" y2="11" stroke="#222" strokeWidth="2" strokeLinecap="round"/>
+              <polyline points="10,7 6,11 10,15" fill="none" stroke="#222" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          )}
+        </button>
+      
+        {welcomeOpen && (
+          <div className="room-welcome">
+            {!currentRoom && (
+              <div className="room-welcome-create">
+                <b>Create Room</b> lets you create your own chat room.
+              </div>
+            )}
+            <div className="room-welcome-important">
+              <div className="room-welcome-highlight">
+                🤖 Rooms では AI が自動でメッセージを英語に変換してくれます<br />
+                気軽に英語でのチャットを楽しみましょう！
+              </div>
+              <div className="room-welcome-caution">
+                <span>
+                  ⚠️ Please never write personal or confidential information.
+                </span>
+                個人情報や機密情報は絶対に書き込まないでください
+                <span>
+                  🚫 Content that makes others uncomfortable or disruptive behavior is also prohibited.
+                </span>
+                他人が不快になる内容や迷惑行為も禁止です
+              </div>
+            </div>
+            {currentRoom && (
+              <div className="room-welcome-input-hint">
+                英語でも日本語でも、AIが自動で変換します🌏🤖思ったことを書き込みましょう📝
+              </div>
+            )}
+          </div>
+        )}
     </div>
   );
 }

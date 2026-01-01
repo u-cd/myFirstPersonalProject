@@ -4,16 +4,21 @@
 
 /* RoomChat elements */
 
+.room-chat-wrapper {
+  display: flex;
+  height: 100%;
+}
 
-/* Flex container for public room list and welcome */
-.public-room-welcome-flex {
-	display: flex;
-	height: 100%;
+/* chat area wrapper class */
+.room-chat {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  margin: 0 auto;
 }
 
 /* Public room list column flex grow */
 .public-room-list-col {
-	flex: 2;
 	margin: 0 auto;
 	display: flex;
 	flex-direction: column;
@@ -139,7 +144,8 @@
 
 .public-room-entry {
   cursor: pointer;
-  margin-bottom: 20px;
+  padding: 20px 0;
+  border-bottom: 1px solid #ccc;
 }
 
 .public-room-entry:hover {
@@ -178,15 +184,7 @@
     max-width: 160px;
 }
 
-/* Sticky welcome/info box for public rooms */
-.room-welcome {
-	padding: 12px;
-	background: #f8f8fa;
-	color: #444;
-	max-width: 321px;
-	box-sizing: border-box;
-}
-
+/* Room chat styles */
 .room-header {
     width: 50vw;
     max-width: 800px;
@@ -229,6 +227,61 @@
 /* Ensure long words/messages in chat wrap properly */
 .room-message-content {
   overflow-wrap: anywhere;
+}
+
+/* room welcome message */
+.room-welcome {
+  padding: 6px 12px;
+  width: 321px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  border-left: 2px dashed #000;
+}
+
+.room-welcome-toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin: auto 2px auto 0;
+}
+.room-welcome-toggle-btn:hover {
+  background: #eee;
+  border-radius: 50%;
+}
+
+.room-welcome-create {
+  padding: 6px;
+}
+
+.room-welcome-important {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.room-welcome-highlight {
+  border: 1px dotted #000;
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 600;
+}
+
+.room-welcome-caution {
+  color: #d32f2f;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.room-welcome-input-hint {
+  margin-top: auto;
+  text-align: center;
+  margin-bottom: 20px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 6px;
 }
 
 
