@@ -51,13 +51,21 @@ export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
     return userColorsRef.current[userId];
   }
 
-  // Fetch messages when currentRoomId changes
+  // Poll for new messages every 3 seconds when a room is open
   useEffect(() => {
+    let intervalId;
     if (currentRoom && currentRoom._id) {
+      // Fetch immediately
       fetchMessages(currentRoom._id);
-    } else {
-      setMessages([]);
+      // Poll every 3 seconds
+      intervalId = setInterval(() => {
+        fetchMessages(currentRoom._id);
+      }, 3000);
     }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+    // Only re-run if currentRoom changes
   }, [currentRoom]);
 
   // Fetch public rooms when currentRoom is null

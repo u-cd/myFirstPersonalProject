@@ -319,6 +319,10 @@
 }
 
 @media screen and (max-width: 1024px) {
+  .room-welcome {
+    display: none;
+  }
+  
   .public-room-list-col {
     width: 100%;
     overflow-y: auto;

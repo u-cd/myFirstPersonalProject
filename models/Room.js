@@ -5,7 +5,7 @@ const roomSchema = new mongoose.Schema({
     description: { type: String, required: false, maxlength: 500 },
     participants: [{ type: String, required: true }], // Supabase userIds
     createdAt: { type: Date, default: Date.now },
-    updatedAt: { type: Date },
+    updatedAt: { type: Date, default: Date.now },
     ownerId: { type: String, required: true }, // Supabase userId
     settings: { type: Object, required: false }, // For future AI/room config
     public: { type: Boolean, default: false }, // Public room flag
