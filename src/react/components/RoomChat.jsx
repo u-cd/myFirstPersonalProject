@@ -27,6 +27,8 @@ function isUserNearBottom(ref) {
 }
 
 export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
+  // Track which message's translation button is visible
+  const [visibleTranslationBtnId, setVisibleTranslationBtnId] = useState(null);
 
   // Store temporary translations for each message in session
   const [messageTranslations, setMessageTranslations] = useState({}); // { [msgId]: translation }
@@ -410,7 +412,12 @@ useEffect(() => {
               messages.map(msg => {
                 const msgId = msg._id || msg.id;
                 return (
-                  <div key={msgId} className={msg.userId === user?.id ? 'my-message' : 'other-message'}>
+                  <div
+                    key={msgId}
+                    className={msg.userId === user?.id ? 'my-message' : 'other-message'}
+                    onMouseEnter={() => setVisibleTranslationBtnId(msgId)}
+                    onMouseLeave={() => setVisibleTranslationBtnId(null)}
+                  >
                     {msg.userId !== user?.id ? (
                       <>
                         <span
@@ -423,16 +430,21 @@ useEffect(() => {
                           {msg.timestamp ? timeAgo(msg.timestamp) : ''}
                         </span>
                         <br />
-                        <span className="room-message-content">{msg.content}</span>
+                        <span
+                          className="room-message-content other-message-content"
+                          style={{ cursor: !messageTranslations[msgId] && !translatingId ? 'pointer' : 'default' }}
+                          onClick={() => {
+                            if (!messageTranslations[msgId] && !translatingId) {
+                              handleShowTranslation(msg);
+                            }
+                          }}
+                          title={!messageTranslations[msgId] && !translatingId ? 'Click to translate!' : ''}
+                        >
+                          {msg.content}
+                        </span>
                         <br />
-                        {!messageTranslations[msgId] && (
-                          <button
-                            className="show-translation-btn"
-                            onClick={() => handleShowTranslation(msg)}
-                            disabled={translatingId === msgId}
-                          >
-                            {translatingId === msgId ? 'Translating...' : 'Show Translation'}
-                          </button>
+                        {translatingId === msgId && (
+                          <div className="room-message-translation-ja">Translating...</div>
                         )}
                         {messageTranslations[msgId] && (
                           <div className="room-message-translation-ja">
@@ -447,11 +459,26 @@ useEffect(() => {
                         </span>
                         <br />
                         <span
-                          className={"room-message-content " + "my-message-content"}
+                          className={"room-message-content my-message-content"}
+                          style={{ cursor: !messageTranslations[msgId] && !translatingId ? 'pointer' : 'default' }}
+                          onClick={() => {
+                            if (!messageTranslations[msgId] && !translatingId) {
+                              handleShowTranslation(msg);
+                            }
+                          }}
+                          title={!messageTranslations[msgId] && !translatingId ? 'Click to translate!' : ''}
                         >
                           {msg.content}
                         </span>
                         <br />
+                        {translatingId === msgId && (
+                          <div className="room-message-translation-ja">Translating...</div>
+                        )}
+                        {messageTranslations[msgId] && (
+                          <div className="room-message-translation-ja">
+                            {messageTranslations[msgId]}
+                          </div>
+                        )}
                         <button
                           className="delete-message-btn"
                           onClick={async () => {
@@ -562,9 +589,15 @@ useEffect(() => {
               </div>
             </div>
             {currentRoom && (
-              <div className="room-welcome-input-hint">
-                英語でも日本語でも、AIが自動で変換します🌏🤖思ったことを書き込みましょう📝
-              </div>
+              <>
+                <div>
+                  Click a message to show translation<br />
+                  メッセージをクリックすると翻訳を表示できます
+                </div>
+                <div className="room-welcome-input-hint">
+                  英語でも日本語でも、AIが自動で変換します🌏🤖思ったことを書き込みましょう📝
+                </div>
+              </>
             )}
           </div>
         )}
