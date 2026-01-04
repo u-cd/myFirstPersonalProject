@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../supabase-config';
+import DOMPurify from 'dompurify';
 
 function getRandomColor() {
   // Pick a random pastel color
@@ -16,6 +17,13 @@ function timeAgo(date) {
   if (diff < 3600) return `${Math.floor(diff / 60)} minutes ago`;
   if (diff < 86400) return `${Math.floor(diff / 3600)} hours ago`;
   return `${Math.floor(diff / 86400)} days ago`;
+}
+
+// Helper: check if user is near the bottom (within 80px)
+function isUserNearBottom(ref) {
+  if (!ref.current) return true;
+  const { scrollTop, scrollHeight, clientHeight } = ref.current;
+  return scrollHeight - scrollTop - clientHeight < 80;
 }
 
 export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
@@ -75,15 +83,9 @@ export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
     }
   }, [currentRoom]);
 
-  // Scroll to bottom on new messages
-  useEffect(() => {
-    if (chatRef.current) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-    }
-  }, [messages]);
-
   const fetchMessages = async (roomId) => {
     try {
+      const wasNearBottom = isUserNearBottom(chatRef);
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
       const res = await fetch(`/rooms/${roomId}/messages`, {
@@ -92,10 +94,26 @@ export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
       const data = await res.json();
       if (data.messages) setMessages(data.messages);
       else setMessages([]);
+      // After messages update, scroll only if user was near bottom
+      setTimeout(() => {
+        if (wasNearBottom && chatRef.current) {
+          chatRef.current.scrollTop = chatRef.current.scrollHeight;
+        }
+      }, 0);
     } catch (e) {
       setMessages([]);
     }
   };
+
+// Scroll to bottom when opening a new room (show latest message)
+useEffect(() => {
+  if (currentRoom && chatRef.current) {
+    // Wait for messages to render
+    setTimeout(() => {
+      chatRef.current.scrollTop = chatRef.current.scrollHeight;
+    }, 0);
+  }
+}, [currentRoom, messages.length]);
 
   const fetchPublicRooms = async () => {
     try {
@@ -310,9 +328,12 @@ useEffect(() => {
                           <strong>{room.name || 'Untitled'}</strong>
                         </div>
                         {room.description && (
-                          <div className="room-description-wrap">
-                            {room.description}
-                          </div>
+                          <div
+                            className="room-description-wrap"
+                            dangerouslySetInnerHTML={{
+                              __html: DOMPurify.sanitize((room.description || '').replace(/\n/g, '<br>'))
+                            }}
+                          />
                         )}
                         <div className="room-meta-row">
                           <span>
@@ -348,9 +369,12 @@ useEffect(() => {
           <div className="room-header">
             <div className="room-title">{currentRoom.name}</div>
             {currentRoom.description && (
-              <div className="room-description">
-                {currentRoom.description}
-              </div>
+              <div
+                className="room-description"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize((currentRoom.description || '').replace(/\n/g, '<br>'))
+                }}
+              />
             )}
           </div>
           <div className="chat-messages" ref={chatRef}>
