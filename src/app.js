@@ -402,6 +402,28 @@ app.delete('/messages/:messageId', authenticate, async (req, res) => {
 });
 
 
+
+// Temporary translation endpoint for frontend session-only translation
+app.post('/translate-message', async (req, res) => {
+    const { text } = req.body;
+    if (!text || typeof text !== 'string') return res.status(400).json({ error: '' });
+    try {
+        const prompt = [
+            { role: 'developer', content: 'Translate the following English into natural Japanese. Respond ONLY with the Japanese translation.' },
+            { role: 'user', content: text }
+        ];
+        const response = await openai.responses.create({
+            model: 'gpt-5-chat-latest',
+            input: prompt
+        });
+        res.status(200).json({ translation: response.output_text });
+    } catch (err) {
+        res.status(500).json({ error: '' });
+    }
+});
+
+
+
 // Serve React app for all other routes (SPA fallback)
 app.get(/.*/, (req, res) => {
     res.sendFile(path.join(__dirname, '../public/dist/index.html'));

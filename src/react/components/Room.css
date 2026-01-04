@@ -229,6 +229,22 @@
   overflow-wrap: anywhere;
 }
 
+.show-translation-btn {
+  background: none;
+  border: none;
+  color: #1565c0b0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.room-message-translation-ja {
+  margin-top: 4px;
+  font-size: 0.8em;
+  color: #777;
+}
+
+
+
 /* room welcome message */
 .room-welcome {
   padding: 6px 12px;

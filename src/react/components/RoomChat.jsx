@@ -27,7 +27,33 @@ function isUserNearBottom(ref) {
 }
 
 export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
-    const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
+
+  // Store temporary translations for each message in session
+  const [messageTranslations, setMessageTranslations] = useState({}); // { [msgId]: translation }
+  const [translatingId, setTranslatingId] = useState(null);
+
+  // Function to fetch translation for a message
+  const handleShowTranslation = async (msg) => {
+    const msgId = msg._id || msg.id;
+    if (messageTranslations[msgId]) return; // Already translated
+    setTranslatingId(msgId);
+    try {
+      const res = await fetch('/translate-message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: msg.content })
+      });
+      const data = await res.json();
+      setMessageTranslations(prev => ({ ...prev, [msgId]: data.translation }));
+    } catch (e) {
+      setMessageTranslations(prev => ({ ...prev, [msgId]: '翻訳に失敗しました' }));
+    }
+    setTranslatingId(null);
+  };
+
+
+
+  const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [publicRooms, setPublicRooms] = useState([]);
@@ -381,54 +407,86 @@ useEffect(() => {
             {messages.length === 0 ? (
               <div>No messages yet</div>
             ) : (
-              messages.map(msg => (
-                <div key={msg._id || msg.id} className={msg.userId === user?.id ? 'my-message' : 'other-message'}>
-                  {msg.userId !== user?.id ? (
-                    <>
-                      <span
-                        className="message-user"
-                        style={{ color: getUserColor(msg.userId), fontWeight: 600 }}
-                      >
-                        {msg.userId ? msg.userId.slice(0, 6) + '...' : 'unknown'}
-                      </span>
-                      <span className="message-timestamp" style={{ marginLeft: 8, color: '#888', fontSize: '0.92em' }}>
-                        {msg.timestamp ? timeAgo(msg.timestamp) : ''}
-                      </span>
-                      <br />
-                      <span className="room-message-content">{msg.content}</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="message-timestamp" style={{ color: '#888', fontSize: '0.92em', float: 'right' }}>
-                        {msg.timestamp ? timeAgo(msg.timestamp) : ''}
-                      </span>
-                      <br />
-                      <span className="room-message-content">{msg.content}</span>
-                      <br />
-                      <button
-                        className="delete-message-btn"
-                        onClick={async () => {
-                          if (window.confirm('Delete this message?')) {
-                            const { data: sessionData } = await supabase.auth.getSession();
-                            const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
-                            const res = await fetch(`/messages/${msg._id}`, {
-                              method: 'DELETE',
-                              headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
-                            });
-                            if (res.ok) {
-                              setMessages(prev => prev.filter(m => m._id !== msg._id));
-                            } else {
-                              alert('Failed to delete message.');
+              messages.map(msg => {
+                const msgId = msg._id || msg.id;
+                return (
+                  <div key={msgId} className={msg.userId === user?.id ? 'my-message' : 'other-message'}>
+                    {msg.userId !== user?.id ? (
+                      <>
+                        <span
+                          className="message-user"
+                          style={{ color: getUserColor(msg.userId), fontWeight: 600 }}
+                        >
+                          {msg.userId ? msg.userId.slice(0, 6) + '...' : 'unknown'}
+                        </span>
+                        <span className="message-timestamp" style={{ marginLeft: 8, color: '#888', fontSize: '0.92em' }}>
+                          {msg.timestamp ? timeAgo(msg.timestamp) : ''}
+                        </span>
+                        <br />
+                        <span className="room-message-content">{msg.content}</span>
+                        <br />
+                        {!messageTranslations[msgId] && (
+                          <button
+                            className="show-translation-btn"
+                            onClick={() => handleShowTranslation(msg)}
+                            disabled={translatingId === msgId}
+                          >
+                            {translatingId === msgId ? 'Translating...' : 'Show Translation'}
+                          </button>
+                        )}
+                        {messageTranslations[msgId] && (
+                          <div className="room-message-translation-ja">
+                            {messageTranslations[msgId]}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <span className="message-timestamp" style={{ color: '#888', fontSize: '0.92em', float: 'right' }}>
+                          {msg.timestamp ? timeAgo(msg.timestamp) : ''}
+                        </span>
+                        <br />
+                        <span className="room-message-content">{msg.content}</span>
+                        <br />
+                        {!messageTranslations[msgId] && (
+                          <button
+                            className="show-translation-btn"
+                            onClick={() => handleShowTranslation(msg)}
+                            disabled={translatingId === msgId}
+                          >
+                            {translatingId === msgId ? 'Translating...' : 'Show Translation'}
+                          </button>
+                        )}
+                        {messageTranslations[msgId] && (
+                          <div className="room-message-translation-ja">
+                            {messageTranslations[msgId]}
+                          </div>
+                        )}
+                        <button
+                          className="delete-message-btn"
+                          onClick={async () => {
+                            if (window.confirm('Delete this message?')) {
+                              const { data: sessionData } = await supabase.auth.getSession();
+                              const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
+                              const res = await fetch(`/messages/${msg._id}`, {
+                                method: 'DELETE',
+                                headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
+                              });
+                              if (res.ok) {
+                                setMessages(prev => prev.filter(m => m._id !== msg._id));
+                              } else {
+                                alert('Failed to delete message.');
+                              }
                             }
-                          }
-                        }}
-                      >
-                        Delete
-                      </button>
-                    </>
-                  )}
-                </div>
-              ))
+                          }}
+                        >
+                          Delete
+                        </button>
+                      </>
+                    )}
+                  </div>
+                );
+              })
             )}
             {isThinking && (
               <div className="my-message">
