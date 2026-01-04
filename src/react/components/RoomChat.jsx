@@ -76,7 +76,7 @@ export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
     if (messageTranslations[msgId]) return; // Already translated
     setTranslatingId(msgId);
     try {
-      const res = await fetch('/translate-message', {
+      const res = await fetch('/rooms/translate-message', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: msg.content })
@@ -181,7 +181,7 @@ useEffect(() => {
     try {
       const { data: sessionData } = await supabase.auth.getSession();
       const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
-      const res = await fetch('/public-rooms', {
+      const res = await fetch('/rooms/public-rooms', {
         headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
       });
       const data = await res.json();
@@ -559,7 +559,7 @@ useEffect(() => {
                             if (window.confirm('Delete this message?')) {
                               const { data: sessionData } = await supabase.auth.getSession();
                               const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
-                              const res = await fetch(`/messages/${msg._id}`, {
+                              const res = await fetch(`/rooms/messages/${msg._id}`, {
                                 method: 'DELETE',
                                 headers: accessToken ? { Authorization: `Bearer ${accessToken}` } : undefined
                               });
