@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const { OpenAI } = require('openai');
 const Room = require('../../models/Room');
 const ChatMessage = require('../../models/ChatMessage');
@@ -6,6 +7,35 @@ const { authenticate } = require('../middleware/authenticate');
 
 const router = express.Router();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'dummy' });
+
+// Simple HTML sanitizer - strips all HTML tags
+const sanitizeText = (text) => {
+    if (typeof text !== 'string') return '';
+    return text
+        .replace(/<[^>]*>/g, '') // Remove HTML tags
+        .replace(/[<>]/g, '')    // Remove any remaining angle brackets
+        .trim();
+};
+
+// Stricter rate limiter for AI-powered endpoints (per user)
+const aiRateLimiter = rateLimit({
+    windowMs: 60_000, // 1 minute
+    max: 30, // 30 requests per minute per user
+    keyGenerator: (req) => req.authUser?.id || 'anonymous', // Rate limit by user ID only
+    message: { error: 'Too many requests. Please wait a moment.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Rate limiter for room creation (prevent spam)
+const roomCreationLimiter = rateLimit({
+    windowMs: 60_000 * 60, // 1 hour
+    max: 5, // 5 rooms per hour per user
+    keyGenerator: (req) => req.authUser?.id || 'anonymous',
+    message: { error: 'Too many rooms created. Please wait.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
 
 // Special system prompt for room chat (group AI)
 const roomSystemPrompt = {
@@ -42,18 +72,22 @@ router.get('/', authenticate, async (req, res) => {
     }
 });
 
-// Create a new room
-router.post('/', authenticate, async (req, res) => {
+// Create a new room (with rate limiting)
+router.post('/', authenticate, roomCreationLimiter, async (req, res) => {
     const { name, description, settings, public: isPublic } = req.body;
     const ownerId = req.authUser.id;
-    if (!ownerId || typeof name !== 'string' || !name.trim() || name.length > 100 ||
-        (description && description.length > 500)) {
+    
+    // Sanitize inputs
+    const safeName = sanitizeText(name);
+    const safeDescription = sanitizeText(description || '');
+    
+    if (!ownerId || !safeName || safeName.length > 100 || safeDescription.length > 500) {
         return res.status(400).json({ error: '' });
     }
     try {
         const room = await Room.create({
-            name: name || '',
-            description: description || '',
+            name: safeName,
+            description: safeDescription,
             participants: [ownerId],
             ownerId,
             settings: settings || {},
@@ -65,8 +99,8 @@ router.post('/', authenticate, async (req, res) => {
     }
 });
 
-// Send a message to a room
-router.post('/:roomId/messages', authenticate, async (req, res) => {
+// Send a message to a room (with AI rate limiting)
+router.post('/:roomId/messages', authenticate, aiRateLimiter, async (req, res) => {
     const roomId = req.params.roomId;
     const userId = req.authUser.id;
     const { content } = req.body;
@@ -142,8 +176,12 @@ router.patch('/:roomId', authenticate, async (req, res) => {
     const roomId = req.params.roomId;
     const userId = req.authUser.id;
     const { description, name, settings } = req.body;
+    
+    // Sanitize description if provided
+    const safeDescription = typeof description === 'string' ? sanitizeText(description) : undefined;
+    
     if (!roomId || !userId ||
-        (typeof description === 'string' && description.length > 500)) {
+        (safeDescription !== undefined && safeDescription.length > 500)) {
         return res.status(400).json({ error: '' });
     }
     try {
@@ -152,9 +190,9 @@ router.patch('/:roomId', authenticate, async (req, res) => {
         // Only allow owner to edit
         if (String(room.ownerId) !== String(userId)) return res.status(403).json({ error: '' });
 
-        if (typeof description === 'string') room.description = description;
+        if (safeDescription !== undefined) room.description = safeDescription;
         // optionally name/settings
-        // if (typeof name === 'string') room.name = name;
+        // if (typeof name === 'string') room.name = sanitizeText(name);
         // if (settings && typeof settings === 'object') room.settings = settings;
 
         room.updatedAt = new Date();
@@ -191,8 +229,8 @@ router.delete('/messages/:messageId', authenticate, async (req, res) => {
     }
 });
 
-// Translate message to Japanese
-router.post('/translate-message', async (req, res) => {
+// Translate message to Japanese (with AI rate limiting)
+router.post('/translate-message', authenticate, aiRateLimiter, async (req, res) => {
     const { text } = req.body;
     if (!text || typeof text !== 'string') return res.status(400).json({ error: '' });
     try {

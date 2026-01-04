@@ -76,9 +76,14 @@ export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
     if (messageTranslations[msgId]) return; // Already translated
     setTranslatingId(msgId);
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
       const res = await fetch('/rooms/translate-message', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+        },
         body: JSON.stringify({ text: msg.content })
       });
       const data = await res.json();
@@ -376,7 +381,8 @@ useEffect(() => {
                 <div className="public-room-list-scrollable">
                   {[...publicRooms]
                     .sort((a, b) => {
-                      const PINNED_ID = "69535eedd90e2cc65d019270";
+                      const PINNED_ID = import.meta.env.VITE_PINNED_ROOM_ID || '';
+                      if (!PINNED_ID) return 0; // No pinning if not configured
                       if ((a._id || a.id) === PINNED_ID) return -1;
                       if ((b._id || b.id) === PINNED_ID) return 1;
                       return 0;
