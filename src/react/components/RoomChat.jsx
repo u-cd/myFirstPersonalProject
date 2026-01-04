@@ -212,7 +212,10 @@ useEffect(() => {
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim() || !currentRoom || !currentRoom._id || !user) return;
+    if (!input.trim() || input.length > 2000 || !currentRoom || !currentRoom._id || !user) {
+      alert('Message must be 1-2000 chars.');
+      return;
+    }
     const messageText = input.trim();
     setInput('');
     setIsThinking(true);
@@ -257,7 +260,10 @@ const [newRoomName, setNewRoomName] = useState('');
 const [newRoomDescription, setNewRoomDescription] = useState('');
 
 const handleCreateRoom = async (roomName, isPrivate = false, description = '') => {
-  if (!roomName.trim()) return;
+  if (!roomName.trim() || roomName.length > 100 || description.length > 500) {
+    alert('Room name must be 1-100 chars. Description max 500 chars.');
+    return;
+  }
   try {
     const { data: sessionData } = await supabase.auth.getSession();
     const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;

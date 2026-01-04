@@ -359,7 +359,10 @@ app.post('/rooms/:roomId/join', authenticate, async (req, res) => {
 app.post('/rooms', authenticate, async (req, res) => {
     const { name, description, settings, public: isPublic } = req.body;
     const ownerId = req.authUser.id;
-    if (!ownerId) return res.status(400).json({ error: '' });
+    if (!ownerId || typeof name !== 'string' || !name.trim() || name.length > 100 ||
+        (description && description.length > 500)) {
+        return res.status(400).json({ error: '' });
+    }
     try {
         // Create room with owner as first participant
         const room = await Room.create({
@@ -425,7 +428,10 @@ app.patch('/rooms/:roomId', authenticate, async (req, res) => {
     const roomId = req.params.roomId;
     const userId = req.authUser.id;
     const { description, name, settings } = req.body;
-    if (!roomId || !userId) return res.status(400).json({ error: '' });
+    if (!roomId || !userId ||
+        (typeof description === 'string' && description.length > 500)) {
+        return res.status(400).json({ error: '' });
+    }
     try {
         const room = await Room.findById(roomId);
         if (!room) return res.status(404).json({ error: '' });
