@@ -446,22 +446,12 @@ useEffect(() => {
                           {msg.timestamp ? timeAgo(msg.timestamp) : ''}
                         </span>
                         <br />
-                        <span className="room-message-content">{msg.content}</span>
+                        <span
+                          className={"room-message-content " + "my-message-content"}
+                        >
+                          {msg.content}
+                        </span>
                         <br />
-                        {!messageTranslations[msgId] && (
-                          <button
-                            className="show-translation-btn"
-                            onClick={() => handleShowTranslation(msg)}
-                            disabled={translatingId === msgId}
-                          >
-                            {translatingId === msgId ? 'Translating...' : 'Show Translation'}
-                          </button>
-                        )}
-                        {messageTranslations[msgId] && (
-                          <div className="room-message-translation-ja">
-                            {messageTranslations[msgId]}
-                          </div>
-                        )}
                         <button
                           className="delete-message-btn"
                           onClick={async () => {

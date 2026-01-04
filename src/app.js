@@ -401,8 +401,6 @@ app.delete('/messages/:messageId', authenticate, async (req, res) => {
   }
 });
 
-
-
 // Temporary translation endpoint for frontend session-only translation
 app.post('/translate-message', async (req, res) => {
     const { text } = req.body;
@@ -421,7 +419,6 @@ app.post('/translate-message', async (req, res) => {
         res.status(500).json({ error: '' });
     }
 });
-
 
 
 // Serve React app for all other routes (SPA fallback)
