@@ -6,28 +6,52 @@
 - Auth: Supabase client-side; protected endpoints validate `Bearer` token server-side.
 
 ## Key Files
-- Backend: [src/app.js](../src/app.js), [src/index.js](../src/index.js), [models/Chat.js](../models/Chat.js), [models/ChatMessage.js](../models/ChatMessage.js)
-- Frontend: [src/react/App.jsx](../src/react/App.jsx), [src\react\components\ChatApp.jsx](../src/react/components/ChatApp.jsx), [src\react\components\Solo.jsx](../src/react/components/Solo.jsx), [src\react\components\SoloChat.jsx](../src/react/components/SoloChat.jsx), [src\react\components\SoloSidebar.jsx](../src/react/components/SoloSidebar.jsx), [src\react\components\Room.jsx](../src/react/components/Room.jsx), [src\react\components\RoomChat.jsx](../src/react/components/RoomChat.jsx), [src\react\components\RoomSidebar.jsx](../src/react/components/RoomSidebar.jsx), [src\react\components\Login.jsx](../src/react/components/Login.jsx)
+- Backend: [src/app.js](../src/app.js), [src/index.js](../src/index.js), [src/routes/chat.js](../src/routes/chat.js), [src/routes/room.js](../src/routes/room.js), [src/middleware/authenticate.js](../src/middleware/authenticate.js)
+- Models: [models/Chat.js](../models/Chat.js), [models/ChatMessage.js](../models/ChatMessage.js), [models/Room.js](../models/Room.js)
+- Frontend: [src/react/App.jsx](../src/react/App.jsx), [src/react/components/ChatApp.jsx](../src/react/components/ChatApp.jsx), [src/react/components/Solo.jsx](../src/react/components/Solo.jsx), [src/react/components/SoloChat.jsx](../src/react/components/SoloChat.jsx), [src/react/components/SoloSidebar.jsx](../src/react/components/SoloSidebar.jsx), [src/react/components/Room.jsx](../src/react/components/Room.jsx), [src/react/components/RoomChat.jsx](../src/react/components/RoomChat.jsx), [src/react/components/RoomSidebar.jsx](../src/react/components/RoomSidebar.jsx), [src/react/components/Login.jsx](../src/react/components/Login.jsx)
 - Config: [vite.config.mjs](../vite.config.mjs), [playwright.config.js](../playwright.config.js), [vitest.config.js](../vitest.config.js), [docker-compose.yml](../docker-compose.yml), [Dockerfile](../Dockerfile), [eslint.config.mjs](../eslint.config.mjs), [README.md](../README.md)
 
-## Backend API (Express)
-- `POST /`: create or continue a chat; returns `{ reply, chatId }`. Accepts `{ message, chatId?, userId? }`. Stores messages in Mongo; uses OpenAI `gpt-5-chat-latest`.
-- `GET /chat-history`: returns `{ messages }` for `chatId`+`userId`. Requires Supabase auth; tokens checked via `supabase.auth.getUser()`.
-- `GET /chats-with-title`: returns `{ chats }` for `userId`. Requires Supabase auth.
-- `POST /writing-suggestions`: returns `{ suggestions }` (3 next-words/phrases) based on last assistant message and current input.
+## Backend Structure
 
+### Main App ([src/app.js](../src/app.js))
+- Express setup: helmet, CORS, rate-limit, JSON parsing
+- MongoDB connection via Mongoose
+- Static file serving: `public/dist` first, then `public`
+- Route mounting:
+  - `app.use('/', chatRoutes)` - Chat endpoints
+  - `app.use('/rooms', roomRoutes)` - Room endpoints
+- SPA fallback for `/.*` to `index.html`
+
+### Middleware ([src/middleware/authenticate.js](../src/middleware/authenticate.js))
+- Supabase auth middleware: validates `Bearer` token via `supabase.auth.getUser()`
+- Sets `req.authUser` for authenticated requests
+
+### Chat Routes ([src/routes/chat.js](../src/routes/chat.js))
+- `POST /`: Create or continue a chat; returns `{ reply, chatId }`. Accepts `{ message, chatId?, userId? }`. Allows anonymous users.
+- `GET /chat-history`: Returns `{ messages }` for `chatId`+`userId`. Requires Supabase auth.
+- `GET /chats-with-title`: Returns `{ chats }` for `userId`. Requires Supabase auth.
+- `POST /writing-suggestions`: Returns `{ suggestions }` (3 next-words/phrases) based on last assistant message and current input.
+
+### Room Routes ([src/routes/room.js](../src/routes/room.js))
 - `GET /rooms`: List all rooms the user has joined. Requires Supabase auth.
-- `POST /rooms`: Create a new room. Accepts `{ name, settings? }`. Returns `{ room }`. Requires Supabase auth.
+- `POST /rooms`: Create a new room. Accepts `{ name, description?, settings?, public? }`. Returns `{ room }`. Requires Supabase auth.
 - `POST /rooms/:roomId/join`: Join an existing room by ID. Returns `{ room }`. Requires Supabase auth.
-- `GET /rooms/:roomId/messages`: Get all messages for a room. Returns `{ messages }`. Requires Supabase auth and membership in the room.
-- `POST /rooms/:roomId/messages`: Send a message to a room. Accepts `{ content }`. Returns `{ message }` (AI-enhanced/translated). Requires Supabase auth and membership in the room.
+- `GET /rooms/:roomId/messages`: Get all messages for a room. Returns `{ messages }`. Requires Supabase auth and membership.
+- `POST /rooms/:roomId/messages`: Send a message to a room. Accepts `{ content }`. Returns `{ message }` (AI-translated). Requires Supabase auth.
+- `PATCH /rooms/:roomId`: Update room description (owner only). Accepts `{ description }`. Returns `{ room }`.
+- `GET /rooms/public-rooms`: List all public rooms. Requires Supabase auth.
+- `DELETE /rooms/messages/:messageId`: Delete a room message (owner of message only). Requires Supabase auth.
+- `POST /rooms/translate-message`: Translate English to Japanese. Accepts `{ text }`. Returns `{ translation }`.
 
-- Validation: see small guards in [src/app.js](../src/app.js) (`isObjectId`, `isUUID`, `isNonEmptyString`). Error bodies intentionally minimal (`{ error: '' }`).
+### Validation
+- Input validators in route files: `isNonEmptyString`, `isStringMax`
+- Error bodies intentionally minimal (`{ error: '' }`)
 
 ## Data Models (Mongo/Mongoose)
 - [models/Chat.js](../models/Chat.js): `userId?`, `title?`, `timestamp` (+ index on `{ userId, timestamp }`).
-- [models/ChatMessage.js](../models/ChatMessage.js): `chatId`, `userId?`, `role` (`user|assistant`), `content` (≤2000), `timestamp` (+ compound index on `{ chatId, userId, timestamp }`).
-- [models/Room.js](../models/Room.js): `name`, `participants` (array of Supabase userIds), `createdAt`, `updatedAt`, `ownerId` (Supabase userId), `settings?` (object, for future config). Index on `{ participants, createdAt }`.
+- [models/ChatMessage.js](../models/ChatMessage.js): `chatId`, `roomId?`, `userId?`, `role` (`user|assistant`), `content` (≤2000), `timestamp` (+ compound indexes).
+- [models/Room.js](../models/Room.js): `name`, `description?`, `participants` (array of Supabase userIds), `createdAt`, `updatedAt`, `ownerId` (Supabase userId), `settings?`, `public` (boolean). Index on `{ participants, createdAt }`.
+
 ## Frontend Patterns
 
 - **[src/react/App.jsx](../src/react/App.jsx)**: Main entry point. Checks Supabase auth state, shows loading screen, and conditionally renders [ChatApp](../src/react/components/ChatApp.jsx) (for logged-in users) or [Login](../src/react/components/Login.jsx) (for guests).
@@ -46,7 +70,7 @@
 
 - **[src/react/components/RoomSidebar.jsx](../src/react/components/RoomSidebar.jsx)**: Sidebar for room navigation and management. Lists all rooms the user has joined, allows creating new rooms, joining by ID, and selecting a room. Handles sidebar open/close for mobile.
 
-- **[src/react/components/RoomChat.jsx](../src/react/components/RoomChat.jsx)**: Renders the group chat conversation for the selected room. Loads and displays room messages, handles sending messages, and shows participants. Scrolls to the latest message automatically.
+- **[src/react/components/RoomChat.jsx](../src/react/components/RoomChat.jsx)**: Renders the group chat conversation for the selected room. Loads and displays room messages, handles sending messages, per-message translation (click to translate), editable room description (owner only), and shows participants. Scrolls to the latest message automatically.
 
 - **Chat rendering**: All chat components use `marked` + `DOMPurify` for markdown rendering; code blocks render in `<pre><code>` style; all HTML is sanitized. Assistant messages are shown as `llm` or `assistant`. A welcome message is shown for empty solo chats.
 
@@ -75,7 +99,8 @@ npm run playwright:ui
 - Static serving order: `public/dist` first, then `public`; SPA fallback for `/.*` to `index.html`.
 - OpenAI usage: `OpenAI().responses.create({ model: 'gpt-5-chat-latest', input })`; system prompt mixes English/Japanese and suggests improved phrasing.
 - Dockerfile expects prebuilt frontend (compose mounts `public/dist` read-only); Node runs `src/index.js`.
+- Route organization: Chat routes in [src/routes/chat.js](../src/routes/chat.js), Room routes in [src/routes/room.js](../src/routes/room.js), Auth middleware in [src/middleware/authenticate.js](../src/middleware/authenticate.js).
 
 ## Environment
-- Backend: `MONGODB_URI`, `OPENAI_API_KEY`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
-- Frontend (Vite): `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
+- Backend: `MONGODB_URI`, `OPENAI_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
+- Frontend (Vite): `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
