@@ -420,6 +420,31 @@ app.post('/translate-message', async (req, res) => {
     }
 });
 
+// Update room description (and optionally name/settings) - owner only
+app.patch('/rooms/:roomId', authenticate, async (req, res) => {
+    const roomId = req.params.roomId;
+    const userId = req.authUser.id;
+    const { description, name, settings } = req.body;
+    if (!roomId || !userId) return res.status(400).json({ error: '' });
+    try {
+        const room = await Room.findById(roomId);
+        if (!room) return res.status(404).json({ error: '' });
+        // Only allow owner to edit
+        if (String(room.ownerId) !== String(userId)) return res.status(403).json({ error: '' });
+
+        if (typeof description === 'string') room.description = description;
+        // optionally name/settings
+        // if (typeof name === 'string') room.name = name;
+        // if (settings && typeof settings === 'object') room.settings = settings;
+
+        room.updatedAt = new Date();
+        await room.save();
+        res.status(200).json({ room });
+    } catch (err) {
+        res.status(500).json({ error: '' });
+    }
+});
+
 
 // Serve React app for all other routes (SPA fallback)
 app.get(/.*/, (req, res) => {

@@ -3,7 +3,6 @@
 
 
 /* RoomChat elements */
-
 .room-chat-wrapper {
   display: flex;
   height: 100%;
@@ -199,11 +198,44 @@
 	overflow-wrap: anywhere;
 }
 
+/* Edit mode textarea for room description */
+.room-description-edit-textarea {
+  width: 100%;
+  font-size: 1em;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  min-height: 60px;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #bbb #ffffff;
+}
+
+/* Row for room description display and edit button */
+.room-description-row {
+  display: flex;
+}
+
 .room-description {
 	font-size: 0.97em;
 	color: #666;
-	padding: 10px;
+	padding: 8px;
 	overflow-wrap: anywhere;
+}
+
+/* Edit button for room description */
+.room-description-edit-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #222;
+  padding: 4px;
+  margin: auto 0;
+}
+.room-description-edit-btn:hover {
+    background: #eee;
+    border-radius: 50%;
 }
 
 .other-message {
@@ -250,11 +282,8 @@
 	cursor: pointer;
 	float: right;
   padding: 0;
-  margin: 4px 0;
+  margin: 2px 0;
 }
-
-
-
 
 /* room welcome message */
 .room-welcome {
@@ -317,6 +346,12 @@
 }
 
 
+
+
+
+
+
+
 /* RoomSidebar elements */
 
 .sidebar-public-rooms-btn-wrap {
@@ -338,12 +373,16 @@
   color: #1565c0;
 }
 
-
-
-
 .room-welcome-toggle-btn-top {
   display: none;
 }
+
+
+
+
+
+
+
 
 @media screen and (max-width: 1024px) {
   .room-welcome {

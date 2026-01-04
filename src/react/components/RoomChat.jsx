@@ -27,8 +27,44 @@ function isUserNearBottom(ref) {
 }
 
 export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
-  // Track which message's translation button is visible
-  const [visibleTranslationBtnId, setVisibleTranslationBtnId] = useState(null);
+    // Editable room description state
+    const [editingDesc, setEditingDesc] = useState(false);
+    const [descValue, setDescValue] = useState(currentRoom?.description || '');
+    const [descSaving, setDescSaving] = useState(false);
+
+    // Update descValue if room changes
+    useEffect(() => {
+      setDescValue(currentRoom?.description || '');
+      setEditingDesc(false);
+    }, [currentRoom]);
+
+    // Save description to backend
+    const handleSaveDesc = async () => {
+      if (!currentRoom || !user) return;
+      setDescSaving(true);
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const accessToken = sessionData && sessionData.session ? sessionData.session.access_token : null;
+        const res = await fetch(`/rooms/${currentRoom._id || currentRoom.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {})
+          },
+          body: JSON.stringify({ description: descValue })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCurrentRoom({ ...currentRoom, description: data.room.description });
+          setEditingDesc(false);
+        } else {
+          alert('Failed to update description');
+        }
+      } catch (e) {
+        alert('Failed to update description');
+      }
+      setDescSaving(false);
+    };
 
   // Store temporary translations for each message in session
   const [messageTranslations, setMessageTranslations] = useState({}); // { [msgId]: translation }
@@ -52,8 +88,6 @@ export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
     }
     setTranslatingId(null);
   };
-
-
 
   const [showCreateRoomModal, setShowCreateRoomModal] = useState(false);
   const [messages, setMessages] = useState([]);
@@ -396,13 +430,49 @@ useEffect(() => {
         <div className="room-chat">
           <div className="room-header">
             <div className="room-title">{currentRoom.name}</div>
-            {currentRoom.description && (
-              <div
-                className="room-description"
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize((currentRoom.description || '').replace(/\n/g, '<br>'))
-                }}
-              />
+            {/* Editable description */}
+            {editingDesc ? (
+              <div>
+                <textarea
+                  className="room-description-edit-textarea"
+                  value={descValue}
+                  onChange={e => setDescValue(e.target.value)}
+                  rows={3}
+                  disabled={descSaving}
+                />
+                <div>
+                  <button onClick={handleSaveDesc} disabled={descSaving} style={{ marginRight: 8 }}>
+                    {descSaving ? 'Saving...' : 'Save'}
+                  </button>
+                  <button onClick={() => { setEditingDesc(false); setDescValue(currentRoom.description || ''); }} disabled={descSaving}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="room-description-row">
+                <div
+                  className="room-description"
+                  style={{ flex: 1 }}
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize((currentRoom.description || 'No description.').replace(/\n/g, '<br>'))
+                  }}
+                />
+                {/* Show edit button only for owner */}
+                {user?.id === currentRoom.ownerId && (
+                  <button
+                    className="room-description-edit-btn"
+                    onClick={() => setEditingDesc(true)}
+                    title="Edit description"
+                    aria-label="Edit description"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 17.25V21h3.75l11.06-11.06a1.5 1.5 0 0 0-2.12-2.12L3 17.25z" stroke="currentColor" strokeWidth="2" fill="none"/>
+                      <path d="M14.06 7.94l2.12 2.12" stroke="currentColor" strokeWidth="2" fill="none"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
             )}
           </div>
           <div className="chat-messages" ref={chatRef}>
@@ -415,8 +485,6 @@ useEffect(() => {
                   <div
                     key={msgId}
                     className={msg.userId === user?.id ? 'my-message' : 'other-message'}
-                    onMouseEnter={() => setVisibleTranslationBtnId(msgId)}
-                    onMouseLeave={() => setVisibleTranslationBtnId(null)}
                   >
                     {msg.userId !== user?.id ? (
                       <>
