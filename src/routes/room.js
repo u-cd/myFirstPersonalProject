@@ -8,13 +8,23 @@ const { authenticate } = require('../middleware/authenticate');
 const router = express.Router();
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'dummy' });
 
-// Simple HTML sanitizer - strips all HTML tags
+// Simple HTML sanitizer - strips all HTML tags / angle brackets
 const sanitizeText = (text) => {
     if (typeof text !== 'string') return '';
-    return text
-        .replace(/<[^>]*>/g, '') // Remove HTML tags
-        .replace(/[<>]/g, '')    // Remove any remaining angle brackets
-        .trim();
+
+    // Remove all angle brackets at the character level to avoid incomplete
+    // multi-character sanitization issues that can occur with regex-based
+    // tag stripping.
+    let result = '';
+    for (let i = 0; i < text.length; i++) {
+        const ch = text[i];
+        if (ch === '<' || ch === '>') {
+            continue;
+        }
+        result += ch;
+    }
+
+    return result.trim();
 };
 
 // Stricter rate limiter for AI-powered endpoints (per user)
