@@ -1,20 +1,10 @@
 {
     "name": "myfirstpersonalproject",
     "version": "1.0.0",
-    "description": "Minimal Express app containerized with Docker",
+    "description": "This is my first personal project.",
     "main": "src/index.js",
-    "scripts": {
-        "vitest": "vitest run",
-        "playwright": "playwright test",
-        "playwright:ui": "playwright test --ui",
-        "build": "vite build",
-        "lint": "eslint .",
-        "security:audit": "npm audit --audit-level=moderate",
-        "security:check": "npm audit && npm outdated",
-        "security:fix": "npm audit fix"
-    },
     "author": "u-cd",
-    "license": "MIT",
+    "license": "UNLICENSED",
     "dependencies": {
         "@supabase/supabase-js": "^2.89.0",
         "cors": "^2.8.5",
