@@ -27,7 +27,7 @@ jobs:
         run: npm ci
 
       - name: Security audit (high & critical vulnerabilities)
-        run: npm audit --audit-level=high
+        run: npx npm@latest audit --audit-level=high
 
   dependency-review:
     name: Dependency Review (PR only)
