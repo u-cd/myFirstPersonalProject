@@ -5,7 +5,7 @@ const ChatMessage = require('../../models/ChatMessage');
 const { authenticate } = require('../middleware/authenticate');
 
 const router = express.Router();
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || 'dummy' });
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 // Initial system prompt
 const systemPrompt = {

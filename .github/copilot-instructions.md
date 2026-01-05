@@ -77,21 +77,21 @@
 ## Developer Workflows
 - Build frontend: generates assets to `public/dist` per [vite.config.mjs](../vite.config.mjs).
 ```bash
-npm run build
+npx vite build
 ```
 - Run server in Docker (serves built SPA at port 3000). Ensure `.env` contains `MONGODB_URI`, `OPENAI_API_KEY`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`.
 ```bash
 docker-compose up --build
 ```
-- Unit tests (Vitest): UI + API with OpenAI/mongoose mocked; see [__tests__](../__tests__) and [vitest.config.js](../vitest.config.js).
+- Unit tests (Vitest): UI + API with OpenAI/mongoose mocked; see [vitest](../vitest) and [vitest.config.js](../vitest.config.js).
 ```bash
-npm run vitest
+npx vitest run
 ```
 - E2E tests (Playwright): requires server running at `http://localhost:3000`; single worker; auth setup project.
 ```bash
-npm run playwright
+npx playwright test
 # Optional UI
-npm run playwright:ui
+npx playwright test --ui
 ```
 
 ## Conventions & Notes
