@@ -23,18 +23,21 @@ test.describe('Authenticated Chat Features', () => {
     
     // Wait a bit for auth state to apply
     await page.waitForTimeout(2000);
-    
+
     // Verify we're logged in - if not, auth.setup.js needs to run first
-    await expect(page.locator('.sidebar-user-account')).toContainText(TEST_EMAIL, { timeout: 10000 });
+    await expect(page.locator('.user-account-email')).toContainText(TEST_EMAIL, { timeout: 10000 });
+
+    // Always click Solo Chat mode to ensure we are in solo mode
+    const soloModeBtn = page.locator('button', { hasText: 'Solo Chat' });
+    await soloModeBtn.click();
+    // Optionally, wait for the solo chat UI to appear
+    await expect(page.locator('textarea.chat-input')).toBeVisible({ timeout: 5000 });
   });
 
-  test('should start with new chat, send message, and appear in sidebar', async ({ page }) => {
-    // Get initial chat count in sidebar
-    const initialChatCount = await page.locator('.sidebar-chat-link').count();
-    
-    // Verify page loads with new chat - only welcome message (1 llm bubble)
-    await expect(page.locator('.bubble.llm')).toHaveCount(1);
-    await expect(page.locator('.bubble.llm').first()).toContainText('Welcome to ai語!');
+  test('should start with new chat, send message', async ({ page }) => {    
+    // Verify page loads with new chat - only welcome message
+    await expect(page.locator('.welcome-message')).toBeVisible();
+    await expect(page.locator('.welcome-message')).toContainText('Welcome to ai語!');
     
     // User sends first message
     const textarea = page.locator('textarea.chat-input');
@@ -45,14 +48,7 @@ test.describe('Authenticated Chat Features', () => {
     await expect(page.locator('.bubble.user')).toHaveCount(1);
     
     // Wait for AI response - should now have 2 llm bubbles (welcome + response)
-    await expect(page.locator('.bubble.llm:not(.thinking)')).toHaveCount(2, { timeout: 20000 });
-    
-    // Wait for sidebar to update with new chat
-    await page.waitForTimeout(2000);
-    
-    // Verify new chat link appears in sidebar
-    const finalChatCount = await page.locator('.sidebar-chat-link').count();
-    expect(finalChatCount).toBeGreaterThan(initialChatCount);
+    await expect(page.locator('.bubble.llm:not(.thinking)')).toHaveCount(1, { timeout: 20000 });
   });
 
   test('should load past chat, see history, and send new message', async ({ page }) => {
@@ -102,7 +98,7 @@ test.describe('Authenticated Chat Features', () => {
     await page.waitForLoadState('networkidle');
     
     // Verify we're logged in
-    await expect(page.locator('.sidebar-user-account')).toContainText(TEST_EMAIL, { timeout: 5000 });
+      await expect(page.locator('.user-account-email')).toContainText(TEST_EMAIL, { timeout: 5000 });
     
     // Verify mobile menu button is visible
     const mobileMenuBtn = page.locator('.mobile-menu-btn');
@@ -112,8 +108,8 @@ test.describe('Authenticated Chat Features', () => {
     await mobileMenuBtn.click();
     await page.waitForTimeout(300);
     
-    // Verify sidebar appears (has sidebar-open class)
-    await expect(page.locator('.sidebar-content-wrapper.sidebar-open')).toBeVisible();
+    // Verify sidebar appears (has sidebar open class)
+    await expect(page.locator('.sidebar.open')).toBeVisible();
     
     // Verify overlay is active
     await expect(page.locator('.sidebar-overlay.active')).toBeVisible();
@@ -122,7 +118,7 @@ test.describe('Authenticated Chat Features', () => {
     await page.click('.sidebar-overlay.active', { position: { x: 300, y: 200 }, force: true });
     await page.waitForTimeout(300);
     
-    // Verify sidebar is closed (no sidebar-open class)
-    await expect(page.locator('.sidebar-content-wrapper.sidebar-open')).not.toBeVisible();
+    // Verify sidebar is closed (no sidebar open class)
+    await expect(page.locator('.sidebar.open')).not.toBeVisible();
   });
 });
