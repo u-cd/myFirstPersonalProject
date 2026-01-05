@@ -2,8 +2,7 @@ name: CI
 
 on: 
   push:
-    # Temporarily run on all branches for testing
-    # branches: [main, master]
+    branches: [main, master]
   pull_request:
     branches: [main, master]
 
