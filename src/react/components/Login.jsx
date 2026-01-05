@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import DOMPurify from 'dompurify';
 import ReactMarkdown from 'react-markdown';
 import { supabase } from '../supabase-config';
-import Chat from './Chat';
-import './Login.css';
+import SoloChat from './SoloChat';
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -13,40 +12,12 @@ export default function Login() {
     const [agreed, setAgreed] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false); // Toggle between login and sign-up
 
-    // Anonymous chat state
-    const [chatMessages, setChatMessages] = useState([]);
-    const [chatId, setChatId] = useState(null); // Start as null, set after first message
+    const [currentChatId, setCurrentChatId] = useState(null); // For SoloChat
+
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [mainContent, setMainContent] = useState('chat'); // 'chat' | 'terms' | 'privacy'
     const [termsMarkdown, setTermsMarkdown] = useState('');
     const [privacyMarkdown, setPrivacyMarkdown] = useState('');
-    const [isThinking, setIsThinking] = useState(false);
-
-    // Dynamic max height for markdown panels based on actual layout
-    const docScrollRef = useRef(null);
-    const [docMaxHeight, setDocMaxHeight] = useState(undefined);
-
-    useEffect(() => {
-        const updateMaxHeight = () => {
-            if (!docScrollRef.current) return;
-            const rect = docScrollRef.current.getBoundingClientRect();
-            // Leave a small bottom gap to avoid touching screen edges
-            const bottomGap = 12;
-            const available = Math.max(0, window.innerHeight - rect.top - bottomGap);
-            setDocMaxHeight(available);
-        };
-
-        // Run on mount and when content/view changes
-        const raf = requestAnimationFrame(updateMaxHeight);
-        window.addEventListener('resize', updateMaxHeight);
-        window.addEventListener('orientationchange', updateMaxHeight);
-
-        return () => {
-            cancelAnimationFrame(raf);
-            window.removeEventListener('resize', updateMaxHeight);
-            window.removeEventListener('orientationchange', updateMaxHeight);
-        };
-    }, [mainContent, termsMarkdown, privacyMarkdown]);
 
     const showTerms = async (e) => {
         e.preventDefault();
@@ -55,6 +26,7 @@ export default function Login() {
             setTermsMarkdown(await res.text());
         }
         setMainContent('terms');
+        closeSidebar();
     };
     const showPrivacy = async (e) => {
         e.preventDefault();
@@ -63,6 +35,7 @@ export default function Login() {
             setPrivacyMarkdown(await res.text());
         }
         setMainContent('privacy');
+        closeSidebar();
     };
     const showChat = (e) => {
         if (e) e.preventDefault();
@@ -188,52 +161,6 @@ export default function Login() {
         }
     };
 
-    // Anonymous chat functions
-    const sendAnonymousMessage = async (messageText) => {
-        if (!messageText.trim()) return;
-        if (messageText.length > 2000) return; // client-side guard
-
-        // Add user message to state immediately
-        const userMessage = { role: 'user', content: messageText };
-        setChatMessages(prev => [...prev, userMessage]);
-        setIsThinking(true);
-
-        try {
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000);
-            const res = await fetch('/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    message: messageText,
-                    chatId: chatId // null for first message, then set
-                    // No userId for anonymous users
-                }),
-                signal: controller.signal
-            });
-
-            const data = await res.json();
-
-            // If this was the first message, set the new chatId from backend
-            if (!chatId && data.chatId) {
-                setChatId(data.chatId);
-            }
-
-            // Add AI response to state (avoid rendering backend error text)
-            const aiMessage = {
-                role: 'assistant',
-                content: typeof data.reply === 'string' ? data.reply : ''
-            };
-            setChatMessages(prev => [...prev, aiMessage]);
-            clearTimeout(timeoutId);
-            setIsThinking(false);
-        } catch (error) {
-            const errorMessage = { role: 'assistant', content: 'Error: Failed to send message. メッセージが送信できませんでした🤦‍♂️' };
-            setChatMessages(prev => [...prev, errorMessage]);
-            setIsThinking(false);
-        }
-    };
-
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
@@ -243,20 +170,31 @@ export default function Login() {
     };
 
     return (
-        <>
+        <div className="chatapp-root">
             {/* Sidebar overlay for mobile */}
             <div
                 className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`}
                 onClick={closeSidebar}
-            />
+            >
+                ₍ᐢ._. ᐢ₎
+            </div>
+            <div className="login-topbar">
+                <div className="you-can-log-in-here">🤗 You can log in here →</div>
+                <button
+                    className="login-menu-btn"
+                    onClick={toggleSidebar}
+                    aria-label="Open menu"
+                >
+                    <div>Log in</div>
+                </button>
+            </div>
 
-            {/* Sidebar with login */}
-            <div id="sidebar">
-                <div className={`sidebar-content-wrapper ${sidebarOpen ? 'sidebar-open' : ''}`}>
-                    <div className="login-container">
+            <div className="chatapp-mainarea">
+                <div>
+                    <div className={`login-container${sidebarOpen ? ' open' : ''}`}>
                         <div
                             className="login-message"
-                               dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
+                                dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message) }}
                         />
 
                         <h2>{isSignUp ? 'Sign up' : 'Log in'}</h2>
@@ -364,54 +302,36 @@ export default function Login() {
                                 </>
                             )}
                         </div>
-
                     </div>
                 </div>
-            </div>
 
-            {/* Main content area: chat or policy docs */}
-            <div className="main-content">
-                {/* Mobile menu button */}
-                <button
-                    className="login-menu-btn"
-                    onClick={toggleSidebar}
-                    aria-label="Open menu"
-                >
-                    <div>Log in</div>
-                </button>
-
-                {mainContent === 'chat' && (
-                    <Chat
-                        messages={chatMessages}
-                        onSendMessage={sendAnonymousMessage}
-                        isThinking={isThinking}
-                    />
-                )}
-                {mainContent === 'terms' && (
-                    <div className="doc-container">
-                        <button onClick={showChat} className="doc-close">Close</button>
-                        <div
-                            style={{ maxHeight: docMaxHeight ? `${docMaxHeight}px` : undefined }}
-                            className="doc-scroll"
-                            ref={docScrollRef}
-                        >
-                            <ReactMarkdown>{termsMarkdown}</ReactMarkdown>
+                {/* Main content area: solo chat or policy docs */}
+                <div className="flex-1">
+                    {mainContent === 'chat' && (
+                        <SoloChat currentChatId={currentChatId} setCurrentChatId={setCurrentChatId} />
+                    )}
+                    {mainContent === 'terms' && (
+                        <div className="doc-container">
+                            <button onClick={showChat} className="doc-close">Close</button>
+                            <div
+                                className="doc-scroll"
+                            >
+                                <ReactMarkdown>{termsMarkdown}</ReactMarkdown>
+                            </div>
                         </div>
-                    </div>
-                )}
-                {mainContent === 'privacy' && (
-                    <div className="doc-container">
-                        <button onClick={showChat} className="doc-close">Close</button>
-                        <div
-                            style={{ maxHeight: docMaxHeight ? `${docMaxHeight}px` : undefined }}
-                            className="doc-scroll"
-                            ref={docScrollRef}
-                        >
-                            <ReactMarkdown>{privacyMarkdown}</ReactMarkdown>
+                    )}
+                    {mainContent === 'privacy' && (
+                        <div className="doc-container">
+                            <button onClick={showChat} className="doc-close">Close</button>
+                            <div
+                                className="doc-scroll"
+                            >
+                                <ReactMarkdown>{privacyMarkdown}</ReactMarkdown>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
             </div>
-        </>
+        </div>
     );
 }

@@ -1,15 +1,242 @@
-/* Loading screen styles */
-.loading-screen {
+/* ChatApp Component Styles */
+.chatapp-root {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Top bar */
+.chatapp-topbar {
+    display: flex;
+    width: 100vw;
+    height: 60px;
+    /* border-bottom: 1px dashed #000; */
+
+}
+
+.mode-switcher {
+    display: flex;
+}
+
+.mode-switcher .active {
+    border: 2px dashed #000;
+    border-bottom: none;
+}
+
+.mode-switcher button {
+    font-weight: normal;
+
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 160px;
+
+    font-size: 1em;
+
+    border-bottom: 2px dashed #000;
+}
+
+.mode-switcher button:hover {
+    background: #eee;
+}
+
+.something-flexible-space {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 100vh;
-    background: #fff;
+    width: 100%;
+
+    font-size: 1em;
+
+    border-bottom: 2px dashed #000;
+}
+
+/* .rainbow-text {
+    background: linear-gradient(90deg, #ff3e3e, #ffea00, #00ff85, #00cfff, #a259ff, #ff3e3e 100%);
+    background-size: 200% auto;
+    color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+} */
+
+.user-account {
+    display: flex;
+    /* align-items: center; */
+    /* gap: 24px */
+
+    border-bottom: 2px dashed #000;
+}
+
+.user-account-email {
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+
+    font-size: 1em;
+}
+
+.user-account button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 100px;
+
+    font-size: 1em;
+}
+
+.user-account button:hover {
+    background: #eee;
+}
+
+/* Loading screen styles */
+.loading-screen {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
 }
 
 .loading-text {
     color: #333;
 }
+
+
+/* Mobile menu button */
+.mobile-menu-btn {
+    display: none;
+}
+
+.sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(1px);
+    -webkit-backdrop-filter: blur(1px);
+    z-index: 1;
+}
+
+.sidebar-overlay.active {
+    display: block;
+}
+
+/* Mobile Responsive */
+/* and tablet, so set max 1024px, but usualy should set max 768px and create separate tablet responsive style! */
+@media screen and (max-width: 1024px) {
+    .chatapp-root {
+        flex-direction: column;
+    }
+
+    .mobile-menu-btn {
+        display: block;
+
+        width: 60px;
+        background: #fff;
+        font-size: 1.5em;
+        border: none;
+        border-bottom: 2px dashed #000;
+
+        flex-shrink: 0;
+    }
+
+    .mode-switcher {
+        width: 100%;
+    }
+
+    .mode-switcher button {
+        width: 100%;
+    }
+
+    .something-flexible-space {
+        display: none;
+    }
+
+    .user-account {
+        width: 60px;
+    }
+
+    .user-account-email {
+        display: none;
+    }
+
+
+
+    .sidebar {
+        display: none;
+    }
+
+    .sidebar.open {
+        z-index: 2;
+        display: flex;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: #fff;
+        box-shadow: 1px 0 5px rgba(0, 0, 0, 0.1);
+        max-width: 80%;
+        transition: transform 0.3s ease-in-out;
+    }
+}
+
+/* Tablet Responsive */
+/* @media screen and (min-width: 769px) and (max-width: 1024px) {
+    .mobile-menu-btn {
+        display: block;
+    }
+
+    .mobile-menu-content {
+        font-size: 2em;
+    }
+} */
+
+
+
+
+
+
+
+
+.sidebar-darkmode-toggle:hover,
+.sidebar-logout-btn:hover {
+    background: #e0e0e0;
+    color: #222;
+    /* transform: scale(1.01); */
+    /* box-shadow: 0 2px 12px 0 rgba(210, 210, 210, 0.533); */
+}
+
+body[data-theme="dark"] .sidebar-darkmode-toggle,
+body[data-theme="dark"] .sidebar-logout-btn {
+    background: #000000;
+    color: #eee;
+}
+
+body[data-theme="dark"] .sidebar-darkmode-toggle:hover,
+body[data-theme="dark"] .sidebar-logout-btn:hover {
+    background: #3d434b;
+    color: #fff;
+}
+
+body[data-theme="dark"] .sidebar-user-account {
+    color: #eee;
+    border-top: 1px solid #444;
+}
+
+body[data-theme="dark"] .sidebar-user-account:hover {
+    background: #3d434b;
+}
+
+body[data-theme="dark"] .sidebar-account-actions {
+    border-top: 1px solid #444;
+}
+
 
 body[data-theme="dark"] .loading-screen {
     background: #000;
@@ -19,7 +246,7 @@ body[data-theme="dark"] .loading-text {
     color: #eee;
 }
 
-/* Dark mode overrides */
+
 body[data-theme="dark"] .main-content {
     background: #000000;
     /* color: #eee; */
@@ -41,91 +268,3 @@ body[data-theme="dark"] .mobile-menu-content {
 body[data-theme="dark"] .thinking-emoji {
     color: #fff;
 }
-
-body[data-theme="dark"] 
-/* Thinking emoji animation */
-
-.thinking-emoji {
-    display: inline-block;
-    animation: thinking-spin 2s linear infinite;
-}
-
-@keyframes thinking-spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* ChatApp Component Styles */
-.main-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    height: 100%;
-    overflow: hidden;
-}
-
-/* Mobile menu button */
-.mobile-menu-btn {
-    display: none;
-    position: fixed;
-    top: 0px;
-    left: 0px;
-    z-index: 1;
-    background: #fff;
-    border: none;
-    cursor: pointer;
-}
-
-/* Sidebar overlay for mobile */
-.sidebar-overlay {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100%;
-    background: rgba(255, 255, 255, 0.5);
-    backdrop-filter: blur(1px);
-    -webkit-backdrop-filter: blur(1px);
-    z-index: 999;
-}
-
-.sidebar-overlay.active {
-    display: block;
-}
-
-.mobile-menu-content {
-    padding: 4px;
-    border: none;
-    outline: none;
-    background: #fff;
-}
-
-/* Mobile Responsive */
-/* and tablet, so set max 1024px, but usualy should set max 768px and create separate tablet responsive style! */
-@media screen and (max-width: 1024px) {
-    .mobile-menu-btn {
-        display: block;
-    }
-
-    .mobile-menu-content {
-        font-size: 1.7em;
-    }
-}
-
-/* Tablet Responsive */
-/* @media screen and (min-width: 769px) and (max-width: 1024px) {
-    .mobile-menu-btn {
-        display: block;
-    }
-
-    .mobile-menu-content {
-        font-size: 2em;
-    }
-} */

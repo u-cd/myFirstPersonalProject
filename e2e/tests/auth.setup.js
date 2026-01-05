@@ -20,7 +20,7 @@ setup('authenticate', async ({ page }) => {
   await page.click('.login-form button[type="submit"]');
   
   // Wait for successful login
-  await expect(page.locator('.sidebar-user-account')).toContainText(TEST_EMAIL, { timeout: 10000 });
+  await expect(page.locator('.user-account-email')).toContainText(TEST_EMAIL, { timeout: 10000 });
   
   // Save authenticated state
   await page.context().storageState({ path: authFile });

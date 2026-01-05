@@ -19,25 +19,25 @@ export default defineConfig({
 
   // Configure projects for major browsers
   projects: [
-    // Setup project - runs first to authenticate and save state
-    {
-      name: 'setup',
-      testMatch: '**/auth.setup.js',
-    },
-    // Authenticated tests - use saved state (run BEFORE unauthenticated to avoid session invalidation)
-    {
-      name: 'authenticated',
-      testMatch: '**/chat-features.spec.js',
-      use: { 
-        storageState: 'e2e/.auth/user.json',
-      },
-      dependencies: ['setup'],
-    },
     // Unauthenticated tests - test login flow without saved state (run LAST to avoid invalidating auth session)
     {
       name: 'unauthenticated',
       testMatch: '**/auth.spec.js',
-      dependencies: ['authenticated'],
+    },
+    // Setup project - runs first to authenticate and save state
+    {
+      name: 'setup',
+      testMatch: '**/auth.setup.js',
+      dependencies: ['unauthenticated'],
+    },
+    // Authenticated tests - use saved state (run BEFORE unauthenticated to avoid session invalidation)
+    {
+      name: 'authenticated',
+      testMatch: ['**/chat-features.spec.js', '**/room-features.spec.js'],
+      use: { 
+        storageState: 'e2e/.auth/user.json',
+      },
+      dependencies: ['setup'],
     },
   ],
 

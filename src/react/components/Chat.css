@@ -1,3 +1,168 @@
+/* Chat Component Styles */
+.chat {
+    display: flex;
+    flex-direction: column;
+
+    flex: 1;
+    height: 100%;
+}
+
+.chat-messages {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+
+    width: 50vw;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 24px 16px 16px 16px;
+    gap: 12px;
+
+    height: 100%;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #bbb #ffffff;
+    /* Add space for the fixed form */
+}
+
+/* Chat Bubble Styles */
+.bubble {
+    padding: 12px 18px;
+    border-radius: 18px;
+    font-size: 1rem;
+    line-height: 1.5;
+    word-break: break-word;
+    margin-bottom: 2px;
+    position: relative;
+    animation: fadein 0.2s;
+    max-width: 100%;
+    box-sizing: border-box;
+    /* include padding in width to avoid leaching into chat padding */
+}
+
+@keyframes fadein {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.user {
+    background: #bdd;
+    color: #0a2a4a;
+    align-self: flex-end;
+    border-bottom-right-radius: 0px;
+}
+
+.llm {
+    color: #222;
+    align-self: flex-start;
+}
+
+/* Form and Input Styles */
+.chat-form {
+    display: flex;
+    width: 50vw;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 8px;
+
+    border: 1px solid #ddd;
+    transition: border 0.2s;
+
+    position: relative;
+}
+
+.chat-form:focus-within {
+    border: 1.5px solid #555;
+}
+
+.chat-input {
+    flex: 1;
+    font-size: 1rem;
+    background: #ffffff;
+    padding: 8px 12px;
+    outline: none;
+    border: none;
+    width: 100%;
+    box-sizing: border-box;
+
+    resize: none;
+    overflow: hidden;
+}
+
+/* Send Button */
+.send-btn {
+    background: none;
+    color: #222;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.send-btn:hover {
+    background: #eee;
+}
+
+
+
+/* Code block styling for chat LLM responses */
+.chat-code-block {
+    background: #f5f5f5;
+    color: #222;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
+    font-size: 0.98em;
+    margin: 8px 0;
+    overflow-x: auto;
+    max-width: 100%;
+    box-sizing: border-box;
+    display: block;
+    scrollbar-width: thin;
+}
+
+.chat-code-block code {
+    background: none;
+    color: inherit;
+    font-family: inherit;
+    font-size: inherit;
+    padding: 0;
+    display: block;
+    white-space: pre;
+    /* keep long lines; enable internal horizontal scroll */
+}
+
+/* Thinking emoji animation */
+.thinking-emoji {
+    display: inline-block;
+    animation: thinking-spin 2s linear infinite;
+}
+
+@keyframes thinking-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
 /* Suggestions toggle button styles */
 .suggestions-toggle-btn {
     align-self: center;
@@ -28,21 +193,6 @@
     color: #333;
 }
 
-body[data-theme="dark"] .suggestions-toggle-btn {
-    background: #000000;
-    color: #cceeff;
-}
-
-body[data-theme="dark"] .suggestions-toggle-btn.enabled {
-    background: #2d4a5a;
-    color: #cceeff;
-}
-
-body[data-theme="dark"] .suggestions-toggle-btn.disabled {
-    /* background: #444; */
-    color: #aaa;
-}
-
 /* Suggestions dropdown for input prediction */
 .chat-suggestions {
     position: absolute;
@@ -50,12 +200,11 @@ body[data-theme="dark"] .suggestions-toggle-btn.disabled {
     right: 0;
     bottom: 100%;
     top: auto;
-    z-index: 10;
+    z-index: 1;
     background: #fff;
     border: 1px solid #ddd;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-    margin-top: 2px;
     padding: 0;
     list-style: none;
     max-height: 180px;
@@ -80,6 +229,24 @@ body[data-theme="dark"] .suggestions-toggle-btn.disabled {
     padding: 8px 16px;
 }
 
+
+
+
+body[data-theme="dark"] .suggestions-toggle-btn {
+    background: #000000;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .suggestions-toggle-btn.enabled {
+    background: #2d4a5a;
+    color: #cceeff;
+}
+
+body[data-theme="dark"] .suggestions-toggle-btn.disabled {
+    /* background: #444; */
+    color: #aaa;
+}
+
 body[data-theme="dark"] .chat-suggestions {
     background: #23272e;
     color: #e6e6e6;
@@ -99,33 +266,6 @@ body[data-theme="dark"] .chat-suggestions .suggestion.selected {
 
 body[data-theme="dark"] .chat-suggestions .loading {
     color: #aaa;
-}
-
-/* Code block styling for chat LLM responses */
-.chat-code-block {
-    background: #f5f5f5;
-    color: #222;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-family: 'Fira Mono', 'Consolas', 'Menlo', 'Monaco', monospace;
-    font-size: 0.98em;
-    margin: 8px 0;
-    overflow-x: auto;
-    max-width: 100%;
-    box-sizing: border-box;
-    display: block;
-    scrollbar-width: thin;
-}
-
-.chat-code-block code {
-    background: none;
-    color: inherit;
-    font-family: inherit;
-    font-size: inherit;
-    padding: 0;
-    display: block;
-    white-space: pre;
-    /* keep long lines; enable internal horizontal scroll */
 }
 
 body[data-theme="dark"] .chat-code-block {
@@ -182,163 +322,36 @@ body[data-theme="dark"] .disclaimer {
     color: #aaa;
 }
 
-/* Chat Component Styles */
-.chat {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-    /* avoid chat-wide horizontal scrollbar */
-    width: 50vw;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 24px 16px 16px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    scrollbar-width: thin;
-    scrollbar-color: #bbb #ffffff;
-}
 
-/* Chat Bubble Styles */
-.bubble {
-    padding: 12px 18px;
-    border-radius: 18px;
-    font-size: 1rem;
-    line-height: 1.5;
-    word-break: break-word;
-    margin-bottom: 2px;
-    position: relative;
-    animation: fadein 0.2s;
-    max-width: 100%;
-    box-sizing: border-box;
-    /* include padding in width to avoid leaching into chat padding */
-}
 
-@keyframes fadein {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.user {
-    background: #bdd;
-    color: #0a2a4a;
-    align-self: flex-end;
-    border-bottom-right-radius: 4px;
-}
-
-.llm {
-    color: #222;
-    align-self: flex-start;
-}
-
-/* Form and Input Styles */
-.chat-form {
-    display: flex;
-    /* gap: 8px; */
-    width: 50vw;
-    max-width: 800px;
-    margin: 0 auto;
-    border: 1px solid #ddd;
-    transition: border 0.2s;
-    /* margin-bottom: 16px; */
-    padding: 15px;
-    position: relative;
-}
-
-.chat-form:focus-within {
-    border: 1.5px solid #555;
-}
-
-.chat-input {
-    flex: 1;
-    font-size: 1rem;
-    background: #ffffff;
-    padding: 10px 14px;
-    outline: none;
-    border: none;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-/* Send Button */
-.send-btn {
-    background: none;
-    color: #222;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    align-self: center;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background 0.2s;
-}
-
-.send-btn:hover {
-    background: #eee;
-}
-
-/* Disclaimer */
-.disclaimer {
-    text-align: center;
-    color: #888;
-    font-size: 0.95em;
-    margin: 12px 0 8px 0;
-}
 
 /* Mobile Responsive */
 @media screen and (max-width: 1024px) {
     .chat {
-        box-sizing: border-box;
-        width: 100%;
-        max-width: 100%;
-        padding: 60px 16px 16px 16px;
-        margin: 0;
+        width: 100vw;
     }
 
-    .chat-form {
+    .chat-messages {
+        width: 100vw;
+        padding: 16px 8px 8px 8px;
         box-sizing: border-box;
-        width: 90vw;
-        max-width: 100%;
-        padding: 0;
-        margin-bottom: 16px;
-        gap: 0;
-    }
-
-    .disclaimer {
-        font-size: 0.8em;
-        margin: 12px 0;
     }
 
     .bubble {
         padding: 10px 14px;
         font-size: 0.95rem;
-        line-height: 1.8;
     }
 
-    .llm.bubble {
-        padding-left: 0;
-        padding-right: 0;
+    .chat-form {
+        width: 100vw;
+        box-sizing: border-box;
     }
 
     .chat-input {
-        font-size: 16px;
         padding: 12px 14px;
     }
 
-    .send-btn {
-        width: 44px;
-        height: 44px;
-        flex-shrink: 0;
+    .chat-suggestions {
+        right: 8px;
     }
 }

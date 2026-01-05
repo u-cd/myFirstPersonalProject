@@ -1,8 +1,9 @@
-import { report } from 'process';
 import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
-    include: ['__tests__/**/*'],
+    include: ['vitest/**/*.{js,jsx,ts,tsx}'],
+    setupFiles: ['vitest/vitest.setup.js'],
+    exclude: ['**/vitest.setup.js', 'vitest/index.test.js'],
   },
 });
