@@ -26,6 +26,16 @@ function isUserNearBottom(ref) {
   return scrollHeight - scrollTop - clientHeight < 80;
 }
 
+const SPECIAL_USER_ID = import.meta.env.VITE_SPECIAL_USER_ID;
+const SPECIAL_USER_NAME = import.meta.env.VITE_SPECIAL_USER_NAME || 'Creator';
+
+function getUserDisplayName(userId) {
+    if (userId === SPECIAL_USER_ID) {
+        return SPECIAL_USER_NAME;
+    }
+    return userId ? userId.slice(0, 6) + '...' : 'unknown';
+}
+
 export default function RoomChat({ user, currentRoom, setCurrentRoom }) {
     // Editable room description state
     const [editingDesc, setEditingDesc] = useState(false);
@@ -396,7 +406,7 @@ useEffect(() => {
                         }}
                       >
                         <div className="room-created-by">
-                          <span>Created by: {room.ownerId ? room.ownerId.slice(0, 6) + '...' : 'unknown'}</span>
+                          <span>Created by: {getUserDisplayName(room.ownerId)}</span>
                         </div>
                         <div className="room-title-wrap">
                           <strong>{room.name || 'Untitled'}</strong>
@@ -504,7 +514,7 @@ useEffect(() => {
                           className="message-user"
                           style={{ color: getUserColor(msg.userId), fontWeight: 600 }}
                         >
-                          {msg.userId ? msg.userId.slice(0, 6) + '...' : 'unknown'}
+                          {getUserDisplayName(msg.userId)}
                         </span>
                         <span className="message-timestamp" style={{ marginLeft: 8, color: '#888', fontSize: '0.92em' }}>
                           {msg.timestamp ? timeAgo(msg.timestamp) : ''}
