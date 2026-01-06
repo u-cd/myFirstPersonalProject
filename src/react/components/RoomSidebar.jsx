@@ -97,7 +97,7 @@ export default function RoomSidebar({ user, currentRoom, setCurrentRoom, sidebar
             <div className="sidebar-loading">Loading rooms...</div>
           ) : (
             rooms.length === 0 ? (
-              <div>No rooms found</div>
+              <div></div>
             ) : (
               rooms.map(room => (
                 <button

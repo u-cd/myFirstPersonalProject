@@ -15,7 +15,7 @@ COPY . .
 
 # Build React application
 # uncomment while mount volume from docker-compose (need manual build)
-# RUN npm run build
+# npx vite build
 
 # Create a non-root user and use it (for security best practices)
 # uncomment because i don't like this
