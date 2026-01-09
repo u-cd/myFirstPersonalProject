@@ -4,13 +4,15 @@
 ## サービス概要
 ai語はチャット形式の英語学習アプリです。主に２つのモードを実装しています。
 
-Solo Chat Mode
-[![Image from Gyazo](https://i.gyazo.com/b44f9eba133ef7fd9d9c808a62f93492.gif)](https://gyazo.com/b44f9eba133ef7fd9d9c808a62f93492)
+### Solo Chat Mode
+
+![Solo Chat Demo](public\readme_gif\solochat.gif)
 
 AI とのチャットボットです。英語と日本語を混ぜて会話を行う方式を採用しており、自然な会話のなかでユーザーの英語力が向上していくことを目指しています。
 
-Rooms Mode
-[![Image from Gyazo](https://i.gyazo.com/0ddbb222020f6e05cc95e71d2617e3d4.gif)](https://gyazo.com/0ddbb222020f6e05cc95e71d2617e3d4)
+### Rooms Mode
+
+![Rooms Demo](public\readme_gif\rooms.gif)
 
 他のユーザーと英語でチャットを行うことができるモードです。ユーザーが送信したメッセージは自動で英語に翻訳され表示されます。各メッセージをクリックすると日本語訳をみることができます。
 
