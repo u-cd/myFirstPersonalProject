@@ -2,112 +2,168 @@
 [https://aigooooo.com/](https://aigooooo.com/)
 
 ## サービス概要
-AI chatbot tutor for English practice  
-AIチャットボットが英語学習をサポートします。  
-ユーザーは自然な会話を通じて英語力を向上させることができます。
+ai語はチャット形式の英語学習アプリです。主に２つのモードを実装しています。
 
-## このサービスへの思い・作りたい理由
-自分自身がChatGPTを使って英語の勉強をしており、実際にChatGPTのおかげでTOEFLなどのテストで良い点数を取ることができました。  
-具体的には、ChatGPTにTOEFLに似た問題を生成してもらうと、実際の問題にそっくりな問題を作ってくれたため、本番に近い形式で何度も練習することができました。  
-また、自分の回答に対して採点や解説も丁寧にしてくれたので、弱点を把握しやすく、効率的に英語力を伸ばすことができました。  
-  
-この経験から、AIを活用した英語学習という新しい方法を多くの人に広めたいと思い、このサービスを作ることにしました。  
-  
-また、TOEFL合格を目指す人もいれば、仕事や興味で英語を勉強する人もいるため、ユーザーごとにニーズは異なると考えています。  
-メインの機能としては、誰でも気軽に使えるよう、日常的な会話をする形で日本語と英語を混ぜてAIとチャットできる機能を提供します。  
-  
-さらに、特定のニーズに応じて、例えばTOEFL対策では各設問に準拠した問題をAIが自動生成し、回答への採点・解説も行う機能、仕事目的では必要な場面のシミュレーションをAIが行う機能など、拡張機能として実装できればと考えています。  
-また、旅行や買い物など、実際にありそうな場面に応じてAIがその場面をシミュレーションしてくれる機能も追加したいと考えています。
+Solo Chat Mode
+[![Image from Gyazo](https://i.gyazo.com/b44f9eba133ef7fd9d9c808a62f93492.gif)](https://gyazo.com/b44f9eba133ef7fd9d9c808a62f93492)
 
-## ユーザー層について
-老若男女、英語のレベルを問わず、英語力を向上させたい全ての人が対象です。  
-誰でも気軽に英語学習を始められるように設計しています。
+AI とのチャットボットです。英語と日本語を混ぜて会話を行う方式を採用しており、自然な会話のなかでユーザーの英語力が向上していくことを目指しています。
 
-## サービスの利用イメージ
-スマホやパソコンから、暇なときなどいつでもAIと英語で会話ができます。  
-日常的に英語でチャットすることで、知らず知らずのうちに英語力が向上していくイメージです。
+Rooms Mode
+[![Image from Gyazo](https://i.gyazo.com/0ddbb222020f6e05cc95e71d2617e3d4.gif)](https://gyazo.com/0ddbb222020f6e05cc95e71d2617e3d4)
 
-会話例  
-[![Image from Gyazo](https://i.gyazo.com/0a22da370392cc8771b3a049c8570a5e.png)](https://gyazo.com/0a22da370392cc8771b3a049c8570a5e)
+他のユーザーと英語でチャットを行うことができるモードです。ユーザーが送信したメッセージは自動で英語に翻訳され表示されます。各メッセージをクリックすると日本語訳をみることができます。
 
-## ユーザーの獲得について
-可能であれば、SNSの英語学習コミュニティに向けて発信したり、
-自分でブログやYouTubeを始めてそこでこのアプリの紹介をしたり、
-実際に友人や知人に使ってもらうことで、少しずつユーザーを広げていきたいと考えています。
+## モチベーション
+自分自身がChatGPTやその他のLLMをつかって英語の勉強をしています。多くのLLMは基本的に無料で使用できますが、１対１でナチュラルな英会話を行うことができ、翻訳等も即座に行ってくれるため英語学習に非常に適したツールであると思います。なのでこのLLMを使用した新しい英語の学習方式を多くの人に広めたいと思いました。
+
+（理想的には英語ネイティブのユーザーを増やすことで、単なる言語学習ではなく言語間の壁を取り除いた文化交流アプリのようなものをつくれたらよいと考えていましたが、実際にどうユーザーを増やせばよいか分からなかったため断念しています）
 
 ## サービスの差別化ポイント・推しポイント
 - AI（LLM）を中心的な役割として活用
-    - 翻訳タスクから派生したLLMは語学学習との相性が非常に良い
-    - 英語学習を通じてAIに親しむユーザーを広げたい（AIの民主化）
-    - 従来の英語教材ではコストがかかったものを自然な形で、極めて低コストで実装できるかもしれない（ユーザーごとに最適化された自然な会話体験、リアルタイムでのフィードバック・添削、実際の場面（旅行・仕事・買い物など）のシミュレーション等）
-- テスト形式ではなく自然な会話を通じて英語力が身につくようなアプリのデザイン
-    - 友達と話す感覚で学べるチャットボット形式
-    - ユーザーが積極的に英語でライティングできる設計（自分の言葉で表現することは単なるインプットよりもより深い理解につながるとされています）
-    - AIとの会話なので恥ずかしさや委縮を感じず自分のペースで学習できる（AIは優しいので英語に苦手意識のある人でも前向きに学習を続けられるかもしれない）
-- 基本的に無料で運用しようと考えていますが、OpenAI API等の料金がかかりすぎる場合には少額の課金形式にすることを考えています
+  - 翻訳タスクから派生したLLM (transformer) は語学学習との相性が非常に良いと思われる
+  - 従来の英語教材ではコストがかかったものを自然な形で、極めて低コストで実装できる（ユーザーごとに最適化された自然な会話体験、リアルタイムでのフィードバック・添削、実際の場面（旅行・仕事・買い物など）のシミュレーション等）
+  - 英語学習を通じてAIに親しむユーザーを広げたい（AIの民主化）
+- テスト等の形式ではなく自然な会話を通じて英語力が身につくようなアプリのデザイン
+  - 友達と話す感覚で学べるチャットボット形式
+  - Code-switching　（英語と日本語を混ぜた会話形式）の採用
+  - ユーザーが積極的に英語でライティングできる設計（自分の言葉で表現することは単なるインプットよりもより深い理解につながるとされている）
+  - AIとの会話なので恥ずかしさや委縮を感じず自分のペースで学習できる（AIは優しいので英語に苦手意識のある人でも前向きに学習を続けられるかもしれない）
+- Solo と Rooms ２つのメイン機能の実装
+  - 個人学習用と他のユーザーとのチャット用の２つのモードを並列して設けています。マイペースにAIと英語の学習をできる環境と、よりリアルな英会話を他のユーザーと体験できる環境をシームレスにつなげることを狙いとしています。
 
-## 機能候補
-MVP：AI英語会話アシスタントとのチャットボット。  
-ユーザーがメッセージを送ると、英語初心者でもわかるよう英語と日本語を混ぜた形式で返信し、
-ユーザーが送った英語の文章のより良い表現（伝わりやすく、ネイティブから見ても違和感がないようなもの）の提案も行ってくれる機能を実装予定です。
+## サービスの利用イメージ
+スマホやパソコンから、暇なときなどいつでも英語の勉強ができることを目指しています。  
+ユーザー層に関しては、英語の勉強をしたいないし英語でコミュニケーションをとりたい全ての層を可能な限り対象に含めたいと考えています。しかしユーザー間の英語力の差をどう埋めるかという問題はあります。
 
-本リリース：アプリとしての使いやすさを高めるため、ログイン機能や、ユーザーの英語レベルに応じてアシスタントの返答を調整する機能などを追加したいと考えています。  
-加えて、試験対策（TOEFL等の設問に準拠した問題生成・採点・解説）、仕事や旅行など実際の場面に応じたAIによるシミュレーション機能なども実装できればと考えています。
+## Technology Stack
 
-## 使用する技術スタック
-バックエンド：Node.js, Express  
-データベース：MongoDB  
-AI：OpenAI API  
-フロントエンド：React  
-開発環境：VS Code, Docker, GitHub, AWS（EC2等）
+### Core MERN Stack
+- **Node.js** - JavaScript runtime for server-side execution
+- **Express** - Web framework for building RESTful APIs and handling HTTP requests
+- **MongoDB Atlas** - Cloud-hosted NoSQL database for storing user data, chat history, and room information
+- **React** - Frontend library for building interactive user interfaces
+- **Vite** - Fast build tool and development server for React applications
 
-### 技術スタック選定に関する補足・懸念点
+### Development Environment
+- **VS Code** - Primary code editor with GitHub Copilot integration for AI-assisted coding
+- **Docker** - Containerization platform for consistent development and production environments
+- **GitHub** - Version control and source code repository  
+  Repository: https://github.com/u-cd/myFirstPersonalProject/tree/main
+- **AWS EC2** - Cloud server hosting the Dockerized application
 
-#### 懸念点
-- 未経験技術が多いため、完成までのハードルが高くなる可能性があります
-- 学習しなければならない内容が増え、MVP到達までに時間がかかる可能性があります
-- 不具合発生時に原因の特定が難しくなることがあります
-- タスクの見積もりが難しく、スケジュールが遅れるリスクがあります
+### AI & Services
+- **OpenAI API** - AI language model for English conversation and learning assistance
+  - Currently using `gpt-5-chat-latest`
+  - Flexible to adopt newer models in the future
+- **Supabase** - Backend-as-a-Service for user authentication and session management
+- **Cloudflare** - DNS management and CDN for improved performance and security  
+  Domain: https://aigooooo.com/
 
-#### 対応方針
-- MVP機能を最小限に絞り、まずは「AIとチャットできる」ことだけに集中します
-- まずは最小構成（Express + MongoDB）でシンプルなCRUD操作を実装し、基礎を固めます
-- フロントエンドは当面HTMLとバニラJavaScriptで進め、React/Svelteは後回しにします
-- チュートリアルや公式ドキュメントを活用し、段階的に理解を深めていきます
-- 各技術を個別に動作確認してから統合し、問題の切り分けをしやすくします
-- 必要に応じて技術面談で相談します
-- 1週間単位で小さな目標を設定し、進捗を確認しながら進めます
-- 1つ1つのタスクに対して目安の所要時間を振っていく形でスケジュールの調整を行います
-- 想定以上に時間がかかる場合は、技術選定の見直しも検討します
+### Testing
+- **Playwright** - End-to-end testing framework for automated browser testing
+- **Vitest** - Unit testing framework for React components and backend logic
 
-## 画面遷移図
-Figma：https://www.figma.com/board/P2QWX1Z0kuKyk7pWxFjvGb/Screen-transition-diagram?node-id=0-1&t=e7SoDy2GQPxRZXmq-1
+### Security
+- **GitHub Actions**: Automated security audits, CodeQL analysis, and Docker image scans on every push/PR and weekly.
+- **Dependabot**: Weekly npm and monthly GitHub Actions updates, with grouped PRs and security labels.
+- See [.github/workflows/security.yml](.github/workflows/security.yml) and [.github/dependabot.yml](.github/dependabot.yml) for details.
 
-## ER図
-[![Image from Gyazo](https://i.gyazo.com/dca0c4d4b9bd6e9a18ba41e2f9a7765e.png)](https://gyazo.com/dca0c4d4b9bd6e9a18ba41e2f9a7765e)
+## Project Structure
 
-### テーブル詳細
+```
+myFirstPersonalProject/
+├── src/
+│   ├── app.js                  # Express app configuration
+│   ├── index.js                # Server entry point
+│   ├── middleware/
+│   │   └── authenticate.js     # Supabase authentication middleware
+│   ├── routes/
+│   │   ├── chat.js            # Solo chat API endpoints
+│   │   └── room.js            # Group room API endpoints
+│   └── react/
+│       ├── App.jsx            # Main React component
+│       ├── supabase-config.js # Supabase client configuration
+│       └── components/        # React components (Login, ChatApp, Solo, Room, etc.)
+├── models/
+│   ├── Chat.js                # MongoDB chat schema
+│   ├── ChatMessage.js         # MongoDB message schema
+│   └── Room.js                # MongoDB room schema
+├── public/
+│   ├── dist/                  # Built React assets (generated by Vite)
+│   ├── terms-of-use.md       # Terms of Use document
+│   ├── privacy-policy.md     # Privacy Policy document
+│   └── welcom-message.md     # Welcome message for chat
+├── e2e/
+│   └── tests/                 # Playwright E2E tests
+├── vitest/                    # Vitest unit tests
+├── docker-compose.yml         # Docker Compose configuration
+├── Dockerfile                 # Docker image configuration
+├── vite.config.mjs           # Vite build configuration
+├── playwright.config.js      # Playwright test configuration
+├── vitest.config.js          # Vitest test configuration
+├── package.json              # Node.js dependencies
+└── README.md                 # Project documentation
+```
+
+## Development Workflow
+
+### Build Frontend
+```bash
+npx vite build
+```
+Compiles React application and outputs static files to `public/dist` directory.
+
+### Run with Docker
+```bash
+docker compose up --build
+```
+Builds Docker image and starts the server at `http://localhost:3000`.
+
+## Screen transition diagram
+[![Image from Gyazo](https://i.gyazo.com/1687d14d8b5d08ba805c10da6dd9ab11.png)](https://gyazo.com/1687d14d8b5d08ba805c10da6dd9ab11)
+
+## ER diagram
+[![Image from Gyazo](https://i.gyazo.com/78ccb8fa023d910faace40b3e1be405e.png)](https://gyazo.com/78ccb8fa023d910faace40b3e1be405e)
+
+### Table Details
 #### users
-ユーザー認証にはSupabaseを用いている為、Supabaseのuserオブジェクトの主な要素を書きます
-- id: ユーザーのユニークID
-- email: ユーザーのメールアドレス
-- app_metadata: プロバイダー情報を含むメタデータ（最初にサインアップに使用したプロバイダーや、ログインに使用できるプロバイダーのリスト等）
-- created_at: ユーザーが作成されたタイムスタンプ
-- last_sign_in_at: ユーザーが最後にサインインしたタイムスタンプ
+Supabase is used for user authentication, so the main elements of the Supabase user object are listed below:
+- id: Unique user ID
+- email: User's email address
+- created_at: Timestamp when the user was created
+- last_sign_in_at: Timestamp of the user's last sign-in
 
 #### chats
-チャット（セッション）のテーブル
-- _id: MongoDBで自動的に設定されるユニークID
-- userId: チャットを開始したユーザーのID
-- title: チャットのタイトル
-- timestamp: チャットの作成日時
+Solo chat table
+- _id:
+- userId: ID of the user
+- title: Chat title
+- timestamp: Chat creation timestamp
 
 #### chatMessages
-メッセージのテーブル
-- _id: MongoDBで自動的に設定されるユニークID
-- chatId: チャット（セッション）ID
-- userId: メッセージを送ったユーザーのID（Supabase のユーザーIDを使用）
-- role: OpenAI API にリクエストを送るときに使用される変数 (user or assistant)
-- content: メッセージの本文
-- timestamp: メッセージ送信日時
+Message table (shared by solo chat and rooms. For solo chat messages, roomId is null; for room messages, chatId is null)
+- _id:
+- chatId: Chat ID
+- roomId: Room ID
+- userId: ID of the user who sent the message (uses Supabase user ID)
+- role: Variable used when sending requests to the OpenAI API (user or assistant)
+- content: Message body
+- timestamp: Message sent timestamp
 
+#### rooms
+Room (group chat) table
+- _id:
+- name: Room name (max 100 characters)
+- description: Room description (max 500 characters, optional)
+- participants: Array of user IDs participating in the room (uses Supabase user IDs)
+- createdAt: Room creation timestamp
+- updatedAt: Room last updated timestamp
+- ownerId: User ID of the room creator (uses Supabase user ID)
+- settings: Room settings object (for future AI/room configuration, optional)
+- public: Public room flag (boolean, default: false)
+
+## License
+
+This repository is public for review and demonstration purposes only.  
+It is not open source and redistribution or reuse of the code is not permitted without permission.
