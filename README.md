@@ -6,13 +6,13 @@ ai語はチャット形式の英語学習アプリです。主に２つのモー
 
 ### Solo Chat Mode
 
-![Solo Chat Demo](public\readme_gif\solochat.gif)
+![Solo Chat Demo](public/readme_gif/solochat.gif)
 
 AI とのチャットボットです。英語と日本語を混ぜて会話を行う方式を採用しており、自然な会話のなかでユーザーの英語力が向上していくことを目指しています。
 
 ### Rooms Mode
 
-![Rooms Demo](public\readme_gif\rooms.gif)
+![Rooms Demo](public/readme_gif/rooms.gif)
 
 他のユーザーと英語でチャットを行うことができるモードです。ユーザーが送信したメッセージは自動で英語に翻訳され表示されます。各メッセージをクリックすると日本語訳をみることができます。
 
